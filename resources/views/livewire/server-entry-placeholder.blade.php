@@ -1,108 +1,62 @@
 @php
-    $backgroundImage = $server->icon ?? $server->egg->icon;
-    $serverEntryColumn = $column ?? \App\Filament\Components\Tables\Columns\ServerEntryColumn::make('server_entry');
+    use App\Enums\ServerResourceType;
+    use Wyvern\ServerCover;
+
+    $icon = $server->icon ?? $server->egg->icon;
 @endphp
 
-<div class="relative cursor-pointer"
+{{-- The same shape as the loaded card, so nothing jumps once the daemon answers. --}}
+<div class="wy-server-card wy-server-card-loading"
      x-on:click="{{ $component->redirectUrl() }}"
      x-on:auxclick.prevent="if ($event.button === 1) {{ $component->redirectUrl(true) }}">
-    <div class="absolute left-0 top-1 bottom-0 w-1 rounded-lg fi-color fi-color-warning fi-bg-color-600" style="background-color: var(--bg);"></div>
 
-    <div class="flex-1 dark:bg-gray-800 dark:text-white rounded-lg overflow-hidden p-3">
-        @if($backgroundImage)
-            <div style="
-                position: absolute;
-                inset: 0;
-                background: url('{{ $backgroundImage }}') right no-repeat;
-                background-size: contain;
-                opacity: 0.20;
-                max-width: 680px;
-                max-height: 140px;
-            "></div>
+    <div class="wy-server-card-cover" style="background: {{ ServerCover::gradient($server) }};">
+        @if ($icon)
+            <img src="{{ $icon }}" alt="" class="wy-server-card-emblem">
+        @else
+            <span class="wy-server-card-emblem wy-server-card-emblem-letter"
+                  style="color: {{ ServerCover::tint($server) }};">{{ Str::upper(Str::substr($server->name, 0, 2)) }}</span>
         @endif
 
-        <div @class([
-            'flex items-center gap-2',
-            'mb-5' => !$server->description,
-            ])>
+        <div class="wy-server-card-scrim"></div>
 
-            <x-filament::loading-indicator class="h-6 w-6" />
-            <h2 class="text-xl font-bold">
-                {{ $server->name }}
-                <span class="dark:text-gray-400">({{ trans('server/dashboard.loading') }})</span>
-            </h2>
+        <div class="wy-server-card-heading">
+            <div class="wy-server-card-identity">
+                <span class="wy-server-card-egg">{{ $server->egg->name }}</span>
+                <h2 class="wy-server-card-name">{{ $server->name }}</h2>
+            </div>
+            <span class="wy-server-card-state wy-server-card-state-pending">
+                <x-filament::loading-indicator class="h-3 w-3" />
+                {{ trans('server/dashboard.loading') }}
+            </span>
+        </div>
+    </div>
+
+    <div class="wy-server-card-body">
+        <div class="wy-server-card-address">
+            <span class="wy-server-card-host">{{ $server->allocation?->address ?? trans('server/dashboard.none') }}</span>
         </div>
 
         @if ($server->description)
-            <div class="text-left mb-1 ml-4 pl-4">
-                <p class="text-base dark:text-gray-400">{{ Str::limit($server->description, 40, preserveWords: true) }}</p>
-            </div>
+            <p class="wy-server-card-description">{{ Str::limit($server->description, 64, preserveWords: true) }}</p>
         @endif
 
-
-        <div class="flex justify-between text-center items-center gap-4">
-            <div>
-                @php
-                    $cpuCurrent = 0;
-                    $cpuMax = \App\Enums\ServerResourceType::CPULimit->getResourceAmount($server) ?: 100;
-                    $getState = fn() => $cpuCurrent;
-                    $getMaxValue = fn() => $cpuMax;
-                    $getProgressLabel = fn () => $server->formatResource(App\Enums\ServerResourceType::CPU, 0) . ' / ' . $server->formatResource(App\Enums\ServerResourceType::CPULimit, 0);
-                @endphp
-
-                @include('livewire.columns.progress-bar-column', [
-                    'getState' => $getState,
-                    'getMaxValue' => $getMaxValue,
-                    'getProgressLabel' => $getProgressLabel,
-                    'getProgressStatus' => fn() => 'success',
-                    'getProgressPercentage' => fn () => 0,
-                    'getProgressColor' => fn () => $serverEntryColumn->getProgressColorForStatus('success'),
-                ])
+        <div class="wy-server-card-stats">
+            <div class="wy-server-card-stat">
+                <span class="wy-server-card-stat-label">{{ trans('server/dashboard.cpu') }}</span>
+                <span class="wy-server-card-stat-value wy-server-card-stat-idle">&mdash;</span>
+                <span class="wy-server-card-meter"></span>
             </div>
-
-            <div>
-                @php
-                    $memCurrent = 0;
-                    $memMax = \App\Enums\ServerResourceType::MemoryLimit->getResourceAmount($server);
-                    $getState = fn() => $memCurrent;
-                    $getMaxValue = fn() => $memMax > 0 ? $memMax : null;
-                    $getProgressLabel = fn() => convert_bytes_to_readable($memCurrent) . ' / ' . ($memMax > 0 ? convert_bytes_to_readable($memMax) : "\u{221E}");
-                @endphp
-
-                @include('livewire.columns.progress-bar-column', [
-                    'getState' => $getState,
-                    'getMaxValue' => $getMaxValue,
-                    'getProgressLabel' => $getProgressLabel,
-                    'getProgressStatus' => fn() => 'success',
-                    'getProgressPercentage' => fn () => 0,
-                    'getProgressColor' => fn () => $serverEntryColumn->getProgressColorForStatus('success'),
-                ])
+            <div class="wy-server-card-stat">
+                <span class="wy-server-card-stat-label">{{ trans('server/dashboard.memory') }}</span>
+                <span class="wy-server-card-stat-value wy-server-card-stat-idle">&mdash;</span>
+                <span class="wy-server-card-meter"></span>
             </div>
-
-            <div>
-                @php
-                    $diskCurrent = 0;
-                    $diskMax = \App\Enums\ServerResourceType::DiskLimit->getResourceAmount($server);
-                    $getState = fn() => $diskCurrent;
-                    $getMaxValue = fn() => $diskMax > 0 ? $diskMax : null;
-                    $getProgressLabel = fn() => convert_bytes_to_readable($diskCurrent) . ' / ' . ($diskMax > 0 ? convert_bytes_to_readable($diskMax) : "\u{221E}");
-                @endphp
-
-                @include('livewire.columns.progress-bar-column', [
-                    'getState' => $getState,
-                    'getMaxValue' => $getMaxValue,
-                    'getProgressLabel' => $getProgressLabel,
-                    'getProgressStatus' => fn() => 'success',
-                    'getProgressPercentage' => fn () => 0,
-                    'getProgressColor' => fn () => $serverEntryColumn->getProgressColorForStatus('success'),
-                ])
-            </div>
-
-            <div class="hidden sm:block">
-                <p class="text-sm dark:text-gray-400">{{ trans('server/dashboard.network') }}</p>
-                <p class="text-md font-semibold">{{ $server->allocation?->address ?? trans('server/dashboard.none') }}</p>
+            <div class="wy-server-card-stat">
+                <span class="wy-server-card-stat-label">{{ trans('server/dashboard.disk') }}</span>
+                <span class="wy-server-card-stat-value wy-server-card-stat-idle">&mdash;</span>
+                <span class="wy-server-card-meter"></span>
             </div>
         </div>
     </div>
 </div>
-
