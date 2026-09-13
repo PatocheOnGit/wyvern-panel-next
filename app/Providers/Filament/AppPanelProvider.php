@@ -3,10 +3,12 @@
 namespace App\Providers\Filament;
 
 use App\Enums\TablerIcon;
+use App\Filament\Pages\Auth\EditProfile;
 use App\Services\Helpers\PluginService;
 use Boquizo\FilamentLogViewer\FilamentLogViewerPlugin;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
+use Filament\Navigation\NavigationItem;
 use Filament\Panel;
 
 class AppPanelProvider extends PanelProvider
@@ -17,8 +19,21 @@ class AppPanelProvider extends PanelProvider
             ->id('app')
             ->default()
             ->breadcrumbs(false)
-            ->navigation(false)
-            ->topbar(true)
+            ->sidebarCollapsibleOnDesktop()
+            ->navigationItems([
+                NavigationItem::make(fn () => trans('server/dashboard.title'))
+                    ->icon(TablerIcon::LayoutGrid)
+                    ->url(fn () => Filament::getPanel('app')->getUrl())
+                    ->isActiveWhen(fn () => request()->routeIs('filament.app.resources.*')),
+                NavigationItem::make(fn () => trans('profile.title'))
+                    ->icon(TablerIcon::UserCircle)
+                    ->url(fn () => EditProfile::getUrl(panel: 'app'))
+                    ->isActiveWhen(fn () => request()->routeIs('filament.app.auth.profile')),
+                NavigationItem::make(fn () => trans('profile.admin'))
+                    ->icon(TablerIcon::ArrowForward)
+                    ->url(fn () => Filament::getPanel('admin')->getUrl())
+                    ->visible(fn () => user()?->canAccessPanel(Filament::getPanel('admin')) ?? false),
+            ])
             ->userMenuItems([
                 Action::make('to_admin')
                     ->label(trans('profile.admin'))
