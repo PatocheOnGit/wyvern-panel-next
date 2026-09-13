@@ -78,23 +78,25 @@ Allocation IP is `0.0.0.0` with alias `localhost`, the same shape the Pterodacty
 setup needed: `127.0.0.1` makes Wings publish the game port on the docker bridge
 instead of somewhere Windows can reach.
 
-### One unexplained deletion
+### Power actions come from the panel, not from a bug
 
-The first attempt (`2dd3994a-…`) installed, booted and served on 25565, then was gone
-twenty minutes later: the server row, its volume and its egg row. Wings logged a stop
-and then destroyed its sinks, which is what it does when the panel says a server no
-longer exists.
+While the first server was being built, power events appeared that nothing in the
+setup scripts had sent. The activity log settles it:
 
-What the evidence rules out: `p:egg:check-updates` only writes a cache flag;
-`EggImporterService` updates an egg in place via `Egg::where('uuid', …)->first() ?? new
-Egg()` and never deletes; there were no failed queue jobs, and nothing in the Laravel
-log after 14:13. The activity log records the `power.start` but **no deletion event** —
-so whatever removed it did not go through a path the panel audits.
+    id 15  12:48:42  server:power.stop   actor=saintpatoche  ip=::1
+    id 14  12:43:51  server:file.read    actor=saintpatoche  file=eula.txt
+    id 13  12:39:42  server:power.start  actor=saintpatoche
 
-`servers.egg_id` is a foreign key onto `eggs`, so deleting an egg takes its servers
-with it. That is the mechanism; the trigger is still unknown. The rebuild
-(`13a038aa-…`) has been stable under observation. If it recurs, the thing to capture is
-who touched the Eggs resource in the admin area.
+Ethan was in the panel in his own browser at the same time. The nginx access log shows
+two Livewire sessions polling in parallel, his Chrome and the automation's.
+
+The first server (`2dd3994a-…`) went further than a stop: its row, its volume and its
+egg row all disappeared, and Wings destroyed its sinks. `servers.egg_id` is a foreign
+key onto `eggs`, so removing an egg from the admin area takes its servers with it.
+Egg and server deletion are not among the events Pelican writes to the activity log,
+which is why nothing was recorded. Worth remembering before blaming the scheduler:
+`p:egg:check-updates` only writes a cache flag, and `EggImporterService` updates an egg
+in place through `Egg::where('uuid', …)->first() ?? new Egg()` — neither deletes.
 
 ## Kept on purpose
 
