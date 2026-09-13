@@ -1,0 +1,116 @@
+/* Wyvern surface treatment.
+ *
+ * The palette arrives through PanelProvider::colors(), which Filament turns into
+ * --gray-*, --primary-* and friends. That already lands the page ground and the topbar
+ * on the right values, because Filament reads gray-950 for the body and gray-900 for
+ * raised chrome.
+ *
+ * What it cannot do is change the SHAPE of a surface. Filament outlines every card with
+ * `ring-1 ring-white/10`; the direction we settled on is borderless, carried by
+ * elevation instead. That is what this file is for, and it is deliberately the only
+ * place that reaches for !important — a ring utility composes into box-shadow, so
+ * replacing it means winning that one property outright.
+ *
+ * Loaded through the STYLES_AFTER render hook (see Wyvern\WyvernServiceProvider) so it
+ * lands after Filament's own sheet whatever order Vite emits.
+ */
+
+:root {
+    --wy-ground: #0B1017;
+    --wy-card: #141C26;
+    --wy-raised: #1B2530;
+    --wy-control: #1E2833;
+    --wy-hairline: rgba(255, 255, 255, 0.045);
+    --wy-lift: 0 10px 26px rgba(0, 0, 0, 0.38);
+    --wy-lift-sm: 0 6px 16px rgba(0, 0, 0, 0.3);
+
+    /* cards sit a touch softer than Filament's default 8px */
+    --radius-lg: 0.625rem;
+    --radius-xl: 0.75rem;
+}
+
+/* One light source, top-left, fixed so it does not swim while the page scrolls. */
+.fi-body {
+    background-image: radial-gradient(
+        ellipse 820px 520px at 18% -8%,
+        rgba(22, 184, 166, 0.10),
+        rgba(22, 184, 166, 0) 70%
+    );
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+}
+
+/* ---- chrome ---------------------------------------------------------- */
+
+.fi-topbar {
+    box-shadow: inset 0 -1px 0 var(--wy-hairline), 0 6px 20px rgba(0, 0, 0, 0.26) !important;
+}
+
+.fi-sidebar {
+    background-color: #0E141B;
+    box-shadow: inset -1px 0 0 var(--wy-hairline) !important;
+}
+
+.fi-sidebar-header {
+    box-shadow: none !important;
+    background-color: transparent !important;
+}
+
+.fi-sidebar-group-label {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+}
+
+/* The active item earns a gradient and a rail rather than a flat fill. */
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn,
+.fi-sidebar-item .fi-active.fi-sidebar-item-btn {
+    background-image: linear-gradient(90deg, rgba(22, 184, 166, 0.16), rgba(22, 184, 166, 0.03));
+    box-shadow: inset 2px 0 0 var(--primary-400);
+}
+
+/* ---- surfaces -------------------------------------------------------- */
+
+.fi-section,
+.fi-wi-chart,
+.fi-wi-stats-overview-stat,
+.fi-ta-ctn,
+.fi-fo-component-ctn > .fi-sc-component-ctn {
+    border-radius: var(--radius-lg);
+    box-shadow: inset 0 1px 0 var(--wy-hairline), var(--wy-lift) !important;
+}
+
+.fi-section-header,
+.fi-section-content-ctn {
+    border-color: transparent !important;
+}
+
+/* Tables keep their row rules — a borderless table is unreadable — but lose the outline. */
+.fi-ta-row {
+    border-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+.fi-ta-header-cell {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+}
+
+/* ---- controls -------------------------------------------------------- */
+
+.fi-input-wrp {
+    background-color: var(--wy-card);
+    box-shadow: inset 0 1px 0 var(--wy-hairline) !important;
+}
+
+.fi-btn.fi-color-primary {
+    background-image: linear-gradient(135deg, var(--primary-400), var(--primary-600));
+}
+
+/* Figures line up wherever they are stacked. */
+.fi-wi-stats-overview-stat-value,
+.fi-ta-text-item-label {
+    font-variant-numeric: tabular-nums;
+}

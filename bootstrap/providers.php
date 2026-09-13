@@ -15,6 +15,7 @@ use App\Providers\Filament\FilamentServiceProvider;
 use App\Providers\Filament\ServerPanelProvider;
 use App\Providers\RouteServiceProvider;
 use SocialiteProviders\Manager\ServiceProvider;
+use Wyvern\WyvernServiceProvider;
 
 return [
     ActivityLogServiceProvider::class,
@@ -32,4 +33,5 @@ return [
     ServerPanelProvider::class,
     RouteServiceProvider::class,
     ServiceProvider::class,
+    WyvernServiceProvider::class,
 ];

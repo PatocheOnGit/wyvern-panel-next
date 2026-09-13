@@ -5,8 +5,8 @@ namespace Wyvern;
 /**
  * The Wyvern palette, in the six roles Filament recognises.
  *
- * Slate carries every surface: 900 is the page ground, 800 cards, 700 raised, 600
- * hairlines, 500-300 text. Teal is the single accent — 400 reads on dark, 500 and
+ * Slate carries every surface: 950 is the page ground, 900 cards, 800 raised, 700
+ * controls, 600 the rare hairline, 500-200 text. Teal is the single accent — 400 reads on dark, 500 and
  * darker carry white text where 400 would fail contrast. Red, green and yellow are
  * status only and follow the same split.
  */
@@ -15,15 +15,15 @@ final class WyvernTheme
     public const SLATE = [
         50 => '#F7F9FB',
         100 => '#EDF1F5',
-        200 => '#E4E9EF',
-        300 => '#A5B1BF',
-        400 => '#8C99A8',
-        500 => '#7A8794',
-        600 => '#273241',
+        200 => '#E8EDF3',
+        300 => '#C7D3DF',
+        400 => '#9FAEBE',
+        500 => '#6E7E8F',
+        600 => '#2E3E4E',
         700 => '#1E2833',
-        800 => '#161E28',
-        900 => '#0E141B',
-        950 => '#080C11',
+        800 => '#1B2530',
+        900 => '#141C26',
+        950 => '#0B1017',
     ];
 
     public const TEAL = [
