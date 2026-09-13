@@ -62,6 +62,22 @@ Also deleted: upstream's community process files — funding, issue templates, t
 and its workflow, bounties, contributing and security. They describe Pelican's
 project, not ours.
 
+## First server
+
+| | |
+|---|---|
+| Name | Paper 26.2 |
+| Egg | Paper, imported from `pelican-eggs/minecraft` (no eggs ship seeded) |
+| UUID | `2dd3994a-11e0-4cdb-b350-3744f0e07ad1` |
+| Version | Paper 26.2-123 on Minecraft 26.2, Java 25 |
+| Address | `0.0.0.0:25565`, alias `localhost` |
+| Limits | 4096 MB memory, 10240 MB disk, CPU unmetered |
+| EULA | accepted — `eula.txt` written into the volume |
+
+Allocation IP is `0.0.0.0` with alias `localhost`, the same shape the Pterodactyl
+setup needed: `127.0.0.1` makes Wings publish the game port on the docker bridge
+instead of somewhere Windows can reach.
+
 ## Kept on purpose
 
 - Database `wyvern` — the old Pterodactyl data, 1.5 MB.
