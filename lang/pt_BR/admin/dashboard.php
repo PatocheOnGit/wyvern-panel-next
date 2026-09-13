@@ -30,8 +30,8 @@ return [
             'button_label' => 'Criar o primeiro nó',
         ],
         'intro-support' => [
-            'heading' => 'Apoie o Pelican',
-            'content' => 'Obrigado por usar o Pelican, isso só foi possível através do apoio de vocês, dos nossos colaboradores e dos nossos apoiadores!',
+            'heading' => 'Apoie o Wyvern',
+            'content' => 'Obrigado por usar o Wyvern, isso só foi possível através do apoio de vocês, dos nossos colaboradores e dos nossos apoiadores!',
             'extra_note' => 'Apreciamos todo e qualquer apoio de qualquer um.',
             'button_translate' => 'Ajudar na Tradução',
             'button_donate' => 'Doar Diretamente',

@@ -46,10 +46,10 @@ abstract class PanelProvider extends BasePanelProvider
                 url: fn () => Vite::asset('resources/css/wyvern.css'),
                 provider: LocalFontProvider::class,
             )
-            ->brandName(config('app.name', 'Pelican'))
+            ->brandName(config('app.name', 'Wyvern'))
             ->brandLogo(config('app.logo'))
             ->brandLogoHeight('2rem')
-            ->favicon(config('app.favicon', '/pelican.ico'))
+            ->favicon(config('app.favicon', '/wyvern/mark.svg'))
             ->topNavigation(function () {
                 $navigationType = user()?->getCustomization(CustomizationKey::TopNavigation);
 

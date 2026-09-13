@@ -122,7 +122,7 @@ return [
         'include_logs' => 'Includi i log',
         'include_logs_hint' => 'Includendo i log verranno mostrati quelli recenti, aiutando a individuare eventuali problemi.',
         'run_diagnostics' => 'Esegui la diagnostica',
-        'upload_to_pelican' => 'Carica Logs',
+        'upload_to_wyvern' => 'Carica Logs',
         'logs_pulled' => 'Log Scaricati!',
         'logs_uploaded' => 'Log Caricati',
         'upload_failed' => 'Caricamento dei Log Non Riuscito',

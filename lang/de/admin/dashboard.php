@@ -30,8 +30,8 @@ return [
             'button_label' => 'Erste Node erstellen',
         ],
         'intro-support' => [
-            'heading' => 'Pelican unterstützen',
-            'content' => 'Vielen Dank für die Verwendung von Pelican, dies konnte nur durch die Unterstützung von Ihnen, unseren Mitwirkenden und den Rest unserer Unterstützer erreicht werden!',
+            'heading' => 'Wyvern unterstützen',
+            'content' => 'Vielen Dank für die Verwendung von Wyvern, dies konnte nur durch die Unterstützung von Ihnen, unseren Mitwirkenden und den Rest unserer Unterstützer erreicht werden!',
             'extra_note' => 'Wir freuen uns über jede Unterstützung.',
             'button_translate' => 'Beim Übersetzen helfen',
             'button_donate' => 'Direkt spenden',

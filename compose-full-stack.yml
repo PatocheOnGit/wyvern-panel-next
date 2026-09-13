@@ -26,7 +26,7 @@ x-common:
     MYSQL_ROOT_PASSWORD: "SUPERNEEDSTOCHANGE"
     MYSQL_PASSWORD: &db-password "NEEDSTOCHANGE"
     MYSQL_DATABASE: &db-database "panel"
-    MYSQL_USER: &db-username "pelican"
+    MYSQL_USER: &db-username "wyvern"
 
 #
 # ------------------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ services:
     restart: always
     command: --default-authentication-plugin=mysql_native_password
     volumes:
-      - pelican-db:/var/lib/mysql
+      - wyvern-db:/var/lib/mysql
     environment:
       <<: *db-environment
 
@@ -51,7 +51,7 @@ services:
     restart: always
 
   panel:
-    image: ghcr.io/pelican/panel:latest
+    image: ghcr.io/wyvern/panel:latest
     build: .
     restart: unless-stopped
     networks:
@@ -67,16 +67,16 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway" # shows the panel on the internal docker network as well. usually '172.17.0.1'
     volumes:
-      - pelican-data:/pelican-data
-      - pelican-logs:/var/www/html/storage/logs
+      - wyvern-data:/wyvern-data
+      - wyvern-logs:/var/www/html/storage/logs
       - type: volume
-        source: pelican-data
+        source: wyvern-data
         target: /var/www/html/plugins
         volume:
           subpath: plugins
     environment:
       <<: [*panel-environment, *mail-environment]
-      XDG_DATA_HOME: /pelican-data
+      XDG_DATA_HOME: /wyvern-data
       # SKIP_CADDY: true # enable when not using caddy.
       CACHE_STORE: "redis"
       SESSION_DRIVER: "redis"
@@ -90,9 +90,9 @@ services:
       DB_PASSWORD: *db-password
 
 volumes:
-  pelican-data:
-  pelican-logs:
-  pelican-db:
+  wyvern-data:
+  wyvern-logs:
+  wyvern-db:
 
 networks:
   default:

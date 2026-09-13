@@ -137,7 +137,7 @@ return [
         'include_logs_hint' => 'Including logs will show recent logs and help track down possible issues.',
         'log_lines' => 'Log Lines',
         'run_diagnostics' => 'Run Diagnostics',
-        'upload_to_pelican' => 'Upload Logs',
+        'upload_to_wyvern' => 'Upload Logs',
         'logs_pulled' => 'Logs Pulled!',
         'logs_uploaded' => 'Logs Uploaded',
         'upload_failed' => 'Logs Upload Failed',

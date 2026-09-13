@@ -122,7 +122,7 @@ return [
         'include_logs' => 'Protokolle einschließen',
         'include_logs_hint' => 'Durch das Einschließen der Protokolle werden die letzten Protokolleinträge angezeigt und mögliche Probleme können leichter aufgespürt werden.',
         'run_diagnostics' => 'Diagnose durchführen',
-        'upload_to_pelican' => 'Protokolle hochladen',
+        'upload_to_wyvern' => 'Protokolle hochladen',
         'logs_pulled' => 'Protokolle abgerufen!',
         'logs_uploaded' => 'Protokolle hochgeladen',
         'upload_failed' => 'Hochladen der Protokolle fehlgeschlagen',

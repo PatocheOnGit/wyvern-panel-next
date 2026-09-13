@@ -21,7 +21,7 @@ return [
         ],
         'intro-no-update' => [
             'heading' => 'A Panel naprakész',
-            'content' => 'A Pelicanod :version verzióját futtatja. A paneled naprakész!',
+            'content' => 'A Wyvernod :version verzióját futtatja. A paneled naprakész!',
         ],
         'intro-first-node' => [
             'heading' => 'Nincs észlelt csomópont',
@@ -30,8 +30,8 @@ return [
             'button_label' => 'Hozd létre az első Node-ot',
         ],
         'intro-support' => [
-            'heading' => 'Pelican támogatása',
-            'content' => 'Köszönjük, hogy használja a Pelicant, ezt csak az Ön és a támogatóink segítségével tudtuk elérni!',
+            'heading' => 'Wyvern támogatása',
+            'content' => 'Köszönjük, hogy használja a Wyvernt, ezt csak az Ön és a támogatóink segítségével tudtuk elérni!',
             'extra_note' => 'Nagyra értékelünk minden támogatást bárkitől.',
             'button_translate' => 'Segítség a fordításhoz',
             'button_donate' => 'Közvetlen adományozás',

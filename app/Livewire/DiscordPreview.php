@@ -111,8 +111,8 @@ class DiscordPreview extends Component
             'link' => fn ($href, $child) => $href ? "<a href=\"$href\" target=\"_blank\" class=\"link\">$child</a>" : $child,
             'content' => null,
             'sender' => [
-                'name' => 'Pelican',
-                'avatar' => asset('pelican.svg'),
+                'name' => 'Wyvern',
+                'avatar' => asset('wyvern/mark.svg'),
             ],
             'embeds' => [],
             'getTime' => fn () => now()->format('H:i'),
@@ -140,8 +140,8 @@ class DiscordPreview extends Component
             'link' => fn ($href, $child) => $href ? "<a href=\"$href\" target=\"_blank\" class=\"link\">$child</a>" : $child,
             'content' => data_get($data, 'content'),
             'sender' => [
-                'name' => filled(data_get($data, 'username')) ? data_get($data, 'username') : 'Pelican',
-                'avatar' => filled(data_get($data, 'avatar_url')) ? data_get($data, 'avatar_url') : asset('pelican.svg'),
+                'name' => filled(data_get($data, 'username')) ? data_get($data, 'username') : 'Wyvern',
+                'avatar' => filled(data_get($data, 'avatar_url')) ? data_get($data, 'avatar_url') : asset('wyvern/mark.svg'),
             ],
             'embeds' => $this->processEmbeds(data_get($data, 'embeds', [])),
             'getTime' => fn () => now()->format('H:i'),

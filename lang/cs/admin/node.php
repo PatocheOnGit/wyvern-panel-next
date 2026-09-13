@@ -122,7 +122,7 @@ return [
         'include_logs' => 'Zahrnout logy',
         'include_logs_hint' => 'Včetně protokolů zobrazí poslední logy a pomůže sledovat možné problémy.',
         'run_diagnostics' => 'Spustit diagnostiku',
-        'upload_to_pelican' => 'Nahrát logy',
+        'upload_to_wyvern' => 'Nahrát logy',
         'logs_pulled' => 'Záznamy staženy!',
         'logs_uploaded' => 'Logy Nahrány',
         'upload_failed' => 'Nahrávání protokolů se nezdařilo',

@@ -50,12 +50,12 @@ class DatabaseStep
                             case 'mariadb':
                             case 'mysql':
                                 $set('env_database.DB_HOST', $get('env_database.DB_HOST') ?? '127.0.0.1');
-                                $set('env_database.DB_USERNAME', $get('env_database.DB_USERNAME') ?? 'pelican');
+                                $set('env_database.DB_USERNAME', $get('env_database.DB_USERNAME') ?? 'wyvern');
                                 $set('env_database.DB_PORT', '3306');
                                 break;
                             case 'pgsql':
                                 $set('env_database.DB_HOST', $get('env_database.DB_HOST') ?? '127.0.0.1');
-                                $set('env_database.DB_USERNAME', $get('env_database.DB_USERNAME') ?? 'pelican');
+                                $set('env_database.DB_USERNAME', $get('env_database.DB_USERNAME') ?? 'wyvern');
                                 $set('env_database.DB_PORT', '5432');
                                 break;
                         }
@@ -83,7 +83,7 @@ class DatabaseStep
                     ->hidden(fn (Get $get) => $get('env_database.DB_CONNECTION') === 'sqlite'),
                 TextInput::make('env_database.DB_USERNAME')
                     ->label(trans('installer.database.fields.username'))
-                    ->placeholder('pelican')
+                    ->placeholder('wyvern')
                     ->hintIcon(TablerIcon::QuestionMark, trans('installer.database.fields.username_help'))
                     ->required(fn (Get $get) => $get('env_database.DB_CONNECTION') !== 'sqlite')
                     ->hidden(fn (Get $get) => $get('env_database.DB_CONNECTION') === 'sqlite'),

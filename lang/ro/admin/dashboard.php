@@ -30,8 +30,8 @@ return [
             'button_label' => 'Crează primul node',
         ],
         'intro-support' => [
-            'heading' => 'Susține Pelican',
-            'content' => 'Vă mulţumim că utilizaţi Pelican, acest lucru poate fi realizat doar prin sprijinul dumneavoastră, al contribuitorilor noştri şi al celorlalţi susţinători ai noştri!',
+            'heading' => 'Susține Wyvern',
+            'content' => 'Vă mulţumim că utilizaţi Wyvern, acest lucru poate fi realizat doar prin sprijinul dumneavoastră, al contribuitorilor noştri şi al celorlalţi susţinători ai noştri!',
             'extra_note' => 'Apreciem orice sprijin din partea oricui.',
             'button_translate' => 'Ajută la traducere',
             'button_donate' => 'Donează direct',

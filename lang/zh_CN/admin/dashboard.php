@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'heading' => '欢迎来到Pelican！',
+    'heading' => '欢迎来到Wyvern！',
     'version' => '版本: :version',
     'advanced' => '高级',
     'server' => '服务器',
@@ -21,17 +21,17 @@ return [
         ],
         'intro-no-update' => [
             'heading' => '您的面板是最新的',
-            'content' => '您正运行的 Pelican 版本为 :version。您的面板目前是最新的！',
+            'content' => '您正运行的 Wyvern 版本为 :version。您的面板目前是最新的！',
         ],
         'intro-first-node' => [
             'heading' => '侦测不到任何节点',
             'content' => '看起来您还没有设置任何节点，但不用担心，因为您可以点击操作按钮来创建第一个节点！',
             'extra_note' => '如果您遇到任何问题，请在GitHub上报告它们。',
-            'button_label' => '在Pelican建立第一个节点',
+            'button_label' => '在Wyvern建立第一个节点',
         ],
         'intro-support' => [
-            'heading' => '支持Pelican',
-            'content' => '感谢您使用Pelican！这得益于您的支持、我们贡献者的努力以及所有支持者的帮助。',
+            'heading' => '支持Wyvern',
+            'content' => '感谢您使用Wyvern！这得益于您的支持、我们贡献者的努力以及所有支持者的帮助。',
             'extra_note' => '我们感谢任何人的任何支持。',
             'button_translate' => '协助翻译',
             'button_donate' => '支持此项目',

@@ -125,7 +125,7 @@ return [
         'include_logs_hint' => '包含日誌將顯示近期日誌，並有助於追蹤可能的問題。',
         'log_lines' => '日誌行數',
         'run_diagnostics' => '執行診斷',
-        'upload_to_pelican' => '上傳日誌',
+        'upload_to_wyvern' => '上傳日誌',
         'logs_pulled' => '已提取日誌！',
         'logs_uploaded' => '已上傳日誌',
         'upload_failed' => '上傳日誌失敗',

@@ -2,9 +2,9 @@
 
 return [
 
-    'name' => env('APP_NAME', 'Pelican'),
+    'name' => env('APP_NAME', 'Wyvern'),
     'logo' => env('APP_LOGO'),
-    'favicon' => env('APP_FAVICON', '/pelican.ico'),
+    'favicon' => env('APP_FAVICON', '/wyvern/mark.svg'),
 
     'version' => 'canary',
 

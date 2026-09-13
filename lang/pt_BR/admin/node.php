@@ -122,7 +122,7 @@ return [
         'include_logs' => 'Incluir registros',
         'include_logs_hint' => 'Incluindo os logs mostrará logs recentes e ajudará a rastrear possíveis problemas.',
         'run_diagnostics' => 'Executar diagnósticos',
-        'upload_to_pelican' => 'Enviar arquivos de log',
+        'upload_to_wyvern' => 'Enviar arquivos de log',
         'logs_pulled' => 'Logs extraidos!',
         'logs_uploaded' => 'Logs enviados',
         'upload_failed' => 'Falha no envio de logs',

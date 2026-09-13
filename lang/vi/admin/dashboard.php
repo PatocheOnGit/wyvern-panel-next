@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'heading' => 'Chào mừng bạn đến với Pelican!',
+    'heading' => 'Chào mừng bạn đến với Wyvern!',
     'version' => 'Phiên bản: :version',
     'advanced' => 'Nâng cao',
     'server' => 'Máy chủ',
@@ -27,11 +27,11 @@ return [
             'heading' => 'Không phát hiện thấy nhánh nào',
             'content' => 'Có vẻ như bạn chưa thiết lập bất kỳ Nhánh nào, nhưng đừng lo lắng vì bạn đã nhấp vào nút hành động để tạo Nhánh đầu tiên!',
             'extra_note' => 'Nếu bạn gặp bất kỳ sự cố nào, vui lòng báo cáo trên GitHub.',
-            'button_label' => 'Tạo Nhánh đầu tiên trong Pelican',
+            'button_label' => 'Tạo Nhánh đầu tiên trong Wyvern',
         ],
         'intro-support' => [
-            'heading' => 'Hỗ trợ Pelican',
-            'content' => 'Cảm ơn bạn đã sử dụng Pelican, thành quả này chỉ có thể đạt được nhờ sự hỗ trợ của bạn, những người đóng góp và những người ủng hộ khác!',
+            'heading' => 'Hỗ trợ Wyvern',
+            'content' => 'Cảm ơn bạn đã sử dụng Wyvern, thành quả này chỉ có thể đạt được nhờ sự hỗ trợ của bạn, những người đóng góp và những người ủng hộ khác!',
             'extra_note' => 'Chúng tôi trân trọng tất cả sự hỗ trợ từ mọi người.',
             'button_translate' => 'Giúp phiên dịch',
             'button_donate' => 'Ủng hộ trực tiếp',

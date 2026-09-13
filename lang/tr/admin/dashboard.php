@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'heading' => 'Pelican\'a Hoş Geldiniz!',
+    'heading' => 'Wyvern\'a Hoş Geldiniz!',
     'version' => 'Sürüm: :version',
     'advanced' => 'Gelişmiş',
     'server' => 'Sunucu',
@@ -27,11 +27,11 @@ return [
             'heading' => 'Hiç Düğüm Algılanmadı',
             'content' => 'Görünüşe göre henüz herhangi bir Düğüm ayarlamadınız, ancak endişelenmeyin çünkü ilk düğümünüzü oluşturmak için eylem düğmesine tıklayabilirsiniz!',
             'extra_note' => 'Herhangi bir sorunla karşılaşırsanız, lütfen GitHub üzerinde bildirin.',
-            'button_label' => 'Pelican\'da İlk Düğümü Oluştur',
+            'button_label' => 'Wyvern\'da İlk Düğümü Oluştur',
         ],
         'intro-support' => [
-            'heading' => 'Pelican\'ı Destekleyin',
-            'content' => 'Pelican\'ı kullandığınız için teşekkür ederiz, bu yalnızca sizin, katkıda bulunanlarımızın ve diğer destekçilerimizin desteğiyle başarılabildi!',
+            'heading' => 'Wyvern\'ı Destekleyin',
+            'content' => 'Wyvern\'ı kullandığınız için teşekkür ederiz, bu yalnızca sizin, katkıda bulunanlarımızın ve diğer destekçilerimizin desteğiyle başarılabildi!',
             'extra_note' => 'Her türlü desteği takdir ediyoruz.',
             'button_translate' => 'Çeviriye Yardım Et',
             'button_donate' => 'Doğrudan Bağış Yap',

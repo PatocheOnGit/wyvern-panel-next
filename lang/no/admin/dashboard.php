@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'heading' => 'Velkommen til Pelican!',
+    'heading' => 'Velkommen til Wyvern!',
     'version' => 'Versjon: :version',
     'advanced' => 'Avansert',
     'server' => 'Server',
@@ -27,11 +27,11 @@ return [
             'heading' => 'Ingen noder oppdaget',
             'content' => 'Det ser ut til at du ikke har satt opp noen noder ennå, men ikke bekymre deg! Klikk på handlingsknappen for å opprette din første node.',
             'extra_note' => 'Hvis du støter på problemer, vennligst rapporter dem på GitHub.',
-            'button_label' => 'Opprett første node i Pelican',
+            'button_label' => 'Opprett første node i Wyvern',
         ],
         'intro-support' => [
-            'heading' => 'Støtt Pelican',
-            'content' => 'Takk for at du bruker Pelican! Dette har kun vært mulig gjennom støtten fra deg, våre bidragsytere og resten av våre støttespillere!',
+            'heading' => 'Støtt Wyvern',
+            'content' => 'Takk for at du bruker Wyvern! Dette har kun vært mulig gjennom støtten fra deg, våre bidragsytere og resten av våre støttespillere!',
             'extra_note' => 'Vi setter pris på all støtte fra hvem som helst.',
             'button_translate' => 'Hjelp med oversettelse',
             'button_donate' => 'Donér direkte',

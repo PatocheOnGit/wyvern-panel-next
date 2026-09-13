@@ -21,7 +21,7 @@ return [
         ],
         'intro-no-update' => [
             'heading' => 'Votre panneau est à jour',
-            'content' => 'Vous utilisez la version :version de Pelican. Votre panel est à jour !',
+            'content' => 'Vous utilisez la version :version de Wyvern. Votre panel est à jour !',
         ],
         'intro-first-node' => [
             'heading' => 'Aucun nœud détecté',
@@ -30,8 +30,8 @@ return [
             'button_label' => 'Créer un premier nœud',
         ],
         'intro-support' => [
-            'heading' => 'Soutenir Pelican',
-            'content' => 'Merci d\'utiliser Pelican, cela n\'aurait pas été possible sans votre soutien, celui de nos contributeurs, et de tous nos autres partisans !',
+            'heading' => 'Soutenir Wyvern',
+            'content' => 'Merci d\'utiliser Wyvern, cela n\'aurait pas été possible sans votre soutien, celui de nos contributeurs, et de tous nos autres partisans !',
             'extra_note' => 'Nous apprécions tout soutien, quel qu\'il soit, de la part de tout le monde.',
             'button_translate' => 'Aider à traduire',
             'button_donate' => 'Faire un don',

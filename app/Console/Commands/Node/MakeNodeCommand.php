@@ -62,7 +62,7 @@ class MakeNodeCommand extends Command
         $data['daemon_connect'] = $this->option('daemonConnectingPort') ?? $this->ask(trans('commands.make_node.daemonConnect'), '8080');
         $data['daemon_sftp'] = $this->option('daemonSFTPPort') ?? $this->ask(trans('commands.make_node.daemonSFTP'), '2022');
         $data['daemon_sftp_alias'] = $this->option('daemonSFTPAlias') ?? $this->ask(trans('commands.make_node.daemonSFTPAlias'), '');
-        $data['daemon_base'] = $this->option('daemonBase') ?? $this->ask(trans('commands.make_node.daemonBase'), '/var/lib/pelican/volumes');
+        $data['daemon_base'] = $this->option('daemonBase') ?? $this->ask(trans('commands.make_node.daemonBase'), '/var/lib/wyvern/volumes');
 
         $node = Node::create($data);
         $this->line(trans('commands.make_node.success', ['name' => $data['name'], 'id' => $node->id]));

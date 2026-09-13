@@ -4,6 +4,6 @@ namespace App\Enums;
 
 enum CustomRenderHooks: string
 {
-    case FooterStart = 'pelican::footer.start';
-    case FooterEnd = 'pelican::footer.end';
+    case FooterStart = 'wyvern::footer.start';
+    case FooterEnd = 'wyvern::footer.end';
 }

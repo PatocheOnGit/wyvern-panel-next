@@ -15,7 +15,7 @@
             <div class="dc-msg-body">
                 {{-- Meta row --}}
                 <div class="dc-meta">
-                    <span class="dc-username">{{ $sender['name'] ?? 'Pelican' }}</span>
+                    <span class="dc-username">{{ $sender['name'] ?? 'Wyvern' }}</span>
                     @if (!($sender['human'] ?? false))
                         <span class="dc-bot-tag">app</span>
                     @endif

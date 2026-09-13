@@ -122,7 +122,7 @@ return [
         'include_logs' => '包括日志',
         'include_logs_hint' => '包括日志将显示最近的日志，并有助于追踪可能的问题。',
         'run_diagnostics' => '运行诊断程序',
-        'upload_to_pelican' => '上传日志',
+        'upload_to_wyvern' => '上传日志',
         'logs_pulled' => '日志已拉取！',
         'logs_uploaded' => '已上传日志',
         'upload_failed' => '日志上传失败',

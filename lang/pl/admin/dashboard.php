@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'heading' => 'Witaj w Pelican!',
+    'heading' => 'Witaj w Wyvern!',
     'version' => 'Wersja: :version',
     'advanced' => 'Zaawansowane',
     'server' => 'Serwer',
@@ -21,17 +21,17 @@ return [
         ],
         'intro-no-update' => [
             'heading' => 'Twój Panel jest aktualny',
-            'content' => 'Używasz Pelican w wersji :version. Twój panel jest aktualny!',
+            'content' => 'Używasz Wyvern w wersji :version. Twój panel jest aktualny!',
         ],
         'intro-first-node' => [
             'heading' => 'Nie wykryto żadnych węzłów',
             'content' => 'Wygląda na to, że nie masz jeszcze skonfigurowanych żadnych węzłów, ale nie martw się, ponieważ wystarczy, że klikniesz przycisk akcji, aby utworzyć swój pierwszy węzeł!',
             'extra_note' => 'Jeśli napotkasz jakieś problemy, zgłoś je na GitHubie.',
-            'button_label' => 'Stwórz pierwszy węzeł w Pelican',
+            'button_label' => 'Stwórz pierwszy węzeł w Wyvern',
         ],
         'intro-support' => [
-            'heading' => 'Wspomóż Pelican',
-            'content' => 'Dziękujemy za korzystanie z Pelican, jest to możliwe jedynie dzięki waszemu wsparciu, naszym współtwórcom i pozostałym naszym zwolennikom!',
+            'heading' => 'Wspomóż Wyvern',
+            'content' => 'Dziękujemy za korzystanie z Wyvern, jest to możliwe jedynie dzięki waszemu wsparciu, naszym współtwórcom i pozostałym naszym zwolennikom!',
             'extra_note' => 'Doceniamy wszelkie wsparcie ze strony każdego.',
             'button_translate' => 'Pomóż w tłumaczeniu',
             'button_donate' => 'Darowizna',

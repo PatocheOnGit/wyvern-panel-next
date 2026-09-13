@@ -30,8 +30,8 @@ return [
             'button_label' => '建立第一個節點',
         ],
         'intro-support' => [
-            'heading' => '支持 Pelican',
-            'content' => '感謝您使用 Pelican，這一切都要歸功於您、我們的貢獻者以及所有支持者的幫助！',
+            'heading' => '支持 Wyvern',
+            'content' => '感謝您使用 Wyvern，這一切都要歸功於您、我們的貢獻者以及所有支持者的幫助！',
             'extra_note' => '我們感謝任何人提供的任何支持。',
             'button_translate' => '協助翻譯',
             'button_donate' => '直接贊助',

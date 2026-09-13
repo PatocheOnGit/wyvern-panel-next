@@ -40,7 +40,6 @@ use Filament\Schemas\Schema;
 use Filament\Support\Enums\Alignment;
 use Filament\Support\RawJs;
 use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\HtmlString;
 use Phiki\Grammar\Grammar;
 
@@ -338,7 +337,7 @@ class EditNode extends EditRecord
                         ->suffix(config('panel.use_binary_prefix') ? 'MiB' : 'MB'),
                     TextInput::make('daemon_base')
                         ->label(trans('admin/node.daemon_base'))
-                        ->placeholder('/var/lib/pelican/volumes')
+                        ->placeholder('/var/lib/wyvern/volumes')
                         ->hintIcon(TablerIcon::QuestionMark, trans('admin/node.daemon_base_help'))
                         ->columnSpan([
                             'default' => 1,
@@ -580,7 +579,7 @@ class EditNode extends EditRecord
                         ->columnSpanFull()
                         ->state(new HtmlString(trans('admin/node.instructions_help'))),
                     CodeEntry::make('config')
-                        ->label('/etc/pelican/config.yml')
+                        ->label('/etc/wyvern/config.yml')
                         ->grammar(Grammar::Yaml)
                         ->state(fn (Node $node) => $node->getYamlConfiguration())
                         ->copyable()
@@ -701,54 +700,6 @@ class EditNode extends EditRecord
                                             ->danger()
                                             ->send();
 
-                                    }
-                                }),
-                            Action::make('upload')
-                                ->tooltip(trans('admin/node.diagnostics.upload'))
-                                ->visible(fn (Get $get) => $get('pulled') ?? false)
-                                ->icon(TablerIcon::CloudUpload)
-                                ->action(function (Get $get, Set $set) {
-                                    try {
-                                        $response = Http::asMultipart()
-                                            ->attach('c', $get('log'))
-                                            ->attach('e', '14d')
-                                            ->post('https://logs.pelican.dev');
-
-                                        if ($response->failed()) {
-                                            Notification::make()
-                                                ->title(trans('admin/node.diagnostics.upload_failed'))
-                                                ->body(fn () => $response->status() . ' - ' . $response->body())
-                                                ->danger()
-                                                ->send();
-
-                                            return;
-                                        }
-
-                                        $data = $response->json();
-                                        $url = $data['url'];
-
-                                        Notification::make()
-                                            ->title(trans('admin/node.diagnostics.logs_uploaded'))
-                                            ->body("{$url}")
-                                            ->success()
-                                            ->actions([
-                                                Action::make('exclude_viewLogs')
-                                                    ->label(trans('admin/node.diagnostics.view_logs'))
-                                                    ->url($url)
-                                                    ->openUrlInNewTab(true),
-                                            ])
-                                            ->persistent()
-                                            ->send();
-                                        $set('log', $url);
-                                        $set('pulled', false);
-                                        $set('uploaded', true);
-
-                                    } catch (Exception $e) {
-                                        Notification::make()
-                                            ->title(trans('admin/node.diagnostics.upload_failed'))
-                                            ->body($e->getMessage())
-                                            ->danger()
-                                            ->send();
                                     }
                                 }),
                             Action::make('clear')

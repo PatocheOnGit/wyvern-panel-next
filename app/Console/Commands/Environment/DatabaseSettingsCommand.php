@@ -80,7 +80,7 @@ class DatabaseSettingsCommand extends Command
             $this->output->note(trans('commands.database_settings.DB_USERNAME_note'));
             $this->variables['DB_USERNAME'] = $this->option('username') ?? $this->ask(
                 'Database Username',
-                config('database.connections.mysql.username', 'pelican')
+                config('database.connections.mysql.username', 'wyvern')
             );
 
             $askForMySQLPassword = true;
@@ -140,7 +140,7 @@ class DatabaseSettingsCommand extends Command
             $this->output->note(trans('commands.database_settings.DB_USERNAME_note'));
             $this->variables['DB_USERNAME'] = $this->option('username') ?? $this->ask(
                 'Database Username',
-                config('database.connections.mariadb.username', 'pelican')
+                config('database.connections.mariadb.username', 'wyvern')
             );
 
             $askForMariaDBPassword = true;
@@ -205,7 +205,7 @@ class DatabaseSettingsCommand extends Command
             $this->output->note(trans('commands.database_settings.DB_USERNAME_note'));
             $this->variables['DB_USERNAME'] = $this->option('username') ?? $this->ask(
                 'Database Username',
-                config('database.connections.pgsql.username', 'pelican')
+                config('database.connections.pgsql.username', 'wyvern')
             );
 
             $askForPgSQLPassword = true;

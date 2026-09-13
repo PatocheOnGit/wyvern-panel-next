@@ -1,5 +1,5 @@
 # syntax=docker.io/docker/dockerfile:1.13-labs
-# Pelican Production Dockerfile
+# Wyvern Production Dockerfile
 
 ##
 #  If you want to build this locally you want to run `docker build -f Dockerfile.dev .`
@@ -65,7 +65,7 @@ WORKDIR /var/www/html
 RUN apk add --no-cache \
     # packages for running the panel
     caddy ca-certificates supervisor supercronic fcgi \
-    # required for installing plugins. Pulled from https://github.com/pelican/panel/pull/2034
+    # required for installing plugins. Pulled from https://github.com/PatocheOnGit/wyvern-panel/pull/2034
     zip unzip 7zip bzip2-dev yarn git
 
 # Copy composer binary for runtime plugin dependency management
@@ -74,19 +74,19 @@ COPY --chown=root:www-data --chmod=770 --from=composerbuild /build .
 COPY --chown=root:www-data --chmod=770 --from=yarnbuild /build/public ./public
 
 # Create and remove directories
-RUN mkdir -p /pelican-data/storage /var/run/supervisord \
+RUN mkdir -p /wyvern-data/storage /var/run/supervisord \
 # Symlinks for env, database, storage
-    && ln -s  /pelican-data/.env /var/www/html/.env \
-    && ln -s  /pelican-data/database/database.sqlite ./database/database.sqlite \
-    && ln -s  /pelican-data/storage /var/www/html/public/storage \
-    && ln -s  /pelican-data/storage /var/www/html/storage/app/public \
+    && ln -s  /wyvern-data/.env /var/www/html/.env \
+    && ln -s  /wyvern-data/database/database.sqlite ./database/database.sqlite \
+    && ln -s  /wyvern-data/storage /var/www/html/public/storage \
+    && ln -s  /wyvern-data/storage /var/www/html/storage/app/public \
 # Allow www-data write permissions where necessary
-    && chown -R www-data: /pelican-data .env ./storage ./bootstrap/cache /var/run/supervisord /var/www/html/public/storage \
-    && chmod -R 770 /pelican-data ./storage ./bootstrap/cache /var/run/supervisord \
+    && chown -R www-data: /wyvern-data .env ./storage ./bootstrap/cache /var/run/supervisord /var/www/html/public/storage \
+    && chmod -R 770 /wyvern-data ./storage ./bootstrap/cache /var/run/supervisord \
     && chown -R www-data: /usr/local/etc/php/ /usr/local/etc/php-fpm.d/ /var/www/html/composer.json /var/www/html/composer.lock
 # Configure PHP and PHP-FPM
-COPY docker/php/pelican.ini /usr/local/etc/php/conf.d/zz-pelican.ini
-COPY docker/php/pelican-pool.conf /usr/local/etc/php-fpm.d/zz-pelican.conf
+COPY docker/php/wyvern.ini /usr/local/etc/php/conf.d/zz-wyvern.ini
+COPY docker/php/wyvern-pool.conf /usr/local/etc/php-fpm.d/zz-wyvern.conf
 # Configure Supervisor
 COPY docker/supervisord.conf /etc/supervisord.conf
 COPY docker/Caddyfile /etc/caddy/Caddyfile
@@ -101,7 +101,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=2m --retries=3 \
 
 EXPOSE 80 443
 
-VOLUME /pelican-data
+VOLUME /wyvern-data
 
 USER www-data
 

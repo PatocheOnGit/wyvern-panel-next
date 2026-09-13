@@ -122,7 +122,7 @@ return [
         'include_logs' => 'Logs toevoegen',
         'include_logs_hint' => 'Inclusief logs zal recente logs tonen en eventuele problemen opsporen.',
         'run_diagnostics' => 'Diagnose uitvoeren',
-        'upload_to_pelican' => 'Logs uploaden',
+        'upload_to_wyvern' => 'Logs uploaden',
         'logs_pulled' => 'Logboeken verzameld!',
         'logs_uploaded' => 'Logs geüpload',
         'upload_failed' => 'Logs Upload Mislukt',

@@ -140,7 +140,7 @@ class ServerConsole extends Widget
                 Action::make('exclude_troubleshooting')
                     ->label('Open troubleshooting guide')
                     ->color('gray')
-                    ->url('https://pelican.dev/docs/troubleshooting/#wings-connection-issues', true),
+                    ->url('https://github.com/PatocheOnGit/wyvern-panel', true),
             ] : [])
             ->danger()
             ->send();

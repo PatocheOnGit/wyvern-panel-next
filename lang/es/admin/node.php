@@ -122,7 +122,7 @@ return [
         'include_logs' => 'Incluir Registros',
         'include_logs_hint' => 'Al incluir los registros se mostrarán los registros recientes y se ayudará a localizar posibles problemas.',
         'run_diagnostics' => 'Ejecutar diagnósticos',
-        'upload_to_pelican' => 'Subir registros',
+        'upload_to_wyvern' => 'Subir registros',
         'logs_pulled' => '¡Registros extraídos!',
         'logs_uploaded' => 'Registros Cargados',
         'upload_failed' => 'Carga de registros fallida',

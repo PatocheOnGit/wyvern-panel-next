@@ -272,11 +272,11 @@ class CreateNode extends CreateRecord
                         ->suffix(config('panel.use_binary_prefix') ? 'MiB' : 'MB'),
                     TextInput::make('daemon_base')
                         ->label(trans('admin/node.daemon_base'))
-                        ->placeholder('/var/lib/pelican/volumes')
+                        ->placeholder('/var/lib/wyvern/volumes')
                         ->hintIcon(TablerIcon::QuestionMark, trans('admin/node.daemon_base_help'))
                         ->columnSpan(1)
                         ->required()
-                        ->default('/var/lib/pelican/volumes')
+                        ->default('/var/lib/wyvern/volumes')
                         ->rule('regex:/^([\/][\d\w.\-\/]+)$/'),
                     TextInput::make('daemon_sftp')
                         ->columnSpan(1)

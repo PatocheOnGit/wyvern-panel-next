@@ -34,7 +34,7 @@ class HelpWidget extends FormWidget
                         Action::make('db_docs')
                             ->label(trans('admin/dashboard.sections.intro-help.button_docs'))
                             ->icon(TablerIcon::Speedboat)
-                            ->url('https://pelican.dev/docs', true),
+                            ->url('https://github.com/PatocheOnGit/wyvern-panel', true),
                     ]),
             ]);
     }

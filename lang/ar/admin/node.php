@@ -122,7 +122,7 @@ return [
         'include_logs' => 'تضمين السجلات',
         'include_logs_hint' => 'تضمين السجلات سوف يظهر السجلات الأخيرة وتساعد في تتبع المشاكل المحتملة.',
         'run_diagnostics' => 'تشغيل التشخيص',
-        'upload_to_pelican' => 'رفع السجلات',
+        'upload_to_wyvern' => 'رفع السجلات',
         'logs_pulled' => 'تم سحب السجلات!',
         'logs_uploaded' => 'تم رفع السجلات',
         'upload_failed' => 'فشل في رفع السجلات',

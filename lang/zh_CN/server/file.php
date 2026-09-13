@@ -104,7 +104,7 @@ return [
             'title' => '无法加载文件！',
         ],
         'pelicanignore' => [
-            'title' => '您正在编辑 <code>.pelicanover</code> 文件！',
+            'title' => '您正在编辑 <code>.wyvernover</code> 文件！',
             'body' => '此处列出的任何文件或目录将被排除在备份之外。通配符将被星号支持(<code>*</code>)。<br>您可以通过预置一个采集点来否定先前的规则 (<code>！</code>)。',
         ],
     ],

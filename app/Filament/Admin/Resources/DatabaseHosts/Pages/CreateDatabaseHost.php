@@ -82,7 +82,7 @@ class CreateDatabaseHost extends CreateRecord
                         ->label(trans('admin/databasehost.username'))
                         ->helperText(trans('admin/databasehost.username_help'))
                         ->required()
-                        ->default('pelicanuser')
+                        ->default('wyvernuser')
                         ->maxLength(255),
                     TextInput::make('password')
                         ->label(trans('admin/databasehost.password'))

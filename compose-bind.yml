@@ -30,7 +30,7 @@ x-common:
 services:
   panel:
     user: "0:0"
-    image: ghcr.io/pelican/panel:latest
+    image: ghcr.io/wyvern/panel:latest
     build: .
     restart: unless-stopped
     networks:
@@ -43,10 +43,10 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway" # shows the panel on the internal docker network as well. usually '172.17.0.1'
     volumes:
-      - /opt/pelican/data:/pelican-data
-      - /opt/pelican/logs:/var/www/html/storage/logs
-      - /opt/pelican/plugins:/var/www/html/plugins
+      - /opt/wyvern/data:/wyvern-data
+      - /opt/wyvern/logs:/var/www/html/storage/logs
+      - /opt/wyvern/plugins:/var/www/html/plugins
     environment:
       <<: [*panel-environment, *mail-environment]
-      XDG_DATA_HOME: /pelican-data
+      XDG_DATA_HOME: /wyvern-data
       # SKIP_CADDY: true # enable when not using caddy.

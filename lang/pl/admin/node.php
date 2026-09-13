@@ -122,7 +122,7 @@ return [
         'include_logs' => 'Dołącz logi',
         'include_logs_hint' => 'Uwzględnienie logów pokaże ostatnie logi i pomoże wyśledzić możliwe problemy.',
         'run_diagnostics' => 'Uruchom Diagnostykę',
-        'upload_to_pelican' => 'Prześlij Logi',
+        'upload_to_wyvern' => 'Prześlij Logi',
         'logs_pulled' => 'Pobrano Logi!',
         'logs_uploaded' => 'Przesłano Logi',
         'upload_failed' => 'Przesyłanie logów nie powiodło się',

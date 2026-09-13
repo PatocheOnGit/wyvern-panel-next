@@ -61,7 +61,7 @@ class UpdateWidget extends FormWidget
                         Action::make('db_update')
                             ->label(trans('admin/dashboard.sections.intro-update-available.heading'))
                             ->icon(TablerIcon::ClipboardText)
-                            ->url('https://pelican.dev/docs/panel/update', true)
+                            ->url('https://github.com/PatocheOnGit/wyvern-panel', true)
                             ->color('warning'),
                     ]),
             ]);

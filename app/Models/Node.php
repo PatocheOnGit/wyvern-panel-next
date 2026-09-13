@@ -168,7 +168,7 @@ class Node extends Model implements Validatable
         'disk_overallocate' => 0,
         'cpu' => 0,
         'cpu_overallocate' => 0,
-        'daemon_base' => '/var/lib/pelican/volumes',
+        'daemon_base' => '/var/lib/wyvern/volumes',
         'daemon_sftp' => 2022,
         'daemon_listen' => 8080,
         'daemon_connect' => 8080,
