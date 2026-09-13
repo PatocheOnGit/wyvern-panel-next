@@ -68,7 +68,7 @@ project, not ours.
 |---|---|
 | Name | Paper 26.2 |
 | Egg | Paper, imported from `pelican-eggs/minecraft` (no eggs ship seeded) |
-| UUID | `2dd3994a-11e0-4cdb-b350-3744f0e07ad1` |
+| UUID | `13a038aa-1392-4439-b459-cf54e112ad11` |
 | Version | Paper 26.2-123 on Minecraft 26.2, Java 25 |
 | Address | `0.0.0.0:25565`, alias `localhost` |
 | Limits | 4096 MB memory, 10240 MB disk, CPU unmetered |
@@ -77,6 +77,24 @@ project, not ours.
 Allocation IP is `0.0.0.0` with alias `localhost`, the same shape the Pterodactyl
 setup needed: `127.0.0.1` makes Wings publish the game port on the docker bridge
 instead of somewhere Windows can reach.
+
+### One unexplained deletion
+
+The first attempt (`2dd3994a-…`) installed, booted and served on 25565, then was gone
+twenty minutes later: the server row, its volume and its egg row. Wings logged a stop
+and then destroyed its sinks, which is what it does when the panel says a server no
+longer exists.
+
+What the evidence rules out: `p:egg:check-updates` only writes a cache flag;
+`EggImporterService` updates an egg in place via `Egg::where('uuid', …)->first() ?? new
+Egg()` and never deletes; there were no failed queue jobs, and nothing in the Laravel
+log after 14:13. The activity log records the `power.start` but **no deletion event** —
+so whatever removed it did not go through a path the panel audits.
+
+`servers.egg_id` is a foreign key onto `eggs`, so deleting an egg takes its servers
+with it. That is the mechanism; the trigger is still unknown. The rebuild
+(`13a038aa-…`) has been stable under observation. If it recurs, the thing to capture is
+who touched the Eggs resource in the admin area.
 
 ## Kept on purpose
 
