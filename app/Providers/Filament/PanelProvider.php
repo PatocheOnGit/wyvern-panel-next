@@ -13,6 +13,8 @@ use App\Http\Middleware\SetSecurityHeaders;
 use Filament\Actions\Action;
 use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Filament\Auth\MultiFactor\Email\EmailAuthentication;
+use Filament\Enums\ThemeMode;
+use Filament\FontProviders\LocalFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -23,7 +25,9 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Vite;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Wyvern\WyvernTheme;
 
 abstract class PanelProvider extends BasePanelProvider
 {
@@ -35,6 +39,13 @@ abstract class PanelProvider extends BasePanelProvider
                 '*/oauth/redirect/*',
             ])
             ->databaseNotifications()
+            ->colors(WyvernTheme::COLORS)
+            ->defaultThemeMode(ThemeMode::Dark)
+            ->font(
+                'Archivo',
+                url: fn () => Vite::asset('resources/css/wyvern.css'),
+                provider: LocalFontProvider::class,
+            )
             ->brandName(config('app.name', 'Pelican'))
             ->brandLogo(config('app.logo'))
             ->brandLogoHeight('2rem')
