@@ -21,19 +21,16 @@
         <div class="wy-server-card-scrim"></div>
 
         <div class="wy-server-card-heading">
-            <div class="wy-server-card-identity">
-                <span class="wy-server-card-egg">{{ $server->egg->name }}</span>
-                <h2 class="wy-server-card-name">{{ $server->name }}</h2>
-            </div>
-            <span class="wy-server-card-state wy-server-card-state-pending">
-                <x-filament::loading-indicator class="h-3 w-3" />
-                {{ trans('server/dashboard.loading') }}
-            </span>
+            <span class="wy-server-card-egg">{{ $server->egg->name }}</span>
+            <h2 class="wy-server-card-name">{{ $server->name }}</h2>
         </div>
     </div>
 
     <div class="wy-server-card-body">
         <div class="wy-server-card-address">
+            <span class="wy-server-card-state wy-server-card-state-pending">
+                <x-filament::loading-indicator class="h-3 w-3" />{{ trans('server/dashboard.loading') }}
+            </span>
             <span class="wy-server-card-host">{{ $server->allocation?->address ?? trans('server/dashboard.none') }}</span>
         </div>
 

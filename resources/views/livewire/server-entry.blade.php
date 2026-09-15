@@ -24,6 +24,7 @@
         ? ($nodeStatistics['memory_total'] ?? 0)
         : ServerResourceType::MemoryLimit->getResourceAmount($server);
 
+    $uptime = ServerResourceType::Uptime->getResourceAmount($server);
     $diskCurrent = ServerResourceType::Disk->getResourceAmount($server);
     $diskMax = ServerResourceType::DiskLimit->getResourceAmount($server) === 0
         ? ($nodeStatistics['disk_total'] ?? 0)
@@ -65,21 +66,21 @@
         <div class="wy-server-card-scrim"></div>
 
         <div class="wy-server-card-heading">
-            <div class="wy-server-card-identity">
-                <span class="wy-server-card-egg">{{ $server->egg->name }}</span>
-                <h2 class="wy-server-card-name">{{ $server->name }}</h2>
-            </div>
-            <span class="wy-server-card-state fi-color fi-color-{{ $server->condition->getColor() }}">
-                {{ $server->condition->getLabel() }}
-            </span>
+            <span class="wy-server-card-egg">{{ $server->egg->name }}</span>
+            <h2 class="wy-server-card-name">{{ $server->name }}</h2>
         </div>
     </div>
 
     {{-- body --}}
     <div class="wy-server-card-body">
         <div class="wy-server-card-address">
+            <span class="wy-server-card-state fi-color fi-color-{{ $server->condition->getColor() }}">
+                <i class="wy-server-card-dot"></i>{{ $server->condition->getLabel() }}
+            </span>
             <span class="wy-server-card-host">{{ $server->allocation?->address ?? trans('server/dashboard.none') }}</span>
-            <span class="wy-server-card-uptime">{{ $server->formatResource(ServerResourceType::Uptime) }}</span>
+            @if ($uptime > 0)
+                <span class="wy-server-card-uptime">{{ $server->formatResource(ServerResourceType::Uptime) }}</span>
+            @endif
         </div>
 
         @if ($server->description)

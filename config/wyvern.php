@@ -1,40 +1,39 @@
 <?php
 
+use App\Enums\TablerIcon;
+
 return [
     /*
      * The shortcut row on the client home.
      *
      * An entry without a url is skipped, so the row shows only what has actually been
-     * set up rather than a wall of dead links. Tone picks the tint behind the icon and
-     * must be one of: brand, accent, positive, caution.
+     * set up rather than a wall of dead links. Wording lives in lang/en/wyvern.php and
+     * is resolved from the id, so this file holds no prose. Tone picks the tint behind
+     * the icon: brand, accent, positive or caution.
      */
     'shortcuts' => [
         [
-            'icon' => 'discord',
+            'id' => 'discord',
+            'icon' => TablerIcon::BrandDiscord->value,
             'tone' => 'brand',
-            'label' => 'Discord',
-            'description' => 'Support et communauté',
             'url' => env('WYVERN_DISCORD_URL'),
         ],
         [
-            'icon' => 'book',
+            'id' => 'docs',
+            'icon' => TablerIcon::Book->value,
             'tone' => 'accent',
-            'label' => 'Documentation',
-            'description' => 'Guides et dépannage',
             'url' => env('WYVERN_DOCS_URL', 'https://github.com/PatocheOnGit/wyvern-panel'),
         ],
         [
-            'icon' => 'pulse',
+            'id' => 'status',
+            'icon' => TablerIcon::ActivityHeartbeat->value,
             'tone' => 'positive',
-            'label' => 'Statut',
-            'description' => 'État des services',
             'url' => env('WYVERN_STATUS_URL'),
         ],
         [
-            'icon' => 'star',
+            'id' => 'store',
+            'icon' => TablerIcon::ShoppingBag->value,
             'tone' => 'caution',
-            'label' => 'Boutique',
-            'description' => 'Étendre vos ressources',
             'url' => env('WYVERN_STORE_URL'),
         ],
     ],

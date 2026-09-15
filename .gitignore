@@ -27,3 +27,4 @@ public/assets/manifest.json
 /database/*.sqlite*
 _ide_helper*
 /.phpstorm.meta.php
+/public/_wyvern-preview.html
