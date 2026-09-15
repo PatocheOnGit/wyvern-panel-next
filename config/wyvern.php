@@ -52,5 +52,9 @@ return [
             'PatocheOnGit/wyvern-panel (254776717+PatocheOnGit@users.noreply.github.com)',
         ),
         'curseforge_key' => env('WYVERN_CURSEFORGE_KEY'),
+
+        // A big pack is hundreds of megabytes and dozens of files; the node is
+        // doing the work, but it still has to finish before the next step.
+        'modpack_timeout' => (int) env('WYVERN_MODPACK_TIMEOUT', 900),
     ],
 ];

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Wyvern\Console\Commands\CheckContentLibrary;
 use Wyvern\Console\Commands\CheckMinecraftCatalogue;
+use Wyvern\Console\Commands\InstallModpack;
 use Wyvern\Filament\Widgets\ShortcutsWidget;
 
 /**
@@ -42,6 +43,7 @@ class WyvernServiceProvider extends ServiceProvider
             $this->commands([
                 CheckContentLibrary::class,
                 CheckMinecraftCatalogue::class,
+                InstallModpack::class,
             ]);
         }
     }

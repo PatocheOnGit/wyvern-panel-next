@@ -146,6 +146,45 @@ class ModrinthSource implements ContentSource
      * "plugin". Faceting on the value the project endpoint reports is the wrong guess,
      * and it fails silently as an empty result rather than an error.
      */
+    /**
+     * What each project says about running on a server, keyed by project id.
+     *
+     * A modpack's index states this per file, but pack authors get it wrong: one
+     * optimisation pack tested here declared Sodium — a client renderer — as
+     * server-required, and installing it stopped the server booting at all. The
+     * project's own metadata is the better authority.
+     *
+     * @param  string[]  $projectIds
+     * @return array<string, string> required | optional | unsupported
+     */
+    public function serverSupport(array $projectIds): array
+    {
+        $projectIds = array_values(array_unique(array_filter($projectIds)));
+
+        if ($projectIds === []) {
+            return [];
+        }
+
+        $support = [];
+
+        // Their bulk endpoint takes the ids as a JSON array in the query string.
+        foreach (array_chunk($projectIds, 100) as $chunk) {
+            $response = $this->client()->get(self::BASE . '/projects', [
+                'ids' => json_encode($chunk),
+            ]);
+
+            if ($response->failed()) {
+                continue;
+            }
+
+            foreach ($response->json() ?? [] as $project) {
+                $support[$project['id']] = $project['server_side'] ?? 'optional';
+            }
+        }
+
+        return $support;
+    }
+
     private function projectTypeFacet(ContentType $type): string
     {
         return match ($type) {
