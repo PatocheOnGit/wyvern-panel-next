@@ -8,6 +8,7 @@ use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Wyvern\Console\Commands\CheckMinecraftCatalogue;
 use Wyvern\Filament\Widgets\ShortcutsWidget;
 
 /**
@@ -35,5 +36,11 @@ class WyvernServiceProvider extends ServiceProvider
             HeaderWidgetPosition::Before,
             ShortcutsWidget::class,
         );
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                CheckMinecraftCatalogue::class,
+            ]);
+        }
     }
 }
