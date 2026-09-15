@@ -74,10 +74,30 @@ the server panel has one. That switch of navigation model mid-journey is what th
 sidebar fixes. It carries the three destinations that actually exist: Servers, Profile,
 and Admin for those who can reach it.
 
+### 4 — console
+
+Done entirely from CSS. The stat blocks already ship the structure the design wants —
+a label span and a value span inside `.fi-small-stat-block` — so restyling them needed
+no view change at all: mono eyebrow, large tabular value, the same borderless card as
+everywhere else.
+
+The terminal keeps xterm's own theme object; its background is set at 70% alpha, so the
+surface under it is ours to choose from CSS without touching the options. The command
+line gets the mono face, a teal prompt and a readable placeholder.
+
+What is **not** done: the stat blocks carry a pre-formatted string ("1.16 GiB / 4 GiB"),
+not a ratio, so they cannot draw the meters the mockup shows. That needs
+`SmallStatBlock` to carry a percentage, which is an upstream logic change rather than a
+restyle — worth doing, but as its own decision.
+
+The players column is not built either: nothing in the panel tracks players yet. That is
+the game-module work, not layout.
+
 ## Still to do
 
-- The console: stat cards, the players column, the inline feature offer.
 - Plugins and modpacks — a Modrinth integration, not a layout change.
+- Meters on the console stat blocks, which needs SmallStatBlock to carry a ratio.
+- The players column, which needs player tracking to exist first.
 - The dense server list with filters and node grouping.
 
 ## Checking work without a browser
