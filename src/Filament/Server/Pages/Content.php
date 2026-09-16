@@ -35,7 +35,7 @@ class Content extends Page
 
     protected static string|BackedEnum|null $navigationIcon = TablerIcon::Puzzle;
 
-    protected static ?int $navigationSort = 12;
+    protected static ?int $navigationSort = 2;
 
     protected string $view = 'wyvern.server.content';
 
@@ -177,6 +177,11 @@ class Content extends Page
         $server = Filament::getTenant();
 
         return $server !== null && ServerProfile::of($server)->installableTypes() !== [];
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('wyvern.navigation.software');
     }
 
     public static function getNavigationLabel(): string

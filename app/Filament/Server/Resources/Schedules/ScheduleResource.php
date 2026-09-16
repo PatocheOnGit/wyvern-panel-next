@@ -58,7 +58,7 @@ class ScheduleResource extends Resource
 
     protected static ?string $model = Schedule::class;
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 1;
 
     protected static string|BackedEnum|null $navigationIcon = TablerIcon::Clock;
 
@@ -391,6 +391,11 @@ class ScheduleResource extends Resource
 
             throw new Halt();
         }
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('wyvern.navigation.automation');
     }
 
     public static function getNavigationLabel(): string

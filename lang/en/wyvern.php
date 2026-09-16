@@ -1,6 +1,24 @@
 <?php
 
 return [
+    /*
+     * Sidebar groups for the server panel.
+     *
+     * The panel shipped fourteen destinations in one flat list, with three of them
+     * colliding on the same sort value. Grouping them is the difference between
+     * scanning a list and reading a menu. Console and Files stay ungrouped at the top
+     * because they are where people actually spend their time.
+     */
+    'navigation' => [
+        'software' => 'Software',
+        'data' => 'Data',
+        'automation' => 'Automation',
+        'access' => 'Access',
+        'configuration' => 'Configuration',
+        'more' => 'More',
+        'mobile_label' => 'Quick navigation',
+    ],
+
     'shortcuts' => [
         'discord' => [
             'label' => 'Discord',

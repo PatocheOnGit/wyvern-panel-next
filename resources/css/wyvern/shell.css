@@ -1,0 +1,70 @@
+/* Wyvern shell — the furniture the panel needs that Filament does not ship.
+ *
+ * Only the mobile tab bar for now. It is deliberately below Filament's own sidebar
+ * drawer in the stacking order: the "More" tab opens that drawer, and the drawer has to
+ * cover the bar that opened it.
+ */
+
+.wy-tabbar {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 20;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    background-color: var(--wy-card);
+    box-shadow: inset 0 1px 0 var(--wy-line), 0 -8px 24px rgb(0 0 0 / 0.14);
+
+    /* Phones with a home indicator put a gesture area below the viewport; without this
+     * the last row of labels sits under it. */
+    padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+/* The bar exists because a drawer costs two taps. Above this width the sidebar is on
+ * screen already, so the bar would be two rows of duplicate navigation. */
+@media (min-width: 48rem) {
+    .wy-tabbar {
+        display: none;
+    }
+}
+
+.wy-tabbar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+
+    /* 3.5rem clears the 44px minimum a thumb needs, label included. */
+    min-height: 3.5rem;
+    padding: 0.5rem 0.25rem;
+
+    font-size: var(--wy-text-xs);
+    font-weight: 500;
+    line-height: 1;
+    color: var(--wy-muted);
+    text-align: center;
+    background: none;
+    border: 0;
+    cursor: pointer;
+}
+
+.wy-tabbar-item-on {
+    color: var(--wy-accent);
+}
+
+.wy-tabbar-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+/* The bar floats over the page, so the page has to end above it — otherwise the last
+ * table row and the footer sit under it. The padding goes on .fi-main-ctn, not .fi-main:
+ * the footer is .fi-main's sibling inside that container, so padding on .fi-main alone
+ * left the copyright line covered. */
+@media (max-width: 47.99rem) {
+    .fi-main-ctn {
+        padding-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px) + 1rem);
+    }
+}

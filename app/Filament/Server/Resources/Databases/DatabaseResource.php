@@ -45,7 +45,7 @@ class DatabaseResource extends Resource
 
     protected static ?string $model = Database::class;
 
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 2;
 
     protected static string|BackedEnum|null $navigationIcon = TablerIcon::Database;
 
@@ -216,6 +216,11 @@ class DatabaseResource extends Resource
         return [
             'index' => ListDatabases::route('/'),
         ];
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('wyvern.navigation.data');
     }
 
     public static function getNavigationLabel(): string

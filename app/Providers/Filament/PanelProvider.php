@@ -55,11 +55,13 @@ abstract class PanelProvider extends BasePanelProvider
 
                 return $navigationType === 'topbar' || $navigationType === true;
             })
-            ->topbar(function () {
-                $navigationType = user()?->getCustomization(CustomizationKey::TopNavigation);
-
-                return $navigationType === 'topbar' || $navigationType === 'mixed' || $navigationType === true;
-            })
+            // Always. The preference above decides where navigation lives — sidebar,
+            // topbar or both — but it used to decide whether a topbar existed at all,
+            // and in the default 'sidebar' mode it did not. That left the majority of
+            // pages with nowhere to anchor global chrome: no search, no breadcrumb, no
+            // notifications, no context. Where the nav sits is a preference; having a
+            // place to put the panel's own furniture is not.
+            ->topbar(true)
             ->maxContentWidth(config('panel.filament.display-width', 'screen-2xl'))
             ->profile(EditProfile::class, false)
             ->userMenuItems([

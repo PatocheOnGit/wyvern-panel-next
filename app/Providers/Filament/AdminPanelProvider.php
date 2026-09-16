@@ -21,7 +21,6 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->homeUrl('/')
-            ->breadcrumbs(false)
             ->sidebarCollapsibleOnDesktop(fn () => !$panel->hasTopNavigation())
             ->userMenuItems([
                 Action::make('exit_admin')

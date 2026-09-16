@@ -12,6 +12,7 @@ use Wyvern\Console\Commands\CheckContentLibrary;
 use Wyvern\Console\Commands\CheckMinecraftCatalogue;
 use Wyvern\Console\Commands\InstallModpack;
 use Wyvern\Filament\Widgets\ShortcutsWidget;
+use Wyvern\Navigation\MobileTabs;
 
 /**
  * Everything Wyvern adds to the panel that is not a panel configuration call.
@@ -30,6 +31,17 @@ class WyvernServiceProvider extends ServiceProvider
         FilamentView::registerRenderHook(
             PanelsRenderHook::STYLES_AFTER,
             fn () => Blade::render("@vite(['resources/css/wyvern-theme.css'])"),
+        );
+
+        // A phone reaches the panel's busiest destinations in one tap instead of two.
+        // BODY_END rather than a layout override: it renders after the page, so the bar
+        // paints over content rather than inside a scroll container, and no upstream view
+        // is touched to get it there.
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::BODY_END,
+            fn () => MobileTabs::shouldRender()
+                ? Blade::render("@include('wyvern.shell.mobile-tabs')")
+                : '',
         );
 
         // The host's own links, above the server cards. This is the extension point

@@ -57,7 +57,7 @@ class BackupResource extends Resource
 
     protected static ?string $model = Backup::class;
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 1;
 
     protected static string|BackedEnum|null $navigationIcon = TablerIcon::FileZip;
 
@@ -305,6 +305,11 @@ class BackupResource extends Resource
         return [
             'index' => ListBackups::route('/'),
         ];
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('wyvern.navigation.data');
     }
 
     public static function getNavigationLabel(): string

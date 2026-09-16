@@ -30,7 +30,7 @@ class Settings extends ServerFormPage
 {
     protected static string|BackedEnum|null $navigationIcon = TablerIcon::Settings;
 
-    protected static ?int $navigationSort = 11;
+    protected static ?int $navigationSort = 2;
 
     /**
      * @throws Exception
@@ -346,6 +346,11 @@ class Settings extends ServerFormPage
     public function getTitle(): string
     {
         return trans('server/setting.title');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('wyvern.navigation.configuration');
     }
 
     public static function getNavigationLabel(): string

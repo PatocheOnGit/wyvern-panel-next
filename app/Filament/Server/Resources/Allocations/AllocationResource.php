@@ -34,7 +34,7 @@ class AllocationResource extends Resource
 
     protected static ?string $model = Allocation::class;
 
-    protected static ?int $navigationSort = 7;
+    protected static ?int $navigationSort = 2;
 
     protected static string|BackedEnum|null $navigationIcon = TablerIcon::Network;
 
@@ -128,6 +128,11 @@ class AllocationResource extends Resource
         return [
             'index' => ListAllocations::route('/'),
         ];
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('wyvern.navigation.access');
     }
 
     public static function getNavigationLabel(): string

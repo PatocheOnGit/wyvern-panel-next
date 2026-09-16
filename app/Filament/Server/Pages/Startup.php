@@ -28,7 +28,7 @@ class Startup extends ServerFormPage
 {
     protected static string|BackedEnum|null $navigationIcon = TablerIcon::PlayerPlay;
 
-    protected static ?int $navigationSort = 10;
+    protected static ?int $navigationSort = 3;
 
     /**
      * @throws Exception
@@ -215,6 +215,11 @@ class Startup extends ServerFormPage
     public function getTitle(): string
     {
         return trans('server/startup.title');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('wyvern.navigation.software');
     }
 
     public static function getNavigationLabel(): string

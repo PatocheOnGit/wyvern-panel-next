@@ -41,7 +41,7 @@ class Version extends ServerFormPage
 {
     protected static string|BackedEnum|null $navigationIcon = TablerIcon::Package;
 
-    protected static ?int $navigationSort = 11;
+    protected static ?int $navigationSort = 1;
 
     protected string $view = 'wyvern.server.version';
 
@@ -271,6 +271,11 @@ class Version extends ServerFormPage
                 ->where('egg_id', $server->egg_id)
                 ->where('env_variable', 'MC_LOADER')
                 ->exists();
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('wyvern.navigation.software');
     }
 
     public static function getNavigationLabel(): string

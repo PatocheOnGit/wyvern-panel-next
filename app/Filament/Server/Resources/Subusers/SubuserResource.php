@@ -49,7 +49,7 @@ class SubuserResource extends Resource
 
     protected static ?string $model = Subuser::class;
 
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 1;
 
     protected static string|BackedEnum|null $navigationIcon = TablerIcon::Users;
 
@@ -318,6 +318,11 @@ class SubuserResource extends Resource
         return [
             'index' => ListSubusers::route('/'),
         ];
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('wyvern.navigation.access');
     }
 
     public static function getNavigationLabel(): string

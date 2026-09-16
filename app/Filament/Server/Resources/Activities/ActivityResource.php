@@ -40,7 +40,7 @@ class ActivityResource extends Resource
 
     protected static ?string $model = ActivityLog::class;
 
-    protected static ?int $navigationSort = 8;
+    protected static ?int $navigationSort = 3;
 
     protected static string|BackedEnum|null $navigationIcon = TablerIcon::Stack;
 
@@ -177,6 +177,11 @@ class ActivityResource extends Resource
         return [
             'index' => ListActivities::route('/'),
         ];
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('wyvern.navigation.access');
     }
 
     public static function getNavigationLabel(): string

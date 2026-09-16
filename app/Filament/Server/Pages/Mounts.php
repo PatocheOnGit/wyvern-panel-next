@@ -20,7 +20,7 @@ class Mounts extends ServerFormPage
 {
     protected static string|BackedEnum|null $navigationIcon = TablerIcon::LayersLinked;
 
-    protected static ?int $navigationSort = 9;
+    protected static ?int $navigationSort = 1;
 
     public static function canAccess(): bool
     {
@@ -105,6 +105,11 @@ class Mounts extends ServerFormPage
     public function getTitle(): string
     {
         return trans('server/mount.title');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('wyvern.navigation.configuration');
     }
 
     public static function getNavigationLabel(): string

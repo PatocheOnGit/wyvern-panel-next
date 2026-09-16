@@ -57,9 +57,14 @@ class WebhookResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'tabler-webhook';
 
-    protected static ?int $navigationSort = 11;
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $slug = 'webhook';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('wyvern.navigation.automation');
+    }
 
     public static function getNavigationLabel(): string
     {
