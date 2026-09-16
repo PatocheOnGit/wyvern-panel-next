@@ -12,6 +12,7 @@ use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
+use Wyvern\Filament\WyvernPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -47,6 +48,7 @@ class AdminPanelProvider extends PanelProvider
                     ->navigationGroup(fn () => trans('admin/dashboard.advanced'))
                     ->navigationIcon(TablerIcon::FileInfo),
                 GlobalSearchModalPlugin::make(),
+                WyvernPlugin::make(),
             ]);
 
         /** @var PluginService $pluginService */

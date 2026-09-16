@@ -6,6 +6,7 @@ use Filament\Contracts\Plugin;
 use Filament\Panel;
 use Wyvern\Filament\Server\Pages\Content;
 use Wyvern\Filament\Server\Pages\Version;
+use Wyvern\Filament\Widgets\FleetOverview;
 
 /**
  * Wyvern's own pages, registered the way Filament expects.
@@ -22,6 +23,17 @@ class WyvernPlugin implements Plugin
 
     public function register(Panel $panel): void
     {
+        if ($panel->getId() === 'admin') {
+            // discoverWidgets() only scans app/Filament/Admin/Widgets, and ours lives in
+            // src/ — registering through the plugin keeps it there and leaves the panel
+            // provider untouched.
+            $panel->widgets([
+                FleetOverview::class,
+            ]);
+
+            return;
+        }
+
         if ($panel->getId() !== 'server') {
             return;
         }

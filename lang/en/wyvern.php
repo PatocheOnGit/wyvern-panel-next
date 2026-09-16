@@ -9,6 +9,24 @@ return [
      * scanning a list and reading a menu. Console and Files stay ungrouped at the top
      * because they are where people actually spend their time.
      */
+    /*
+     * The admin dashboard. Phrased so the good case is as short as the bad one is
+     * specific — an operator scanning four tiles should be able to stop reading as soon
+     * as everything says it is fine.
+     */
+    'dashboard' => [
+        'servers' => 'Servers',
+        'servers_ok' => 'All in service',
+        'servers_attention' => ':suspended suspended, :failed failed to install',
+        'nodes' => 'Nodes',
+        'nodes_ok' => 'All in service',
+        'nodes_maintenance' => ':count in maintenance',
+        'memory' => 'Memory allocated',
+        'disk' => 'Disk allocated',
+        'of_capacity' => ':percent% of :capacity',
+        'no_ceiling' => 'No configured ceiling',
+    ],
+
     'navigation' => [
         'software' => 'Software',
         'data' => 'Data',

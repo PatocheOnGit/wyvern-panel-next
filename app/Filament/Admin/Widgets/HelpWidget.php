@@ -24,6 +24,11 @@ class HelpWidget extends FormWidget
                     ->icon(TablerIcon::QuestionMark)
                     ->iconColor('info')
                     ->collapsible()
+                    // Collapsed by default. An operations dashboard opens on what is
+                    // wrong and how much room is left; a donation appeal and a link to
+                    // the docs are worth keeping and not worth the fold. persistCollapsed
+                    // still remembers anyone who opens it.
+                    ->collapsed()
                     ->persistCollapsed()
                     ->schema([
                         TextEntry::make('info')
