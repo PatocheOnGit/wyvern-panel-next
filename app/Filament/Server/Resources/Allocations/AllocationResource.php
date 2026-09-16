@@ -100,7 +100,6 @@ class AllocationResource extends Resource
             ])
             ->toolbarActions([
                 Action::make('add_allocation')
-                    ->hiddenLabel()
                     ->icon(fn () => $server->allocations()->count() >= $server->allocation_limit ? TablerIcon::NetworkOff : TablerIcon::Network)
                     ->authorize(fn () => user()?->can(SubuserPermission::AllocationCreate, $server))
                     ->tooltip(fn () => $server->allocations()->count() >= $server->allocation_limit ? trans('server/network.limit') : trans('server/network.add'))

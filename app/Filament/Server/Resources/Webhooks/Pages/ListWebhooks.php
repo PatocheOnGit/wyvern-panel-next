@@ -26,8 +26,6 @@ class ListWebhooks extends ListRecords
         return [
             CreateAction::make()
                 ->icon('tabler-plus')
-                ->hiddenLabel()
-                ->iconButton()
                 ->iconSize(IconSize::ExtraLarge)
                 ->hidden(function () {
                     $server = Filament::getTenant();

@@ -169,7 +169,12 @@ class FilamentServiceProvider extends ServiceProvider
         CreateAction::configureUsing(function (CreateAction $action) {
             $action->icon(TablerIcon::Plus);
             $action->tooltip(fn () => $action->getLabel());
-            $action->hiddenLabel();
+            // No hiddenLabel(). This is the page's primary call to action, and hiding its
+            // label is what turned every empty state into a dead end: the table said
+            // "create a backup to get started" while the only way to do so was an
+            // unlabelled plus. Row actions further down stay icon-only — they sit in a
+            // tight column and carry a tooltip — but the thing a page exists to do says
+            // what it does.
             $action->iconSize(IconSize::Large);
 
             if (user()?->getCustomization(CustomizationKey::ButtonStyle)) {
@@ -287,6 +292,10 @@ class FilamentServiceProvider extends ServiceProvider
             PanelsIconAlias::SIDEBAR_EXPAND_BUTTON => TablerIcon::ArrowRightDashed,
             PanelsIconAlias::SIDEBAR_COLLAPSE_BUTTON => TablerIcon::ArrowLeftDashed,
 
+            // Filament falls back to an outlined X when nothing is registered here, so
+            // every table without its own icon announced "no backups yet" with the glyph
+            // for failure. An empty tray says the same thing without the alarm.
+            TablesIconAlias::EMPTY_STATE => TablerIcon::Inbox,
             TablesIconAlias::ACTIONS_FILTER => TablerIcon::Filters,
             TablesIconAlias::SEARCH_FIELD => TablerIcon::Search,
             TablesIconAlias::ACTIONS_COLUMN_MANAGER => TablerIcon::Columns,

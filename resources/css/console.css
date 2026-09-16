@@ -1,8 +1,8 @@
 @import url('@xterm/xterm/css/xterm.css');
 
 #terminal {
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+    border-start-start-radius: var(--radius-xl);
+    border-start-end-radius: var(--radius-xl);
     overflow: hidden;
 }
 
@@ -20,32 +20,23 @@
     cursor: not-allowed;
 }
 
-::-webkit-scrollbar {
+/* Scoped to the terminal. These rules used to be bare ::-webkit-scrollbar selectors,
+ * so loading the console page restyled every scrollbar on it — and in two hard-coded
+ * HSL values that only worked on the old dark theme. */
+#terminal ::-webkit-scrollbar {
     background: none;
-    width: 14px;
-    height: 14px;
+    width: 10px;
+    height: 10px;
 }
 
-::-webkit-scrollbar-thumb {
-    border: solid 0 rgb(0 0 0 / 0%);
-    border-right-width: 4px;
-    border-left-width: 4px;
-    -webkit-border-radius: 9px 4px;
-    -webkit-box-shadow: inset 0 0 0 1px hsl(211, 10%, 53%), inset 0 0 0 4px hsl(209deg 18% 30%);
+#terminal ::-webkit-scrollbar-thumb {
+    background-clip: padding-box;
+    background-color: var(--wy-scrollbar-thumb);
+    border: 3px solid transparent;
+    border-radius: 9999px;
 }
 
-::-webkit-scrollbar-track-piece {
-    margin: 4px 0;
-}
-
-::-webkit-scrollbar-thumb:horizontal {
-    border-right-width: 0;
-    border-left-width: 0;
-    border-top-width: 4px;
-    border-bottom-width: 4px;
-    -webkit-border-radius: 4px 9px;
-}
-
-::-webkit-scrollbar-corner {
-    background: transparent;
+#terminal ::-webkit-scrollbar-track,
+#terminal ::-webkit-scrollbar-corner {
+    background: var(--wy-scrollbar-track);
 }

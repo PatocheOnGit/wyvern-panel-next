@@ -474,7 +474,7 @@ class ListFiles extends ListRecords
                 Action::make('new_file')
                     ->authorize(fn () => user()?->can(SubuserPermission::FileCreate, $server))
                     ->tooltip(trans('server/file.actions.new_file.title'))
-                    ->hiddenLabel()->icon(TablerIcon::FilePlus)
+                    ->icon(TablerIcon::FilePlus)
                     ->color('primary')
                     ->modalSubmitActionLabel(trans('server/file.actions.new_file.create'))
                     ->action(function ($data) {
@@ -515,7 +515,7 @@ class ListFiles extends ListRecords
                     ]),
                 Action::make('new_folder')
                     ->authorize(fn () => user()?->can(SubuserPermission::FileCreate, $server))
-                    ->hiddenLabel()->icon(TablerIcon::FolderPlus)
+                    ->icon(TablerIcon::FolderPlus)
                     ->tooltip(trans('server/file.actions.new_folder.title'))
                     ->color('primary')
                     ->action(function ($data) {
@@ -549,7 +549,7 @@ class ListFiles extends ListRecords
                     ->view('filament.server.pages.file-upload'),
                 Action::make('uploadURL')
                     ->authorize(fn () => user()?->can(SubuserPermission::FileCreate, $server))
-                    ->hiddenLabel()->icon(TablerIcon::WorldDownload)
+                    ->icon(TablerIcon::WorldDownload)
                     ->tooltip(trans('server/file.actions.upload.from_url'))
                     ->modalHeading(trans('server/file.actions.upload.from_url'))
                     ->color('success')
@@ -571,7 +571,6 @@ class ListFiles extends ListRecords
                     ]),
                 Action::make('search')
                     ->authorize(fn () => user()?->can(SubuserPermission::FileRead, $server))
-                    ->hiddenLabel()
                     ->tooltip(trans('server/file.actions.nested_search.title'))
                     ->color('primary')
                     ->icon(TablerIcon::FolderSearch)
@@ -590,7 +589,6 @@ class ListFiles extends ListRecords
                         'path' => $this->path,
                     ]))),
                 ConnectSftpAction::make()
-                    ->hiddenLabel()
                     ->tooltip(trans('server/file.actions.connect_sftp'))
                     ->directory($this->path),
             ]);
@@ -703,7 +701,6 @@ class ListFiles extends ListRecords
         }
 
         return Action::make('fileUpload')
-            ->hiddenLabel()
             ->color('success')
             ->icon(TablerIcon::Upload)
             ->tooltip(trans('server/file.actions.upload.title'))

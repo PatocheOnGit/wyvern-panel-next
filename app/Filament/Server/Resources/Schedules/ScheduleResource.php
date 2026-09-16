@@ -348,12 +348,10 @@ class ScheduleResource extends Resource
             ])
             ->toolbarActions([
                 CreateAction::make()
-                    ->hiddenLabel()
                     ->icon(TablerIcon::CalendarPlus)
                     ->color('primary')
                     ->tooltip(trans('server/schedule.new')),
                 ImportScheduleAction::make()
-                    ->hiddenLabel()
                     ->icon(TablerIcon::FileImport)
                     ->color('success')
                     ->tooltip(trans('server/schedule.import')),

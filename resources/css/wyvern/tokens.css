@@ -63,6 +63,19 @@
     --wy-pad: 0.75rem;
     --wy-gap: 0.75rem;
 
+    /* The console.
+     *
+     * These are hex rather than var(--gray-*) on purpose: xterm.js parses colour strings
+     * with its own parser, which does not understand the oklch() Filament emits. The
+     * terminal reads them at runtime, so they have to be values it can actually take.
+     * Only the chrome lives here — the sixteen ANSI colours stay in the console view,
+     * because a server's log saying "red" has to look red whatever the panel's palette
+     * is doing. */
+    --wy-console-fg: #2b2926;
+    --wy-console-selection: rgba(58, 111, 216, 0.22);
+    --wy-scrollbar-thumb: rgba(11, 10, 9, 0.28);
+    --wy-scrollbar-track: transparent;
+
     /* Type scale. The rule the whole panel follows: sans is for language, mono is for
      * values — numbers, addresses, paths, identifiers, console. Mono is never a label. */
     --wy-text-xs: 0.6875rem;
@@ -95,6 +108,11 @@
     --wy-accent: var(--primary-400);
     --wy-accent-quiet: color-mix(in oklab, var(--primary-400) 16%, transparent);
     --wy-focus: var(--primary-400);
+
+    --wy-console-fg: #ded9d0;
+    --wy-console-selection: rgba(91, 146, 245, 0.28);
+    --wy-scrollbar-thumb: rgba(255, 255, 255, 0.22);
+    --wy-scrollbar-track: transparent;
 
     --wy-online: var(--success-400);
     --wy-transition: var(--warning-400);

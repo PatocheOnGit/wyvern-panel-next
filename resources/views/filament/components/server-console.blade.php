@@ -23,7 +23,7 @@
 
     @if ($this->authorizeSendCommand())
         <div class="flex items-center w-full border-top overflow-hidden dark:bg-gray-900"
-             style="border-bottom-right-radius: 10px; border-bottom-left-radius: 10px;">
+             style="border-end-end-radius: var(--radius-xl); border-end-start-radius: var(--radius-xl);">
             <x-filament::icon
                 icon="tabler-chevrons-right"
             />
@@ -44,27 +44,66 @@
 
     @script
     <script>
-        let theme = {
-            background: 'rgba(19,26,32,0.7)',
-            cursor: 'transparent',
-            black: '#000000',
-            red: '#E54B4B',
-            green: '#9ECE58',
-            yellow: '#FAED70',
-            blue: '#396FE2',
-            magenta: '#BB80B3',
-            cyan: '#2DDAFD',
-            white: '#d0d0d0',
-            brightBlack: 'rgba(255, 255, 255, 0.2)',
-            brightRed: '#FF5370',
-            brightGreen: '#C3E88D',
-            brightYellow: '#FFCB6B',
-            brightBlue: '#82AAFF',
-            brightMagenta: '#C792EA',
-            brightCyan: '#89DDFF',
-            brightWhite: '#ffffff',
-            selection: '#FAF089'
+        // The sixteen ANSI colours stay ANSI. A server writing "error" in red has to look
+        // red whatever the panel's palette is doing, so they are not derived from the
+        // Wyvern tokens — only the chrome around them is. What the theme does need is a
+        // second set: the dark palette below is unreadable on a light background, and the
+        // console is the one surface where a washed-out colour costs you information.
+        const ansi = {
+            dark: {
+                black: '#1f1e1c',
+                red: '#E54B4B',
+                green: '#9ECE58',
+                yellow: '#FAED70',
+                blue: '#6FA0F5',
+                magenta: '#BB80B3',
+                cyan: '#2DDAFD',
+                white: '#d0d0d0',
+                brightBlack: 'rgba(255, 255, 255, 0.35)',
+                brightRed: '#FF5370',
+                brightGreen: '#C3E88D',
+                brightYellow: '#FFCB6B',
+                brightBlue: '#82AAFF',
+                brightMagenta: '#C792EA',
+                brightCyan: '#89DDFF',
+                brightWhite: '#ffffff',
+            },
+            light: {
+                black: '#1f1e1c',
+                red: '#B3261E',
+                green: '#2E7D32',
+                yellow: '#8D6E00',
+                blue: '#1A5FB4',
+                magenta: '#7B3FA0',
+                cyan: '#00697A',
+                white: '#57534C',
+                brightBlack: 'rgba(11, 10, 9, 0.45)',
+                brightRed: '#C5352B',
+                brightGreen: '#38893D',
+                brightYellow: '#A07C00',
+                brightBlue: '#2A6FD0',
+                brightMagenta: '#8E4CB8',
+                brightCyan: '#0A7E92',
+                brightWhite: '#1f1e1c',
+            },
         };
+
+        const token = (name, fallback) =>
+            getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
+
+        const buildTheme = () => ({
+            // Transparent, so the surface is CSS's to choose — #terminal carries it. The
+            // old value was a 70%-alpha navy baked into this file, which is why the
+            // terminal stayed blue after the panel stopped being blue.
+            background: 'transparent',
+            foreground: token('--wy-console-fg', '#ded9d0'),
+            cursor: token('--wy-console-fg', '#ded9d0'),
+            cursorAccent: 'transparent',
+            selectionBackground: token('--wy-console-selection', 'rgba(91, 146, 245, 0.28)'),
+            ...(document.documentElement.classList.contains('dark') ? ansi.dark : ansi.light),
+        });
+
+        let theme = buildTheme();
 
         let options = {
             fontSize: {{ $userFontSize }},
@@ -93,6 +132,13 @@
         terminal.loadAddon(webglAddon);
 
         terminal.open(document.getElementById('terminal'));
+
+        // Filament's theme switcher toggles a class on <html> without reloading, and the
+        // terminal keeps its colours in a JS object rather than in CSS — so it has to be
+        // told. Without this, switching to light leaves a dark-tuned palette on a light
+        // surface.
+        new MutationObserver(() => { terminal.options.theme = buildTheme(); })
+            .observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 
         fitAddon.fit(); // Fixes SPA issues.
 

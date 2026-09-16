@@ -218,7 +218,6 @@ class SubuserResource extends Resource
             ])
             ->toolbarActions([
                 CreateAction::make('invite')
-                    ->hiddenLabel()
                     ->icon(TablerIcon::UserPlus)
                     ->tooltip(trans('server/user.invite_user'))
                     ->createAnother(false)
