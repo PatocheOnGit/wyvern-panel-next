@@ -32,7 +32,10 @@ class ConnectSftpAction extends Action
             return !is_null($server) && user()?->can(SubuserPermission::FileSftp, $server);
         });
 
-        $this->color('success');
+        // Neutral. Green is reserved for a server being up; opening an SFTP client is
+        // neither a success nor a state, and it was the one coloured button left in an
+        // otherwise calm toolbar.
+        $this->color('gray');
 
         $this->icon(TablerIcon::Plug);
 

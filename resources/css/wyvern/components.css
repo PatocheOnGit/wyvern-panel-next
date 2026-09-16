@@ -336,14 +336,21 @@
  * is ours to choose without touching the xterm options. */
 #terminal {
     padding: 0.85rem 1.05rem 0.5rem;
-    background-color: var(--wy-ground);
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    background-color: var(--wy-console-bg);
+
+    /* Recessed, so it needs an edge rather than an elevation: a shadow cast by something
+     * darker than the page reads as nothing at all. */
+    box-shadow: inset 0 0 0 1px var(--wy-line);
+
+    /* --radius-xl, matching the command bar that closes the shape underneath. These two
+     * disagreed before, so the terminal's top corners were rounder than its bottom ones. */
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
 }
 
 /* The command line: a prompt, a field, and nothing else competing with them. */
 .fi-wi:has(#send-command),
 div:has(> #send-command) {
-    background-color: var(--wy-ground) !important;
+    background-color: var(--wy-console-bg) !important;
     padding-inline: 0.85rem;
     gap: 0.5rem;
     box-shadow: inset 0 1px 0 var(--wy-line);

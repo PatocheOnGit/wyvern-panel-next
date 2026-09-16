@@ -2,7 +2,6 @@
 
 namespace App\Filament\Server\Resources\Files\Pages;
 
-use App\Enums\CustomizationKey;
 use App\Enums\EditorLanguages;
 use App\Enums\SubuserPermission;
 use App\Enums\TablerIcon;
@@ -475,7 +474,7 @@ class ListFiles extends ListRecords
                     ->authorize(fn () => user()?->can(SubuserPermission::FileCreate, $server))
                     ->tooltip(trans('server/file.actions.new_file.title'))
                     ->icon(TablerIcon::FilePlus)
-                    ->color('primary')
+                    ->color('gray')
                     ->modalSubmitActionLabel(trans('server/file.actions.new_file.create'))
                     ->action(function ($data) {
                         $path = join_paths($this->path, $data['name']);
@@ -517,7 +516,7 @@ class ListFiles extends ListRecords
                     ->authorize(fn () => user()?->can(SubuserPermission::FileCreate, $server))
                     ->icon(TablerIcon::FolderPlus)
                     ->tooltip(trans('server/file.actions.new_folder.title'))
-                    ->color('primary')
+                    ->color('gray')
                     ->action(function ($data) {
                         try {
                             $this->createFolder($data['name']);
@@ -549,10 +548,13 @@ class ListFiles extends ListRecords
                     ->view('filament.server.pages.file-upload'),
                 Action::make('uploadURL')
                     ->authorize(fn () => user()?->can(SubuserPermission::FileCreate, $server))
+                    // Filament humanises the name when no label is set, and 'uploadURL'
+                    // came out as "Upload u r l".
+                    ->label(trans('server/file.actions.upload.from_url'))
                     ->icon(TablerIcon::WorldDownload)
                     ->tooltip(trans('server/file.actions.upload.from_url'))
                     ->modalHeading(trans('server/file.actions.upload.from_url'))
-                    ->color('success')
+                    ->color('gray')
                     ->action(function ($data) {
                         $this->getDaemonFileRepository()->pull($data['url'], $this->path);
 
@@ -572,7 +574,7 @@ class ListFiles extends ListRecords
                 Action::make('search')
                     ->authorize(fn () => user()?->can(SubuserPermission::FileRead, $server))
                     ->tooltip(trans('server/file.actions.nested_search.title'))
-                    ->color('primary')
+                    ->color('gray')
                     ->icon(TablerIcon::FolderSearch)
                     ->modalHeading(trans('server/file.actions.nested_search.title'))
                     ->modalSubmitActionLabel(trans('server/file.actions.nested_search.search'))
@@ -690,20 +692,13 @@ class ListFiles extends ListRecords
 
     public function fileUploadAction(): Action
     {
-        if (user()?->getCustomization(CustomizationKey::ButtonStyle)) {
-            return Action::make('fileUpload')
-                ->iconSize(IconSize::ExtraLarge)
-                ->iconButton()
-                ->color('success')
-                ->icon(TablerIcon::Upload)
-                ->tooltip(trans('server/file.actions.upload.title'))
-                ->extraAttributes(['@click' => 'triggerBrowse']);
-        }
-
+        // One shape, labelled like its neighbours. The icon-button branch this used to
+        // carry made upload the only bare glyph in a row of labelled buttons, which read
+        // as a rendering fault rather than a choice.
         return Action::make('fileUpload')
-            ->color('success')
+            ->label(trans('server/file.actions.upload.title'))
+            ->color('gray')
             ->icon(TablerIcon::Upload)
-            ->tooltip(trans('server/file.actions.upload.title'))
             ->extraAttributes(['@click' => 'triggerBrowse']);
     }
 }

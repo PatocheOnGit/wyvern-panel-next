@@ -92,13 +92,16 @@
             getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
 
         const buildTheme = () => ({
-            // Transparent, so the surface is CSS's to choose — #terminal carries it. The
-            // old value was a 70%-alpha navy baked into this file, which is why the
-            // terminal stayed blue after the panel stopped being blue.
-            background: 'transparent',
+            // A real colour, not a transparent one. The old value was a 70%-alpha navy
+            // baked into this file, which is why the terminal stayed blue after the panel
+            // stopped being blue — but asking xterm to composite instead does not work:
+            // with the WebGL renderer it paints the viewport opaque black whether the
+            // theme says 'transparent' or rgba(0,0,0,0). xterm owns that canvas, so it
+            // gets a colour it can paint, from the same token CSS uses for the frame.
+            background: token('--wy-console-bg', '#0b0a09'),
             foreground: token('--wy-console-fg', '#ded9d0'),
             cursor: token('--wy-console-fg', '#ded9d0'),
-            cursorAccent: 'transparent',
+            cursorAccent: token('--wy-console-bg', '#0b0a09'),
             selectionBackground: token('--wy-console-selection', 'rgba(91, 146, 245, 0.28)'),
             ...(document.documentElement.classList.contains('dark') ? ansi.dark : ansi.light),
         });

@@ -166,21 +166,21 @@ class FilamentServiceProvider extends ServiceProvider
             }
         });
 
+        // The one action that always says what it does.
+        //
+        // Hiding this label is what turned every empty state into a dead end: the table
+        // said "create a backup to get started" while the only way to do so was an
+        // unlabelled plus. Row actions below stay icon-only — they sit in a tight column
+        // and carry a tooltip — but the thing a page exists to do carries words.
+        //
+        // Note this overrides no preference. CustomizationKey::ButtonStyle offers exactly
+        // two options, 'icon' and 'icon_button'; a labelled button was never among them,
+        // so the preference governs chrome and has no opinion about labels. iconButton()
+        // is skipped here because it renders a square glyph regardless of the label, which
+        // would undo the fix for anyone on the default setting — which is everyone.
         CreateAction::configureUsing(function (CreateAction $action) {
             $action->icon(TablerIcon::Plus);
-            $action->tooltip(fn () => $action->getLabel());
-            // No hiddenLabel(). This is the page's primary call to action, and hiding its
-            // label is what turned every empty state into a dead end: the table said
-            // "create a backup to get started" while the only way to do so was an
-            // unlabelled plus. Row actions further down stay icon-only — they sit in a
-            // tight column and carry a tooltip — but the thing a page exists to do says
-            // what it does.
             $action->iconSize(IconSize::Large);
-
-            if (user()?->getCustomization(CustomizationKey::ButtonStyle)) {
-                $action->iconButton();
-                $action->iconSize(IconSize::ExtraLarge);
-            }
         });
 
         EditAction::configureUsing(function (EditAction $action) {
@@ -235,6 +235,15 @@ class FilamentServiceProvider extends ServiceProvider
             $action->iconSize(IconSize::Large);
 
             if (user()?->getCustomization(CustomizationKey::ButtonStyle)) {
+                // CreateAction is configured above to keep its label, and this callback
+                // runs after that one — so without this the generic rule would put the
+                // icon-button chrome back on and the label would have nowhere to render.
+                // Typed rather than listed by name, so it holds for create actions that
+                // do not exist yet.
+                if ($action instanceof CreateAction) {
+                    return;
+                }
+
                 $name = $action->getName();
 
                 $excludedPrefixes = [
@@ -257,6 +266,19 @@ class FilamentServiceProvider extends ServiceProvider
                     'restart',
                     'kill',
                     'fileUpload',
+
+                    // Toolbar actions. These are the affordance for what a page can do,
+                    // and the preference they are being excluded from offers only 'icon'
+                    // and 'icon_button' — it has no opinion about labels, so stripping
+                    // theirs was never something a user asked for. The file manager's
+                    // toolbar was six unlabelled glyphs because of this.
+                    'add_allocation',
+                    'new_file',
+                    'new_folder',
+                    'uploadURL',
+                    'search',
+                    'connect_sftp',
+                    'import',
                 ];
 
                 foreach ($excludedPrefixes as $prefix) {

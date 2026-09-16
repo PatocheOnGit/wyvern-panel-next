@@ -71,6 +71,7 @@
      * Only the chrome lives here — the sixteen ANSI colours stay in the console view,
      * because a server's log saying "red" has to look red whatever the panel's palette
      * is doing. */
+    --wy-console-bg: #f4f1eb;
     --wy-console-fg: #2b2926;
     --wy-console-selection: rgba(58, 111, 216, 0.22);
     --wy-scrollbar-thumb: rgba(11, 10, 9, 0.28);
@@ -109,6 +110,7 @@
     --wy-accent-quiet: color-mix(in oklab, var(--primary-400) 16%, transparent);
     --wy-focus: var(--primary-400);
 
+    --wy-console-bg: #070606;
     --wy-console-fg: #ded9d0;
     --wy-console-selection: rgba(91, 146, 245, 0.28);
     --wy-scrollbar-thumb: rgba(255, 255, 255, 0.22);
