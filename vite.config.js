@@ -10,7 +10,9 @@ export default defineConfig({
     plugins: [
         laravel({
             input: [
-                ...globSync('resources/css/**/*.css'),
+                // The wyvern/ partials are @import-ed by wyvern-theme.css, so they are inlined
+                // at build time. Without this they would also each become their own entry.
+                ...globSync('resources/css/**/*.css', { ignore: 'resources/css/wyvern/**' }),
                 ...globSync('resources/js/**/*.js'),
 
                 ...globSync('plugins/*/resources/css/**/*.css'),

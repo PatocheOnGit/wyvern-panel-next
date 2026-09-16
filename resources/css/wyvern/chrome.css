@@ -1,0 +1,125 @@
+/* Wyvern chrome — the shell Filament draws, retuned.
+ *
+ * This file is deliberately short. The palette in src/WyvernTheme.php is calibrated so
+ * Filament's own utilities land on the Wyvern surfaces without help: it reads gray-50
+ * for the light page and gray-950 for the dark one, white and gray-900 for cards. So
+ * nothing here repaints a surface that the ramp already gets right.
+ *
+ * What is left is what a palette cannot express: voice, density, and the shape of an
+ * active state. And where a rule does have to win, it wins by setting the custom
+ * property Filament's utility already reads (--tw-ring-color) rather than by overriding
+ * the composed property with !important, which is what the previous file had to do.
+ */
+
+/* ---- voice ----------------------------------------------------------- */
+
+/* The single biggest change to how the panel reads. Every label used to be mono, upper
+ * case and letter-spaced — sidebar groups, table headers, stat labels alike. It shouted,
+ * and letter-spaced capitals are measurably slower to scan. Labels are language, so they
+ * go back to the sans face in sentence case; mono is reserved for values. */
+.fi-sidebar-group-label,
+.fi-ta-header-cell .fi-ta-header-cell-label,
+.fi-in-entry-label,
+.fi-fo-field-wrp-label {
+    font-family: var(--font-family);
+    font-size: var(--wy-text-sm);
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--wy-muted);
+}
+
+/* Values line up in a column when they are stacked, which is the only reason the panel
+ * has a mono face at all. */
+.fi-ta-text-item-label,
+.fi-in-text,
+code,
+kbd,
+samp {
+    font-variant-numeric: tabular-nums;
+}
+
+/* ---- hierarchy ------------------------------------------------------- */
+
+/* A page title was 30px on desktop and clamped to nothing on mobile, where it rendered
+ * near 48px and pushed the actual content below the fold. The title is orientation, not
+ * the subject — the content under it is. */
+.fi-header-heading {
+    font-size: var(--wy-text-2xl);
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    font-weight: 600;
+}
+
+.fi-header-subheading {
+    font-size: var(--wy-text-md);
+    color: var(--wy-muted);
+}
+
+@media (max-width: 48rem) {
+    .fi-header-heading {
+        font-size: var(--wy-text-xl);
+    }
+}
+
+/* ---- navigation ------------------------------------------------------ */
+
+/* The active item is the one piece of chrome allowed to use the accent, because it
+ * answers "where am I" — which is affordance, not decoration. A flat tint and a rail,
+ * no gradient: a gradient on a 36px row is a texture nobody can read. */
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn,
+.fi-sidebar-item .fi-active.fi-sidebar-item-btn {
+    background-color: var(--wy-accent-quiet);
+    box-shadow: inset 2px 0 0 var(--wy-accent);
+    color: var(--wy-accent);
+}
+
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-icon,
+.fi-sidebar-item .fi-active.fi-sidebar-item-btn .fi-icon {
+    color: var(--wy-accent);
+}
+
+/* ---- density --------------------------------------------------------- */
+
+/* Rows were tall enough that ten of them filled a laptop screen. The panel is read, not
+ * browsed, so the default is compact and --wy-row-h carries the preference. */
+.fi-ta-row .fi-ta-cell > .fi-ta-col-wrp,
+.fi-ta-row .fi-ta-cell > .fi-ta-actions {
+    min-height: var(--wy-row-h);
+}
+
+.fi-ta-header-cell,
+.fi-ta-cell {
+    padding-block: 0;
+}
+
+/* ---- focus ----------------------------------------------------------- */
+
+/* Every interactive element gets the same visible ring, in both themes, at an offset so
+ * it never sits on top of the thing it is marking. This is the keyboard user's only
+ * cursor. */
+:where(a, button, [role='button'], [role='option'], input, select, textarea, summary, [tabindex]:not([tabindex='-1'])):focus-visible {
+    outline: 2px solid var(--wy-focus);
+    outline-offset: 2px;
+}
+
+/* Filament composes the field's own border into box-shadow, so the focus state sets the
+ * ring colour the utility already reads instead of replacing the property. */
+.fi-input-wrp:focus-within {
+    --tw-ring-color: var(--wy-focus);
+    outline: 2px solid var(--wy-focus);
+    outline-offset: 1px;
+}
+
+/* The wrapper owns the focus ring, so the inner control must not draw a second one. */
+.fi-input-wrp :where(input, select, textarea):focus-visible {
+    outline: none;
+}
+
+/* ---- sign-in --------------------------------------------------------- */
+
+/* The mark is the only branding on the page, so it is worth seeing. Filament sizes it
+ * from brandLogoHeight, which is tuned for a 36px sidebar slot. */
+.fi-simple-header .fi-logo {
+    height: 3rem;
+}

@@ -1,0 +1,372 @@
+/* ---- server cards ---------------------------------------------------- */
+
+/* The client home is a Filament grid of ServerEntryColumn, so the card is one
+ * Blade view. These rules are the design; the view only supplies structure. */
+
+.wy-server-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    cursor: pointer;
+    border-radius: var(--radius-lg);
+    background-color: var(--wy-card);
+    box-shadow: inset 0 1px 0 var(--wy-line), var(--wy-lift);
+    transition: box-shadow 140ms ease, transform 140ms ease;
+}
+
+.wy-server-card:hover {
+    box-shadow: inset 0 1px 0 var(--wy-line), var(--wy-lift);
+}
+
+.wy-server-card-cover {
+    position: relative;
+    height: 7.25rem;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+/* The egg icon is the cover art, not a badge on it — upstream runs it full
+ * bleed off the right edge and that is the read we want back. */
+.wy-server-card-emblem {
+    position: absolute;
+    right: -0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 122%;
+    width: auto;
+    max-width: 64%;
+    object-fit: contain;
+    object-position: right center;
+    opacity: 0.38;
+}
+
+.wy-server-card-emblem-letter {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+    padding-inline-end: 1rem;
+    font-family: var(--font-mono);
+    font-size: 4.25rem;
+    font-weight: 500;
+    letter-spacing: -0.05em;
+    line-height: 1;
+    opacity: 0.3;
+}
+
+/* The scrim is what makes any cover safe to put type on. */
+.wy-server-card-scrim {
+    position: absolute;
+    inset: 0;
+    /* Bottom-weighted: the art stays readable up top, the title stays readable
+     * on any cover. */
+    background: linear-gradient(
+        180deg,
+        transparent 0%,
+        color-mix(in oklab, var(--wy-card) 55%, transparent) 50%,
+        color-mix(in oklab, var(--wy-card) 92%, transparent) 86%,
+        var(--wy-card) 100%
+    );
+}
+
+.wy-server-card-heading {
+    position: absolute;
+    inset-inline: 1rem;
+    bottom: 0.7rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    /* The art owns the right of the cover, so the title stops before it. */
+    max-width: 68%;
+}
+
+.wy-server-card-egg {
+    font-size: 0.6rem;
+    color: var(--wy-text-2);
+}
+
+.wy-server-card-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.25;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.wy-server-card-state {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.38rem;
+    flex-shrink: 0;
+    font-size: 0.64rem;
+    font-weight: 500;
+    color: var(--tone, var(--wy-text-2));
+}
+
+.wy-server-card-state.fi-color {
+    --tone: var(--color-400);
+}
+
+.wy-server-card-dot {
+    width: 0.44rem;
+    height: 0.44rem;
+    border-radius: 50%;
+    background-color: currentColor;
+    box-shadow: 0 0 0 0.18rem color-mix(in srgb, currentColor 18%, transparent);
+}
+
+.wy-server-card-state-pending {
+    --tone: var(--wy-muted);
+}
+
+.wy-server-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.8rem 1rem 0.95rem;
+}
+
+.wy-server-card-address {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+}
+
+.wy-server-card-address .wy-server-card-host {
+    margin-inline-start: auto;
+}
+
+.wy-server-card-host {
+    color: var(--wy-text-2);
+}
+
+.wy-server-card-uptime {
+    color: var(--wy-muted);
+}
+
+.wy-server-card-description {
+    margin: 0;
+    font-size: 0.78rem;
+    line-height: 1.4;
+    color: var(--wy-text-2);
+}
+
+.wy-server-card-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.65rem;
+}
+
+.wy-server-card-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 0;
+}
+
+.wy-server-card-stat-label {
+    font-size: 0.56rem;
+    color: var(--wy-muted);
+}
+
+.wy-server-card-stat-value {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.86rem;
+    font-weight: 500;
+    color: var(--wy-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.wy-server-card-stat-idle {
+    color: var(--wy-muted);
+}
+
+.wy-server-card-meter {
+    display: block;
+    height: 3px;
+    border-radius: 2px;
+    background-color: var(--wy-control);
+    overflow: hidden;
+}
+
+.wy-server-card-meter > i {
+    display: block;
+    height: 100%;
+    border-radius: 2px;
+    transition: width 400ms ease;
+}
+
+.wy-server-card-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: -0.15rem;
+}
+
+/* ---- shortcut row ---------------------------------------------------- */
+
+.wy-shortcuts {
+    display: grid;
+    /* cap the track so a single configured shortcut stays a card, not a banner */
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 22rem));
+    gap: 0.875rem;
+}
+
+.wy-shortcut {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 0.9rem 1.05rem;
+    border-radius: var(--radius-lg);
+    background-color: var(--wy-card);
+    box-shadow: inset 0 1px 0 var(--wy-line), var(--wy-lift-sm);
+    text-decoration: none;
+    transition: box-shadow 140ms ease;
+}
+
+.wy-shortcut:hover {
+    box-shadow: inset 0 1px 0 var(--wy-line), var(--wy-lift);
+}
+
+.wy-shortcut-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 2.35rem;
+    height: 2.35rem;
+    border-radius: 0.55rem;
+}
+
+.wy-shortcut-icon svg {
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+/* Each tone tints its own badge; the card behind it stays neutral so the row
+ * reads as one object rather than four competing colours. */
+.wy-shortcut-brand {
+    background-image: linear-gradient(120deg, rgba(88, 101, 242, 0.16), var(--wy-card) 62%);
+}
+
+.wy-shortcut-brand .wy-shortcut-icon {
+    background-color: rgba(88, 101, 242, 0.18);
+    color: #8b94f7;
+}
+
+.wy-shortcut-accent .wy-shortcut-icon {
+    background-color: var(--wy-accent-quiet);
+    color: var(--primary-400);
+}
+
+.wy-shortcut-positive .wy-shortcut-icon {
+    background-color: color-mix(in oklab, var(--wy-online) 16%, transparent);
+    color: var(--success-400);
+}
+
+.wy-shortcut-caution .wy-shortcut-icon {
+    background-color: color-mix(in oklab, var(--wy-transition) 16%, transparent);
+    color: var(--warning-400);
+}
+
+.wy-shortcut-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+}
+
+.wy-shortcut-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--wy-text);
+}
+
+.wy-shortcut-description {
+    font-size: 0.73rem;
+    color: var(--wy-text-2);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ---- console page ---------------------------------------------------- */
+
+/* The stat blocks already ship the structure the design needs — a label span and
+ * a value span — so this is all reachable without touching the view. */
+
+.fi-small-stat-block {
+    padding: 0.8rem 1rem;
+    border-radius: var(--radius-lg);
+    background-color: var(--wy-card);
+    box-shadow: inset 0 1px 0 var(--wy-line), var(--wy-lift-sm) !important;
+}
+
+.fi-small-stat-block > span {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 0;
+}
+
+.fi-small-stat-block > span > span:first-child {
+    font-size: 0.6rem;
+    font-weight: 500;
+    color: var(--wy-muted);
+}
+
+.fi-small-stat-block > span > span:last-child {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 1.05rem;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    color: var(--wy-text);
+    white-space: nowrap;
+}
+
+/* The terminal's own theme sets a 70% alpha background, so the surface under it
+ * is ours to choose without touching the xterm options. */
+#terminal {
+    padding: 0.85rem 1.05rem 0.5rem;
+    background-color: var(--wy-ground);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+/* The command line: a prompt, a field, and nothing else competing with them. */
+.fi-wi:has(#send-command),
+div:has(> #send-command) {
+    background-color: var(--wy-ground) !important;
+    padding-inline: 0.85rem;
+    gap: 0.5rem;
+    box-shadow: inset 0 1px 0 var(--wy-line);
+}
+
+div:has(> #send-command) > .fi-icon {
+    color: var(--primary-400);
+}
+
+#send-command {
+    font-family: var(--font-mono) !important;
+    font-size: 0.8rem;
+    background-color: transparent !important;
+    padding-block: 0.7rem !important;
+    color: var(--wy-text);
+}
+
+#send-command::placeholder {
+    color: var(--wy-muted);
+}
+
+/* Charts sit on the same card as everything else rather than in their own box. */
+.fi-console-page .fi-wi-chart {
+    border-radius: var(--radius-lg);
+    background-color: var(--wy-card);
+}

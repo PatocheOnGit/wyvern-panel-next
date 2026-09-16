@@ -5,39 +5,52 @@ namespace Wyvern;
 /**
  * The Wyvern palette, in the six roles Filament recognises.
  *
- * Slate carries every surface: 950 is the page ground, 900 cards, 800 raised, 700
- * controls, 600 the rare hairline, 500-200 text. Teal is the single accent — 400 reads on dark, 500 and
- * darker carry white text where 400 would fail contrast. Red, green and yellow are
- * status only and follow the same split.
+ * One idea carries the whole system: colour means a state, never a decoration. The only
+ * urgent question a game panel answers is whether a server is running, so saturation is
+ * spent on that and nothing else.
+ *
+ * SAND is therefore the whole panel — a warm neutral rather than the blue-black every
+ * other panel uses. Filament reads the ramp from both ends: 50-200 are the light theme's
+ * surfaces and the dark theme's text, 800-950 the dark theme's surfaces and the light
+ * theme's text, 400-600 the muted text of both. So the ramp has to stay monotonic; it
+ * cannot be a set of hand-picked surfaces.
+ *
+ * AZURE is the single accent, and it is affordance only — focus, the active nav item,
+ * links, selection, the primary button. It is cold because every warm accent collides
+ * with a status: a brand amber and a warning amber are indistinguishable in an 8px dot.
+ *
+ * GREEN, AMBER and RED are reserved for state and appear nowhere else.
  */
 final class WyvernTheme
 {
-    public const SLATE = [
-        50 => '#F7F9FB',
-        100 => '#EDF1F5',
-        200 => '#E8EDF3',
-        300 => '#C7D3DF',
-        400 => '#9FAEBE',
-        500 => '#6E7E8F',
-        600 => '#2E3E4E',
-        700 => '#1E2833',
-        800 => '#1B2530',
-        900 => '#141C26',
-        950 => '#0B1017',
+    /** Every surface, and every piece of text, in both themes. */
+    public const SAND = [
+        50 => '#FAF8F4',
+        100 => '#F2EFE9',
+        200 => '#E6E1D7',
+        300 => '#D2CCC0',
+        400 => '#A9A399',
+        500 => '#7C776E',
+        600 => '#5A564F',
+        700 => '#3B3835',
+        800 => '#24221F',
+        900 => '#151412',
+        950 => '#0B0A09',
     ];
 
-    public const TEAL = [
-        50 => '#E9FBF8',
-        100 => '#C8F5EF',
-        200 => '#95EADF',
-        300 => '#5BDACB',
-        400 => '#16B8A6',
-        500 => '#0C8175',
-        600 => '#0A6B61',
-        700 => '#08564E',
-        800 => '#06453F',
-        900 => '#053733',
-        950 => '#032420',
+    /** The accent. 400 reads on dark, 500 and darker carry white text. */
+    public const AZURE = [
+        50 => '#EEF4FE',
+        100 => '#DBE7FD',
+        200 => '#BACFFB',
+        300 => '#8FB2F8',
+        400 => '#5B92F5',
+        500 => '#3A6FD8',
+        600 => '#2D57AC',
+        700 => '#234480',
+        800 => '#1B3461',
+        900 => '#14284A',
+        950 => '#0C1A31',
     ];
 
     public const RED = [
@@ -68,7 +81,7 @@ final class WyvernTheme
         950 => '#0D281A',
     ];
 
-    public const YELLOW = [
+    public const AMBER = [
         50 => '#FBF4E5',
         100 => '#F5E4BF',
         200 => '#EDCE85',
@@ -84,11 +97,11 @@ final class WyvernTheme
 
     /** Wyvern has one accent, so info reuses it rather than introducing a second hue. */
     public const COLORS = [
-        'primary' => self::TEAL,
-        'info' => self::TEAL,
-        'gray' => self::SLATE,
+        'primary' => self::AZURE,
+        'info' => self::AZURE,
+        'gray' => self::SAND,
         'danger' => self::RED,
         'success' => self::GREEN,
-        'warning' => self::YELLOW,
+        'warning' => self::AMBER,
     ];
 }

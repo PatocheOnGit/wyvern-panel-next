@@ -24,15 +24,15 @@
   dependencies:
     tslib "^2.4.0"
 
-"@fontsource/archivo@^5.3.0":
+"@fontsource-variable/instrument-sans@^5.3.0":
   version "5.3.0"
-  resolved "https://registry.yarnpkg.com/@fontsource/archivo/-/archivo-5.3.0.tgz#c0af54dc50817cd19c7711bd1db51b28efc4d358"
-  integrity sha512-5DIMgPVJRi62OqdOVoogCFxP73EkNM/E0YVTSDIQlDEJfDbxqZduwM/YoNZwC9Sx1CDgpKinqf8ckRY1QNIecw==
+  resolved "https://registry.yarnpkg.com/@fontsource-variable/instrument-sans/-/instrument-sans-5.3.0.tgz#56e1c0410be5a224078909ab88113ff776c32019"
+  integrity sha512-u4gKbDBTNFGkg997tfQn3eHOhHuquWUFTRT/rwzuKtrxX5P2ekfs2x+LgBPP4P32+cC+vUwF1Cr+IdRoPQbrGw==
 
-"@fontsource/azeret-mono@^5.3.0":
+"@fontsource-variable/jetbrains-mono@^5.3.0":
   version "5.3.0"
-  resolved "https://registry.yarnpkg.com/@fontsource/azeret-mono/-/azeret-mono-5.3.0.tgz#000dfcb60e9927179bf0c955cac3cba78ea98cfa"
-  integrity sha512-Ag/+gN67fUry7i1yLlTnk16Rr1nnTQI2YefA/G7tYcCSr/+TC/ayMrE8Km7O0OKRgI/B5Mfel46Gq9IGY50Uaw==
+  resolved "https://registry.yarnpkg.com/@fontsource-variable/jetbrains-mono/-/jetbrains-mono-5.3.0.tgz#5738dedd3af40606b0d9b7626f4ba7c4586cb39b"
+  integrity sha512-F32xpS2NsGYoQi2ADSkKTgpJj7ozajsGgDJ8woTnqjmIB+dxDIqImjl4pXZVEExu8UFZ2ndhmX18EBS/hdz3Lw==
 
 "@jridgewell/gen-mapping@^0.3.5":
   version "0.3.13"

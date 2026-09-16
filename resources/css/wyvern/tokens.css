@@ -1,0 +1,110 @@
+/* Wyvern design tokens.
+ *
+ * Filament emits the palette from src/WyvernTheme.php as global OKLCH custom properties
+ * (--gray-50 … --gray-950, --primary-*, --danger-*, …). Those are NOT theme-branched:
+ * the same eleven values exist in light and dark, and Filament picks which stop to use
+ * per theme through its own `dark:` variants.
+ *
+ * So this file is the branch. Every Wyvern surface is named once here, in terms of those
+ * stops, twice — once for light, once for dark. Nothing downstream may write a hex; if a
+ * rule needs a colour it takes a --wy-* token. That is what keeps the two themes honest,
+ * and it is why the previous single-branch file rendered dark cards on a white page.
+ *
+ * The dark class lands on <html>, which is also :root, so the dark branch is written
+ * :root.dark to out-rank the light one on specificity rather than on source order.
+ */
+
+:root {
+    /* Surfaces, in stacking order: the page, the card on it, anything raised above the
+     * card, and the controls cut into it. */
+    --wy-ground: var(--gray-50);
+    --wy-card: #ffffff;
+    --wy-raised: var(--gray-100);
+    --wy-control: var(--gray-50);
+
+    /* Hairlines are alpha rather than a ramp stop on purpose: the same line has to read
+     * on the page, on a card and on a raised surface, and an alpha line composes with
+     * whatever is behind it instead of needing three values. */
+    --wy-line: rgb(11 10 9 / 0.12);
+    --wy-line-strong: rgb(11 10 9 / 0.2);
+
+    /* Elevation is the secondary cue now that hairlines carry separation. A shadow is
+     * nearly invisible on a light page, which is exactly why it cannot be the only one. */
+    --wy-lift-sm: 0 1px 2px rgb(11 10 9 / 0.06);
+    --wy-lift: 0 8px 24px rgb(11 10 9 / 0.1), 0 2px 6px rgb(11 10 9 / 0.06);
+
+    /* Text. Filament covers most of it; these are for our own components. */
+    --wy-text: var(--gray-900);
+    --wy-text-2: var(--gray-600);
+    --wy-muted: var(--gray-500);
+
+    /* The accent, as affordance. 500 on light so it carries contrast against white. */
+    --wy-accent: var(--primary-500);
+    --wy-accent-quiet: color-mix(in oklab, var(--primary-500) 10%, transparent);
+    --wy-focus: var(--primary-500);
+
+    /* Status. Named here so a component never reaches for --success-400 directly and
+     * never invents a fourth state colour. */
+    --wy-online: var(--success-500);
+    --wy-transition: var(--warning-500);
+    --wy-offline: var(--danger-500);
+
+    /* Corner radius. These shadow Tailwind's own theme variables, so setting them here
+     * retunes every rounded-* utility in Filament's compiled stylesheet at once — the
+     * cheapest global lever in the panel. Tighter than Filament's defaults: tight reads
+     * as technical, soft reads as consumer. */
+    --radius-sm: 0.1875rem;
+    --radius-md: 0.25rem;
+    --radius-lg: 0.375rem;
+    --radius-xl: 0.5rem;
+
+    /* Density. Compact is the default because an operations panel is read, not browsed. */
+    --wy-row-h: 2.5rem;
+    --wy-pad: 0.75rem;
+    --wy-gap: 0.75rem;
+
+    /* Type scale. The rule the whole panel follows: sans is for language, mono is for
+     * values — numbers, addresses, paths, identifiers, console. Mono is never a label. */
+    --wy-text-xs: 0.6875rem;
+    --wy-text-sm: 0.75rem;
+    --wy-text-base: 0.8125rem;
+    --wy-text-md: 0.875rem;
+    --wy-text-lg: 1rem;
+    --wy-text-xl: 1.25rem;
+    --wy-text-2xl: 1.5rem;
+}
+
+:root.dark {
+    --wy-ground: var(--gray-950);
+    --wy-card: var(--gray-900);
+    --wy-raised: var(--gray-800);
+    --wy-control: var(--gray-800);
+
+    --wy-line: rgb(255 255 255 / 0.09);
+    --wy-line-strong: rgb(255 255 255 / 0.16);
+
+    --wy-lift-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+    --wy-lift: 0 10px 26px rgb(0 0 0 / 0.45), 0 2px 6px rgb(0 0 0 / 0.3);
+
+    --wy-text: var(--gray-100);
+    --wy-text-2: var(--gray-300);
+    --wy-muted: var(--gray-400);
+
+    /* 400 on dark: 500 is tuned to carry white text, and it is too dark to read as a
+     * link or an active rail against a near-black page. */
+    --wy-accent: var(--primary-400);
+    --wy-accent-quiet: color-mix(in oklab, var(--primary-400) 16%, transparent);
+    --wy-focus: var(--primary-400);
+
+    --wy-online: var(--success-400);
+    --wy-transition: var(--warning-400);
+    --wy-offline: var(--danger-400);
+}
+
+/* Comfortable density, offered as a per-user preference. Only the two size tokens move;
+ * no rule is written twice. */
+:root[data-wy-density='comfortable'] {
+    --wy-row-h: 3rem;
+    --wy-pad: 1rem;
+    --wy-gap: 1rem;
+}

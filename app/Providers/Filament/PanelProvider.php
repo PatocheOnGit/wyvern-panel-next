@@ -42,7 +42,7 @@ abstract class PanelProvider extends BasePanelProvider
             ->colors(WyvernTheme::COLORS)
             ->defaultThemeMode(ThemeMode::Dark)
             ->font(
-                'Archivo',
+                'Instrument Sans Variable',
                 url: fn () => Vite::asset('resources/css/wyvern.css'),
                 provider: LocalFontProvider::class,
             )

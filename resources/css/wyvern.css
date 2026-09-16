@@ -3,20 +3,21 @@
  * Filament loads this through font() + LocalFontProvider, so it is one <link> in the
  * head of every panel. Faces are self-hosted via @fontsource — no CDN.
  *
- * Colours live in PanelProvider::panel() instead; Filament emits them as custom
- * properties, which is cheaper than fighting the compiled stylesheet from here.
+ * Instrument Sans carries the interface and JetBrains Mono carries values: numbers,
+ * addresses, paths, identifiers, the terminal. The split is the rule — mono is never a
+ * label. Both are the variable cut, so one file per family covers every weight the
+ * panel uses instead of the eight static files the previous pairing shipped.
+ *
+ * Colours live in PanelProvider::panel() instead, because Filament needs them as PHP to
+ * emit its own custom properties.
  */
 
-@import '@fontsource/archivo/400.css';
-@import '@fontsource/archivo/500.css';
-@import '@fontsource/archivo/600.css';
-@import '@fontsource/archivo/700.css';
-@import '@fontsource/azeret-mono/400.css';
-@import '@fontsource/azeret-mono/500.css';
+@import '@fontsource-variable/instrument-sans/wght.css';
+@import '@fontsource-variable/jetbrains-mono/wght.css';
 
-/* font() only sets the sans family. The mono stack has to be claimed here, and the
+/* font() only claims the sans family. The mono stack has to be claimed here, and the
  * extra `html` beats Filament's own `:root` on specificity rather than source order. */
 html:root {
-    --font-mono: 'Azeret Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --font-mono: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     --default-mono-font-family: var(--font-mono);
 }
