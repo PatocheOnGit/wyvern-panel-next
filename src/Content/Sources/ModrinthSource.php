@@ -72,6 +72,19 @@ class ModrinthSource implements ContentSource
             return [];
         }
 
+        $hits = $response->json('hits', []);
+
+        // A search run for a server should not offer client mods. Every hit already
+        // carries server_side, so this costs nothing — and without it the first page of
+        // results for a mod loader is mostly shaders and rendering engines that stop the
+        // server booting at all.
+        if ($type !== ContentType::Modpack) {
+            $hits = array_filter(
+                $hits,
+                fn (array $hit): bool => ($hit['server_side'] ?? 'optional') !== 'unsupported',
+            );
+        }
+
         return array_map(
             fn (array $hit): ContentProject => new ContentProject(
                 source: $this->key(),
@@ -85,7 +98,7 @@ class ModrinthSource implements ContentSource
                 pageUrl: 'https://modrinth.com/' . ($hit['project_type'] ?? 'mod') . '/' . ($hit['slug'] ?? ''),
                 categories: $hit['categories'] ?? [],
             ),
-            $response->json('hits', []),
+            $hits,
         );
     }
 

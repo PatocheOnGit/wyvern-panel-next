@@ -29,6 +29,19 @@ enum Loader: string
         };
     }
 
+    /** The flavour's own mark, served from the panel rather than a CDN. */
+    public function logo(): string
+    {
+        return match ($this) {
+            self::Vanilla => '/wyvern/loaders/vanilla.svg',
+            self::Paper => '/wyvern/loaders/paper.webp',
+            self::Purpur => '/wyvern/loaders/purpur.svg',
+            self::Fabric => '/wyvern/loaders/fabric.png',
+            self::Forge => '/wyvern/loaders/forge.png',
+            self::NeoForge => '/wyvern/loaders/neoforge.png',
+        };
+    }
+
     /** What the flavour is for, in one line, for the picker. */
     public function summary(): string
     {

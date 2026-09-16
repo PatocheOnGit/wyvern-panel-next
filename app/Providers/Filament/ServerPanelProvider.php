@@ -12,6 +12,7 @@ use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Navigation\NavigationItem;
 use Filament\Panel;
+use Wyvern\Filament\WyvernPlugin;
 
 class ServerPanelProvider extends PanelProvider
 {
@@ -45,6 +46,9 @@ class ServerPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Server/Widgets'), for: 'App\\Filament\\Server\\Widgets')
             ->tenantMiddleware([
                 ServerSubject::class,
+            ])
+            ->plugins([
+                WyvernPlugin::make(),
             ]);
 
         /** @var PluginService $pluginService */
