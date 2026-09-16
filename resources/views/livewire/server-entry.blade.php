@@ -30,53 +30,64 @@
         ? ($nodeStatistics['disk_total'] ?? 0)
         : ServerResourceType::DiskLimit->getResourceAmount($server);
 
+    // A meter is only honest when there is a ceiling to measure against. Where a limit is
+    // unset the card falls back to the node's own capacity above; where even that is
+    // unknown the bar is suppressed rather than drawn at zero, which would read as idle.
     $meter = function (int|float $current, int|float $max) use ($warningPercent, $dangerPercent) {
-        $ratio = $max > 0 ? $current / $max : 0;
-        $status = $ratio >= $dangerPercent ? 'danger' : ($ratio >= $warningPercent ? 'warning' : 'success');
+        if ($max <= 0) {
+            return ['percent' => null, 'colour' => null];
+        }
+
+        $ratio = $current / $max;
 
         return [
             'percent' => max(0, min(100, $ratio * 100)),
-            'colour' => match ($status) {
-                'danger' => 'var(--danger-400)',
-                'warning' => 'var(--warning-400)',
-                default => 'var(--primary-400)',
+            'colour' => match (true) {
+                $ratio >= $dangerPercent => 'var(--wy-offline)',
+                $ratio >= $warningPercent => 'var(--wy-transition)',
+                default => 'var(--wy-accent)',
             },
         ];
     };
 
-    $cpu = $meter($cpuCurrent, $cpuMax);
-    $mem = $meter($memCurrent, $memMax);
-    $disk = $meter($diskCurrent, $diskMax);
+    $stats = [
+        ['label' => trans('server/dashboard.cpu'), 'value' => $server->formatResource(ServerResourceType::CPU, 0), 'meter' => $meter($cpuCurrent, $cpuMax)],
+        ['label' => trans('server/dashboard.memory'), 'value' => $server->formatResource(ServerResourceType::Memory), 'meter' => $meter($memCurrent, $memMax)],
+        ['label' => trans('server/dashboard.disk'), 'value' => $server->formatResource(ServerResourceType::Disk), 'meter' => $meter($diskCurrent, $diskMax)],
+    ];
 @endphp
 
 <div wire:poll.15s
      class="wy-server-card"
+     style="--wy-server-hue: {{ ServerCover::stripe($server) }}; --wy-server-plate: {{ ServerCover::plate($server) }};"
      x-on:click="{{ $component->redirectUrl() }}"
      x-on:auxclick.prevent="if ($event.button === 1) {{ $component->redirectUrl(true) }}">
 
-    {{-- cover --}}
-    <div class="wy-server-card-cover" style="background: {{ ServerCover::gradient($server) }};">
-        @if ($icon)
-            <img src="{{ $icon }}" alt="" class="wy-server-card-emblem">
-        @else
-            <span class="wy-server-card-emblem wy-server-card-emblem-letter"
-                  style="color: {{ ServerCover::tint($server) }};">{{ Str::upper(Str::substr($server->name, 0, 2)) }}</span>
-        @endif
+    {{-- The head answers the two questions a card is scanned for: which server, and is
+         it up. The game identity is the edge and the emblem, not a picture behind the
+         title — it used to take 40% of the card and crop its own icon. --}}
+    <div class="wy-server-card-head">
+        <span class="wy-server-card-emblem">
+            @if ($icon)
+                <img src="{{ $icon }}" alt="">
+            @else
+                <span class="wy-server-card-initials"
+                      style="color: {{ ServerCover::tint($server) }};">{{ Str::upper(Str::substr($server->name, 0, 2)) }}</span>
+            @endif
+        </span>
 
-        <div class="wy-server-card-scrim"></div>
-
-        <div class="wy-server-card-heading">
+        <span class="wy-server-card-heading">
             <span class="wy-server-card-egg">{{ $server->egg->name }}</span>
             <h2 class="wy-server-card-name">{{ $server->name }}</h2>
-        </div>
+        </span>
+
+        <span class="wy-server-card-state fi-color fi-color-{{ $server->condition->getColor() }}">
+            <i class="wy-server-card-dot"></i>{{ $server->condition->getLabel() }}
+        </span>
     </div>
 
-    {{-- body --}}
     <div class="wy-server-card-body">
-        <div class="wy-server-card-address">
-            <span class="wy-server-card-state fi-color fi-color-{{ $server->condition->getColor() }}">
-                <i class="wy-server-card-dot"></i>{{ $server->condition->getLabel() }}
-            </span>
+        <div class="wy-server-card-meta">
             <span class="wy-server-card-host">{{ $server->allocation?->address ?? trans('server/dashboard.none') }}</span>
             @if ($uptime > 0)
                 <span class="wy-server-card-uptime">{{ $server->formatResource(ServerResourceType::Uptime) }}</span>
@@ -88,23 +99,17 @@
         @endif
 
         <div class="wy-server-card-stats">
-            <div class="wy-server-card-stat">
-                <span class="wy-server-card-stat-label">{{ trans('server/dashboard.cpu') }}</span>
-                <span class="wy-server-card-stat-value">{{ $server->formatResource(ServerResourceType::CPU, 0) }}</span>
-                <span class="wy-server-card-meter"><i style="width: {{ $cpu['percent'] }}%; background: {{ $cpu['colour'] }};"></i></span>
-            </div>
-
-            <div class="wy-server-card-stat">
-                <span class="wy-server-card-stat-label">{{ trans('server/dashboard.memory') }}</span>
-                <span class="wy-server-card-stat-value">{{ $server->formatResource(ServerResourceType::Memory) }}</span>
-                <span class="wy-server-card-meter"><i style="width: {{ $mem['percent'] }}%; background: {{ $mem['colour'] }};"></i></span>
-            </div>
-
-            <div class="wy-server-card-stat">
-                <span class="wy-server-card-stat-label">{{ trans('server/dashboard.disk') }}</span>
-                <span class="wy-server-card-stat-value">{{ $server->formatResource(ServerResourceType::Disk) }}</span>
-                <span class="wy-server-card-meter"><i style="width: {{ $disk['percent'] }}%; background: {{ $disk['colour'] }};"></i></span>
-            </div>
+            @foreach ($stats as $stat)
+                <div class="wy-server-card-stat">
+                    <span class="wy-server-card-stat-label">{{ $stat['label'] }}</span>
+                    <span class="wy-server-card-stat-value">{{ $stat['value'] }}</span>
+                    @if ($stat['meter']['percent'] !== null)
+                        <span class="wy-server-card-meter"><i style="width: {{ $stat['meter']['percent'] }}%; background: {{ $stat['meter']['colour'] }};"></i></span>
+                    @else
+                        <span class="wy-server-card-meter wy-server-card-meter-unmetered"></span>
+                    @endif
+                </div>
+            @endforeach
         </div>
 
         @if ($actiongroup->isVisible())

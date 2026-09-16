@@ -1,36 +1,39 @@
 @php
-    use App\Enums\ServerResourceType;
     use Wyvern\ServerCover;
 
     $icon = $server->icon ?? $server->egg->icon;
 @endphp
 
-{{-- The same shape as the loaded card, so nothing jumps once the daemon answers. --}}
+{{-- The same shape as the loaded card, down to the row count, so nothing jumps once the
+     daemon answers. Everything here is known without asking it: the name, the game, the
+     address. Only the state and the three figures have to wait. --}}
 <div class="wy-server-card wy-server-card-loading"
+     style="--wy-server-hue: {{ ServerCover::stripe($server) }}; --wy-server-plate: {{ ServerCover::plate($server) }};"
      x-on:click="{{ $component->redirectUrl() }}"
      x-on:auxclick.prevent="if ($event.button === 1) {{ $component->redirectUrl(true) }}">
 
-    <div class="wy-server-card-cover" style="background: {{ ServerCover::gradient($server) }};">
-        @if ($icon)
-            <img src="{{ $icon }}" alt="" class="wy-server-card-emblem">
-        @else
-            <span class="wy-server-card-emblem wy-server-card-emblem-letter"
-                  style="color: {{ ServerCover::tint($server) }};">{{ Str::upper(Str::substr($server->name, 0, 2)) }}</span>
-        @endif
+    <div class="wy-server-card-head">
+        <span class="wy-server-card-emblem">
+            @if ($icon)
+                <img src="{{ $icon }}" alt="">
+            @else
+                <span class="wy-server-card-initials"
+                      style="color: {{ ServerCover::tint($server) }};">{{ Str::upper(Str::substr($server->name, 0, 2)) }}</span>
+            @endif
+        </span>
 
-        <div class="wy-server-card-scrim"></div>
-
-        <div class="wy-server-card-heading">
+        <span class="wy-server-card-heading">
             <span class="wy-server-card-egg">{{ $server->egg->name }}</span>
             <h2 class="wy-server-card-name">{{ $server->name }}</h2>
-        </div>
+        </span>
+
+        <span class="wy-server-card-state wy-server-card-state-pending">
+            <x-filament::loading-indicator class="h-3 w-3" />{{ trans('server/dashboard.loading') }}
+        </span>
     </div>
 
     <div class="wy-server-card-body">
-        <div class="wy-server-card-address">
-            <span class="wy-server-card-state wy-server-card-state-pending">
-                <x-filament::loading-indicator class="h-3 w-3" />{{ trans('server/dashboard.loading') }}
-            </span>
+        <div class="wy-server-card-meta">
             <span class="wy-server-card-host">{{ $server->allocation?->address ?? trans('server/dashboard.none') }}</span>
         </div>
 
@@ -39,21 +42,13 @@
         @endif
 
         <div class="wy-server-card-stats">
-            <div class="wy-server-card-stat">
-                <span class="wy-server-card-stat-label">{{ trans('server/dashboard.cpu') }}</span>
-                <span class="wy-server-card-stat-value wy-server-card-stat-idle">&mdash;</span>
-                <span class="wy-server-card-meter"></span>
-            </div>
-            <div class="wy-server-card-stat">
-                <span class="wy-server-card-stat-label">{{ trans('server/dashboard.memory') }}</span>
-                <span class="wy-server-card-stat-value wy-server-card-stat-idle">&mdash;</span>
-                <span class="wy-server-card-meter"></span>
-            </div>
-            <div class="wy-server-card-stat">
-                <span class="wy-server-card-stat-label">{{ trans('server/dashboard.disk') }}</span>
-                <span class="wy-server-card-stat-value wy-server-card-stat-idle">&mdash;</span>
-                <span class="wy-server-card-meter"></span>
-            </div>
+            @foreach ([trans('server/dashboard.cpu'), trans('server/dashboard.memory'), trans('server/dashboard.disk')] as $label)
+                <div class="wy-server-card-stat">
+                    <span class="wy-server-card-stat-label">{{ $label }}</span>
+                    <span class="wy-server-card-stat-value wy-server-card-stat-idle">&mdash;</span>
+                    <span class="wy-server-card-meter wy-server-card-meter-unmetered"></span>
+                </div>
+            @endforeach
         </div>
     </div>
 </div>

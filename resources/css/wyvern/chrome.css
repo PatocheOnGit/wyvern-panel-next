@@ -62,6 +62,32 @@ samp {
     }
 }
 
+/* ---- tabs ------------------------------------------------------------ */
+
+/* Filament lays a tab strip out as a nowrap flex row that scrolls. On a phone that put
+ * "All Servers" half off the screen behind a scrollbar nobody looks for — a filter you
+ * cannot see is a filter you do not have. Three short tabs wrap into two rows and are
+ * all readable; the scroll stays available for strips genuinely too long to wrap. */
+@media (max-width: 48rem) {
+    .fi-tabs {
+        flex-wrap: wrap;
+        overflow-x: visible;
+    }
+}
+
+/* Left, with the rest of the page. Centred, the strip floated free of the table it
+ * filters and read as page furniture rather than as a control on that table.
+ *
+ * The centring is margin-inline:auto on .fi-tabs itself, not justify-content on the
+ * container — setting the container alone changes nothing. */
+.fi-sc-tabs {
+    justify-content: flex-start;
+}
+
+.fi-sc-tabs > .fi-tabs {
+    margin-inline: 0;
+}
+
 /* ---- navigation ------------------------------------------------------ */
 
 /* The active item is the one piece of chrome allowed to use the accent, because it

@@ -16,6 +16,13 @@ class ShortcutsWidget extends Widget
 {
     protected string $view = 'wyvern.widgets.shortcuts';
 
+    /**
+     * Not lazy. Filament renders a lazy widget as an empty card until it resolves, and
+     * this one reads a config array — there is nothing to wait for, so all the laziness
+     * bought was a blank slab at the top of the client home on every page load.
+     */
+    protected static bool $isLazy = false;
+
     protected int|string|array $columnSpan = 'full';
 
     public static function canView(): bool
