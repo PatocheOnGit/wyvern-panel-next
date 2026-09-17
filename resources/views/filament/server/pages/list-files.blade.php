@@ -1,5 +1,6 @@
 <x-filament-panels::page>
     <div
+        x-on:contextmenu="openRowMenu($event)"
         x-data="
         {
             serverUuid: @js(\Filament\Facades\Filament::getTenant()->uuid),
@@ -10,6 +11,30 @@
             currentFileIndex: 0,
             totalFiles: 0,
             autoCloseTimer: 1000,
+
+            // Right-click a row to reach the same menu its dots button opens.
+            //
+            // Filament's dropdown toggles on a left mousedown only — its trigger checks
+            // $event.button === 0 — so rather than reaching into filamentDropdown's
+            // internals, this replays the gesture it already listens for, on the trigger
+            // it already owns. The menu therefore anchors to the dots button rather than
+            // to the cursor, which is predictable and costs no custom menu.
+            openRowMenu(event) {
+                // A text field keeps its own context menu: cut, copy, paste and spelling
+                // are more useful there than file actions.
+                if (event.target.closest('input, textarea, [contenteditable]')) {
+                    return;
+                }
+
+                const trigger = event.target.closest('.fi-ta-row')?.querySelector('.fi-dropdown-trigger');
+
+                if (! trigger) {
+                    return;
+                }
+
+                event.preventDefault();
+                trigger.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 }));
+            },
 
             async fetchUploadUrl() {
                 const r = await fetch(`/api/client/servers/${this.serverUuid}/files/upload`, {

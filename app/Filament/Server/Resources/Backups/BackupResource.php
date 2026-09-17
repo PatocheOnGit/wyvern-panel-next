@@ -264,11 +264,12 @@ class BackupResource extends Resource
                     ->icon(TablerIcon::FileZip)
                     ->tooltip(fn () => $server->backups()->count() >= $server->backup_limit ? trans('server/backup.actions.create.limit') : trans('server/backup.actions.create.title'))
                     ->disabled(fn () => $server->backups()->count() >= $server->backup_limit)
-                    // Neutral, not danger, when the allowance is used up. Red means an error
-                    // or a destructive action; "you have no backup slots left" is neither, and
-                    // it was painting the most prominent control on the page red. The button is
-                    // already disabled and its tooltip already explains the limit.
-                    ->color(fn () => $server->backups()->count() >= $server->backup_limit ? 'gray' : 'primary')
+                    // Amber when the allowance is used up, not red and not grey. Red means
+                    // an error or something destructive, and a quota is neither — it was
+                    // painting the most prominent control on the page red. But grey said
+                    // nothing at all, and "you cannot do this right now" deserves to be
+                    // visible. The tooltip carries the reason.
+                    ->color(fn () => $server->backups()->count() >= $server->backup_limit ? 'warning' : 'primary')
                     ->createAnother(false)
                     ->successNotificationTitle(null)
                     ->action(function (InitiateBackupService $initiateBackupService, $data) use ($server) {

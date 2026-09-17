@@ -333,10 +333,14 @@ class ListFiles extends ListRecords
 
                             $this->refreshPage();
                         }),
+                    // Amber, not neutral: unarchiving writes into the current directory
+                    // and will overwrite a file that is already there. Not destructive
+                    // enough for danger, not harmless enough for grey.
                     Action::make('fm_unarchive')
                         ->authorize(fn () => user()?->can(SubuserPermission::FileArchive, $server))
                         ->label(trans('server/file.actions.unarchive.title'))
                         ->icon(TablerIcon::Archive)->iconSize(IconSize::Large)
+                        ->color('warning')
                         ->visible(fn (File $file) => $file->isArchive())
                         ->action(function (File $file) {
                             $this->getDaemonFileRepository()->decompressFile($this->path, $file->name);
@@ -355,10 +359,25 @@ class ListFiles extends ListRecords
                         }),
                     DeleteAction::make()
                         ->authorize(fn () => user()?->can(SubuserPermission::FileDelete, $server))
-                        // The global DeleteAction config hides its label, which is right in
-                        // a row of icons and wrong inside a dropdown, where it would render
-                        // as a blank menu item.
+                        // Three things are needed to make this a menu row rather than a
+                        // stray glyph, and they are not obvious.
+                        //
+                        // hiddenLabel(false) because the global DeleteAction config hides
+                        // the label — right in a row of icons, wrong in a dropdown.
+                        //
+                        // The view, because ActionGroup only sets defaultView() on its
+                        // children, and the generic Action::configureUsing calls
+                        // iconButton() on anything not in its exclusion list, which sets an
+                        // explicit view that beats the default. The fm_* actions above are
+                        // excluded by prefix; DeleteAction is not, so it alone rendered as an
+                        // icon button inside the dropdown — unlabelled and misaligned.
+                        //
+                        // The colour stays danger, which is DeleteAction's default: this is
+                        // the one action here that destroys something, and it should look
+                        // like it.
                         ->hiddenLabel(false)
+                        ->view(Action::GROUPED_VIEW)
+                        ->color('danger')
                         ->requiresConfirmation()
                         ->modalHeading(fn (File $file) => trans('filament-actions::delete.single.modal.heading', ['label' => $file->name . ' ' . ($file->is_directory ? 'folder' : 'file')]))
                         ->action(function (File $file) {
