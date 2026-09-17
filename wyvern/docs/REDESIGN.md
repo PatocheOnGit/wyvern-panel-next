@@ -90,22 +90,44 @@ are gone from the chrome.
 - **SPA is on everywhere except the console**, so new JS must re-initialise on
   `livewire:navigated`.
 
+## Also shipped
+
+9.  **Files** — right-click a row for its menu; one dropdown per row; delete labelled and
+    red again.
+10. **Power controls on every server page**, through `CanCustomizeHeaderActions`. A second
+    implementation on purpose: `ListServers::getPowerActionGroup()` dispatches a
+    `powerAction` event whose only listener is on the app panel, so reused elsewhere its
+    buttons would appear, be clickable, and do nothing.
+11. **Pinned servers**, in the existing customization JSON, keyed by UUID so a stale pin
+    matches no row and needs no cleanup.
+12. **Keyboard** — `?` for the sheet, `g`+letter to jump, per panel.
+13. **Density** — Compact/Comfortable, emitted as two token values server-side.
+14. **The API docs index**, on the token system instead of hex and emoji.
+15. **Egg and server deletion are logged**, via model events so it holds however the
+    deletion was triggered.
+
+## Naming: two things are already called "shortcuts"
+
+The host link row above the server cards owns both `wyvern.shortcuts.*` in the lang file
+and `.wy-shortcuts` in CSS. The keyboard feature is `wyvern.keyboard.*` and `.wy-keys`
+because of it — a duplicate array key silently drops one block, and the duplicate class
+leaked a `max-width` onto that row. Check both namespaces before adding a third.
+
 ## Still open
 
 - **No Filament view has been published.** `resources/views/vendor/` still holds only
   scramble's. Every change so far went through a render hook, a Filament API, or a Pelican
   Blade file — so there is no `OVERRIDES.md` to keep yet, and it is worth keeping it that
   way as long as possible.
-- Server pinning and favourites. The density preference has tokens but no control.
-- A shortcuts help modal, and `g` plus letter jumps.
 - The palette offers pages and servers, not actions: power actions need the Filament action
   infrastructure, which a bespoke Alpine component does not have.
-- The server context bar — power actions on every server page, not only the console.
 - Skeletons beyond the server card placeholder.
-- `resources/views/docs/api-index.blade.php` is still hex and emoji.
+- The console remains outside SPA mode, so entering it is a full reload.
 - `public/wyvern/loaders/vanilla.svg` is 152 KB and `forge.png` 151 KB.
-- Egg and server deletion are still not written to the activity log, which is why
-  confirming the 2026-09-17 egg consolidation meant cross-referencing `auth:success` rows.
+- `SmallStatBlock` carries a ratio now, but the three console charts still hard-code
+  `rgba(96,165,250,0.3)` for their fill.
+- The client panel has no bottom tab bar by choice (three destinations); revisit if it
+  gains more.
 
 ## Verification
 
