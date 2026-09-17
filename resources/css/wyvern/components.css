@@ -103,6 +103,42 @@
     white-space: nowrap;
 }
 
+/* ---- pin ---- */
+
+/* Quiet until it means something. An unpinned card should not advertise a control nobody
+ * has asked for, so it only reaches full contrast on hover, on focus, or once pinned. */
+.wy-server-card-pin {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    margin-inline-start: auto;
+    width: 1.75rem;
+    height: 1.75rem;
+    color: var(--wy-muted);
+    background: none;
+    border: 0;
+    border-radius: var(--radius-md);
+    opacity: 0.55;
+    cursor: pointer;
+    transition: opacity 120ms ease, color 120ms ease;
+}
+
+.wy-server-card-pin svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+.wy-server-card:hover .wy-server-card-pin,
+.wy-server-card-pin:focus-visible {
+    opacity: 1;
+}
+
+.wy-server-card-pin-on {
+    color: var(--wy-accent);
+    opacity: 1;
+}
+
 /* ---- state ---- */
 
 /* Pushed to the end of the head so it lands in the same place on every card in the grid:
@@ -112,7 +148,6 @@
     flex: 0 0 auto;
     gap: 0.375rem;
     align-items: center;
-    margin-inline-start: auto;
     padding: 0.1875rem 0.5rem;
     font-size: var(--wy-text-xs);
     font-weight: 500;

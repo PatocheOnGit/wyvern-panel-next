@@ -18,6 +18,35 @@ return [
      * The command palette. "Jump to" rather than "Search", because it does not search
      * records — it goes to pages and servers, and saying so avoids promising otherwise.
      */
+    'api_docs' => [
+        'title' => 'API documentation',
+        'lead' => 'Two APIs, with separate keys and separate scopes.',
+        'application' => 'Application API',
+        'application_hint' => 'Administrative: servers, nodes, users, eggs.',
+        'client' => 'Client API',
+        'client_hint' => 'What a server owner can do to their own servers.',
+        'note' => 'Both require you to be signed in to this panel.',
+    ],
+
+    'pins' => [
+        'pin' => 'Pin this server',
+        'unpin' => 'Unpin this server',
+    ],
+
+    'density' => [
+        'label' => 'Density',
+        'compact' => 'Compact',
+        'comfortable' => 'Comfortable',
+    ],
+
+    'keyboard' => [
+        'title' => 'Keyboard shortcuts',
+        'general' => 'General',
+        'jump' => 'Go to',
+        'close' => 'Close a dialog',
+        'armed' => 'waiting for a letter',
+    ],
+
     'palette' => [
         'label' => 'Jump to a page or server',
         'trigger' => 'Jump to',

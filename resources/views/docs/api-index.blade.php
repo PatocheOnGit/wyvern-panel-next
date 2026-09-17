@@ -1,31 +1,51 @@
+{{-- Standalone, like the error pages: this is not a panel route, so no panel render hook
+     fires here. Both stylesheets are named explicitly, in the panel's own order, or every
+     class below is undefined. --}}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="fi">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API Documentation</title>
-    @vite('resources/css/app.css')
+    <title>{{ trans('wyvern.api_docs.title') }} - {{ config('app.name') }}</title>
+    <link rel="icon" href="{{ config('app.favicon') }}">
+
+    @vite(['resources/css/app.css', 'resources/css/wyvern-theme.css'])
+    {{ filament()->getFontHtml() }}
+
+    <script>
+        // The panel's own pre-paint theme guard, repeated because this page is outside it.
+        const theme = localStorage.getItem('theme') ?? @js(filament()->getDefaultThemeMode()->value);
+
+        if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
 </head>
-<body class="bg-gray-100 dark:bg-gray-950 min-h-screen flex items-center justify-center">
-    <div class="bg-white dark:bg-gray-900 shadow-lg rounded-lg py-8 px-8 max-w-md w-full text-center">
-        <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4">API Documentation</h2>
+<body class="fi-body wy-docs-page">
+    <main class="wy-docs">
+        <h1 class="wy-docs-title">{{ trans('wyvern.api_docs.title') }}</h1>
+        <p class="wy-docs-lead">{{ trans('wyvern.api_docs.lead') }}</p>
 
-        <div class="mb-2">
-            <a href="/docs/api/application" class="inline-flex items-center">
-                <span class="mr-2">📘</span> <span style="color: #2563EB;">Application API</span>
-            </a>
-        </div>
+        <a href="/docs/api/application" class="wy-docs-link">
+            <x-filament::icon icon="tabler-server-cog" />
+            <span>
+                <strong>{{ trans('wyvern.api_docs.application') }}</strong>
+                {{ trans('wyvern.api_docs.application_hint') }}
+            </span>
+        </a>
 
-        <div class="mb-4">
-            <a href="/docs/api/client" class="inline-flex items-center">
-                <span class="mr-2">📗</span> <span style="color: #10B981;">Client API</span>
-            </a>
-        </div>
+        <a href="/docs/api/client" class="wy-docs-link">
+            <x-filament::icon icon="tabler-user-cog" />
+            <span>
+                <strong>{{ trans('wyvern.api_docs.client') }}</strong>
+                {{ trans('wyvern.api_docs.client_hint') }}
+            </span>
+        </a>
 
-        <div class="text-sm mt-4 flex items-center justify-center">
-            <span class="text-yellow-500 mr-2">⚠️</span>
-            <span style="color: #EF4444;">Note: You need to be logged in to view the API docs!</span>
-        </div>
-    </div>
+        <p class="wy-docs-note">
+            <x-filament::icon icon="tabler-info-circle" />
+            {{ trans('wyvern.api_docs.note') }}
+        </p>
+    </main>
 </body>
 </html>

@@ -488,6 +488,13 @@ class EditProfile extends BaseEditProfile
                                     true => trans('profile.icon'),
                                     false => trans('profile.icon_button'),
                                 ]),
+                            ToggleButtons::make('density')
+                                ->label(trans('wyvern.density.label'))
+                                ->inline()
+                                ->options([
+                                    'compact' => trans('wyvern.density.compact'),
+                                    'comfortable' => trans('wyvern.density.comfortable'),
+                                ]),
                         ]),
                     Section::make(trans('profile.admin'))
                         ->collapsible()
@@ -625,7 +632,14 @@ class EditProfile extends BaseEditProfile
             'dashboard_layout' => $data['dashboard_layout'],
             'top_navigation' => $data['top_navigation'],
             'button_style' => $data['button_style'],
+            'density' => $data['density'] ?? $this->getUser()->getCustomization(CustomizationKey::Density),
             'redirect_to_admin' => $data['redirect_to_admin'] ?? $this->getUser()->getCustomization(CustomizationKey::RedirectToAdmin),
+
+            // Carried through rather than read from the form, because nothing here renders
+            // it. This array is rebuilt from scratch on every save, so a key that is not
+            // listed is a key that gets erased — pinned servers would vanish the first time
+            // anyone touched their profile.
+            'pinned_servers' => $this->getUser()->getCustomization(CustomizationKey::PinnedServers),
         ];
 
         unset(
@@ -635,6 +649,7 @@ class EditProfile extends BaseEditProfile
             $data['dashboard_layout'],
             $data['top_navigation'],
             $data['button_style'],
+            $data['density'],
             $data['redirect_to_admin'],
         );
 
@@ -645,6 +660,7 @@ class EditProfile extends BaseEditProfile
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
+        $data['density'] = $this->getUser()->getCustomization(CustomizationKey::Density);
         $data['console_font'] = $this->getUser()->getCustomization(CustomizationKey::ConsoleFont);
         $data['console_font_size'] = (int) $this->getUser()->getCustomization(CustomizationKey::ConsoleFontSize);
         $data['console_rows'] = (int) $this->getUser()->getCustomization(CustomizationKey::ConsoleRows);

@@ -30,6 +30,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Client\ConnectionException;
 use Livewire\Attributes\On;
+use Wyvern\Servers\Pins;
 
 class ListServers extends ListRecords
 {
@@ -123,6 +124,27 @@ class ListServers extends ListRecords
             ->paginated($usingGrid ? [10, 20, 30, 40] : [10, 20, 50, 100])
             ->defaultPaginationPageOption($usingGrid ? 10 : 20)
             ->query(fn () => $baseQuery)
+            // Pinned first, then by name.
+            //
+            // This has to live on the table and not on $baseQuery: each tab replaces the
+            // query through its own modifyQueryUsing with a fresh clone of
+            // accessibleServers(), so an ordering applied to $baseQuery is thrown away the
+            // moment a tab is active — which is always.
+            //
+            // Sorted in SQL rather than in PHP so it survives pagination: with ten cards a
+            // page, a pin that only floated within the current page would be worse than no
+            // pin at all. A stale pin — a server since deleted — is a uuid that matches no
+            // row, so it costs nothing and needs no cleanup.
+            ->modifyQueryUsing(function (Builder $query) {
+                if (filled($pinned = Pins::for(user()))) {
+                    $query->orderByRaw(
+                        'case when uuid in (' . implode(',', array_fill(0, count($pinned), '?')) . ') then 0 else 1 end',
+                        $pinned,
+                    );
+                }
+
+                return $query->orderBy('name');
+            })
             ->poll($usingGrid ? null : '15s')
             ->columns($usingGrid ? $this->gridColumns() : $this->tableColumns())
             ->recordUrl(!$usingGrid ? (fn (Server $server) => Console::getUrl(panel: 'server', tenant: $server)) : null)
@@ -214,6 +236,13 @@ class ListServers extends ListRecords
         }
 
         return null;
+    }
+
+    /** A pin changes the order, and order is the page's business, not the card's. */
+    #[On('wyvern-pins-changed')]
+    public function refreshAfterPinChange(): void
+    {
+        $this->resetTable();
     }
 
     #[On('powerAction')]

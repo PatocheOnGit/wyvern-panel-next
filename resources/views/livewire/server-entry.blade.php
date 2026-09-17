@@ -81,6 +81,29 @@
             <h2 class="wy-server-card-name">{{ $server->name }}</h2>
         </span>
 
+        {{-- Before the state chip so the two never swap places: the pin is a control and
+             the chip is a readout, and a control that moves is a control you misclick.
+
+             $component is read into a local first because Blade rebinds $component inside
+             a component tag — calling $component->isPinned() in the icon's attribute
+             resolves against the icon component, not this one, and throws. --}}
+        @php
+            $isPinned = $component->isPinned();
+            $pinLabel = trans($isPinned ? 'wyvern.pins.unpin' : 'wyvern.pins.pin');
+        @endphp
+
+        <button
+            type="button"
+            class="wy-server-card-pin @if ($isPinned) wy-server-card-pin-on @endif"
+            wire:click.stop="togglePin"
+            x-on:click.stop
+            aria-pressed="{{ $isPinned ? 'true' : 'false' }}"
+            aria-label="{{ $pinLabel }}"
+            title="{{ $pinLabel }}"
+        >
+            <x-filament::icon :icon="$isPinned ? 'tabler-pinned-filled' : 'tabler-pin'" />
+        </button>
+
         <span class="wy-server-card-state fi-color fi-color-{{ $server->condition->getColor() }}">
             <i class="wy-server-card-dot"></i>{{ $server->condition->getLabel() }}
         </span>

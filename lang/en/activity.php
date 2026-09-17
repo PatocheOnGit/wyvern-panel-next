@@ -38,7 +38,12 @@ return [
             'delete' => 'Disabled two-factor auth',
         ],
     ],
+    'egg' => [
+        'delete' => 'Deleted the <b>:name</b> egg, and the <b>:servers</b> server(s) that used it',
+    ],
+
     'server' => [
+        'delete' => 'Deleted the server <b>:name</b> (<b>:uuid</b>)',
         'console' => [
             'command' => 'Executed "<b>:command</b>" on the server',
         ],

@@ -2,8 +2,10 @@
 
 namespace Wyvern;
 
+use App\Enums\CustomizationKey;
 use App\Enums\HeaderActionPosition;
 use App\Enums\HeaderWidgetPosition;
+use App\Facades\Activity;
 use App\Filament\App\Resources\Servers\Pages\ListServers;
 use App\Filament\Server\Pages\ServerFormPage;
 use App\Filament\Server\Resources\Activities\Pages\ListActivities;
@@ -14,6 +16,8 @@ use App\Filament\Server\Resources\Files\Pages\ListFiles;
 use App\Filament\Server\Resources\Schedules\Pages\ListSchedules;
 use App\Filament\Server\Resources\Subusers\Pages\ListSubusers;
 use App\Filament\Server\Resources\Webhooks\Pages\ListWebhooks;
+use App\Models\Egg;
+use App\Models\Server;
 use Filament\Facades\Filament;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
@@ -35,6 +39,22 @@ use Wyvern\Navigation\MobileTabs;
  */
 class WyvernServiceProvider extends ServiceProvider
 {
+    /**
+     * The comfortable density, as two token values.
+     *
+     * Server-rendered rather than stamped onto <html> by a script, because a script that
+     * sets an attribute after first paint shows the compact layout and then jumps. The
+     * whole preference is two numbers, so there is nothing to load and nothing to flash.
+     */
+    private static function densityOverride(): string
+    {
+        if (user()?->getCustomization(CustomizationKey::Density) !== 'comfortable') {
+            return '';
+        }
+
+        return '<style>:root{--wy-row-h:3rem;--wy-pad:1rem;--wy-gap:1rem}</style>';
+    }
+
     public function boot(): void
     {
         // Filament serves its own panel stylesheet, and Pelican injects app.css through
@@ -42,7 +62,7 @@ class WyvernServiceProvider extends ServiceProvider
         // goes on the other hook rather than relying on Vite's emission order.
         FilamentView::registerRenderHook(
             PanelsRenderHook::STYLES_AFTER,
-            fn () => Blade::render("@vite(['resources/css/wyvern-theme.css'])"),
+            fn () => Blade::render("@vite(['resources/css/wyvern-theme.css'])") . self::densityOverride(),
         );
 
         // The command palette, on every panel. BODY_END so it is a sibling of the page
@@ -52,6 +72,15 @@ class WyvernServiceProvider extends ServiceProvider
             PanelsRenderHook::BODY_END,
             fn () => Filament::auth()->check()
                 ? Blade::render("@include('wyvern.shell.command-palette')")
+                : '',
+        );
+
+        // Keyboard shortcuts and the help sheet that teaches them. Same hook and same
+        // reasoning as the palette.
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::BODY_END,
+            fn () => Filament::auth()->check()
+                ? Blade::render("@include('wyvern.shell.shortcuts')")
                 : '',
         );
 
@@ -109,6 +138,30 @@ class WyvernServiceProvider extends ServiceProvider
         foreach ($powerPages as $page) {
             $page::registerCustomHeaderActions(HeaderActionPosition::Before, PowerActions::group());
         }
+
+        // Deleting a server or an egg leaves no trace in the activity log, which is the
+        // one gap that turns a two-minute question into a twenty-minute one: servers.egg_id
+        // is a foreign key onto eggs, so removing an egg takes its servers with it, and
+        // nothing anywhere records that it happened. Power actions are logged, so the log
+        // shows a server being started and then simply stops mentioning it.
+        //
+        // Model events rather than a resource hook, so it holds however the deletion was
+        // triggered — admin page, API, tinker or cascade.
+        Server::deleted(function (Server $server) {
+            Activity::event('server:delete')
+                ->property('name', $server->name)
+                ->property('uuid', $server->uuid)
+                ->log();
+        });
+
+        Egg::deleted(function (Egg $egg) {
+            Activity::event('egg:delete')
+                ->property('name', $egg->name)
+                // The count is the point: an egg deletion is only alarming in proportion to
+                // what went with it, and after the fact there is no way to find out.
+                ->property('servers', $egg->servers()->count())
+                ->log();
+        });
 
         if ($this->app->runningInConsole()) {
             $this->commands([

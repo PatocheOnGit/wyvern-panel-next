@@ -200,6 +200,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'customization.console_graph_period' => ['integer', 'min:1'],
         'customization.top_navigation' => ['boolean'],
         'customization.dashboard_layout' => ['string', 'in:grid,table'],
+        'customization.density' => ['string', 'in:compact,comfortable'],
+        'customization.pinned_servers' => ['array'],
+        'customization.pinned_servers.*' => ['string', 'uuid'],
     ];
 
     protected function casts(): array
