@@ -7,6 +7,8 @@ use Filament\Panel;
 use Wyvern\Filament\Server\Pages\Content;
 use Wyvern\Filament\Server\Pages\Version;
 use Wyvern\Filament\Widgets\FleetOverview;
+use Wyvern\Filament\Widgets\NodeHealth;
+use Wyvern\Filament\Widgets\RecentActivity;
 
 /**
  * Wyvern's own pages, registered the way Filament expects.
@@ -29,6 +31,8 @@ class WyvernPlugin implements Plugin
             // provider untouched.
             $panel->widgets([
                 FleetOverview::class,
+                NodeHealth::class,
+                RecentActivity::class,
             ]);
 
             return;

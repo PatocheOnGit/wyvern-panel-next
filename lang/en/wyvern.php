@@ -32,6 +32,9 @@ return [
         'disk' => 'Disk allocated',
         'of_capacity' => ':percent% of :capacity',
         'no_ceiling' => 'No configured ceiling',
+        'node_health' => 'Nodes',
+        'recent_activity' => 'Recent activity',
+        'no_activity' => 'Nothing has happened yet',
     ],
 
     'navigation' => [
