@@ -23,13 +23,20 @@ namespace Wyvern;
  */
 final class ChartPalette
 {
-    /** Azure 400 — the single-series fill, and the first of a pair. */
-    public const ACCENT_FILL = 'rgba(91, 146, 245, 0.28)';
+    /**
+     * Azure 400 — the single-series fill, and the first of a pair.
+     *
+     * 0.16 rather than the 0.28 this started at. A filled line chart of a steady value is
+     * one large flat area, and at 0.28 it read as a solid slab that outweighed the line
+     * describing it. The fill is there to show which side of the line is "inside"; the
+     * line carries the data.
+     */
+    public const ACCENT_FILL = 'rgba(91, 146, 245, 0.16)';
 
     public const ACCENT_LINE = 'rgb(91, 146, 245)';
 
     /** A violet that is distinguishable from azure at a glance and is nobody's status. */
-    public const SECOND_FILL = 'rgba(150, 128, 232, 0.28)';
+    public const SECOND_FILL = 'rgba(150, 128, 232, 0.16)';
 
     public const SECOND_LINE = 'rgb(150, 128, 232)';
 

@@ -105,6 +105,12 @@ are gone from the chrome.
 14. **The API docs index**, on the token system instead of hex and emoji.
 15. **Egg and server deletion are logged**, via model events so it holds however the
     deletion was triggered.
+16. **Skeletons** — `.wy-skeleton`, plus content for Filament's own empty lazy-widget
+    placeholder and bands for a deferred table, which previously showed a spinner in an
+    empty container and jumped when rows arrived.
+17. **Chart colours** from `src/ChartPalette.php`. Nine literals across six widgets, and
+    the network chart no longer draws inbound traffic in green — a status hue borrowed for
+    a category reads as a claim about health that the data does not make.
 
 ## Naming: two things are already called "shortcuts"
 
@@ -121,11 +127,11 @@ leaked a `max-width` onto that row. Check both namespaces before adding a third.
   way as long as possible.
 - The palette offers pages and servers, not actions: power actions need the Filament action
   infrastructure, which a bespoke Alpine component does not have.
-- Skeletons beyond the server card placeholder.
 - The console remains outside SPA mode, so entering it is a full reload.
 - `public/wyvern/loaders/vanilla.svg` is 152 KB and `forge.png` 151 KB.
-- `SmallStatBlock` carries a ratio now, but the three console charts still hard-code
-  `rgba(96,165,250,0.3)` for their fill.
+- Chart colours are literal rgba in `src/ChartPalette.php` and do not flip with the theme.
+  They do not need to — every fill is semi-transparent — but if a future series ever needs
+  a solid fill, it will.
 - The client panel has no bottom tab bar by choice (three destinations); revisit if it
   gains more.
 
