@@ -18,6 +18,16 @@
 
     @filamentStyles
 
+    {{-- An error page is not a panel page, so none of the panel render hooks fire here:
+         app.css goes on STYLES_BEFORE and wyvern-theme.css on STYLES_AFTER, and neither
+         ran. filament()->getTheme() has no current panel to resolve either, so it
+         emitted nothing. The result was a page whose only stylesheet was the font one —
+         every Tailwind class in the markup below, including its own dark: variants, was
+         undefined, which is why a 404 rendered as a white slab on a dark ground.
+
+         Loaded in the panel's own order: Tailwind and Filament first, ours last. --}}
+    @vite(['resources/css/app.css', 'resources/css/wyvern-theme.css'])
+
     {{ filament()->getTheme()->getHtml() }}
     {{ filament()->getFontHtml() }}
 
