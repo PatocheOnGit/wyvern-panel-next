@@ -3,4 +3,4 @@
         {{ $this->form }}
     </form>
     <x-filament-actions::modals />
-</x-filament-panels::form>
+</x-filament-panels::page>

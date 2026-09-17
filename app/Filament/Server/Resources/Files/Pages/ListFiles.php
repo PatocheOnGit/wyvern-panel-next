@@ -25,7 +25,6 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Select;
@@ -129,17 +128,14 @@ class ListFiles extends ListRecords
 
                 return $file->canEdit() ? EditFiles::getUrl(['path' => encode_path(join_paths($this->path, $file->name))]) : null;
             })
+            // One control per row.
+            //
+            // There used to be four: an eye, a pencil, a menu, and a red trash can
+            // immediately beside the menu. The eye and the pencil duplicated recordUrl()
+            // above — the row already opens the folder or the file when you click it — and
+            // a destructive button one pixel from a dropdown trigger is a misclick waiting
+            // to happen. Everything moves into the menu, with delete last.
             ->recordActions([
-                Action::make('view')
-                    ->authorize(fn () => user()?->can(SubuserPermission::FileRead, $server))
-                    ->label(trans('server/file.actions.open'))
-                    ->icon(TablerIcon::Eye)
-                    ->visible(fn (File $file) => $file->is_directory)
-                    ->url(fn (File $file) => self::getUrl(['path' => encode_path(join_paths($this->path, $file->name))])),
-                EditAction::make('edit')
-                    ->authorize(fn () => user()?->can(SubuserPermission::FileReadContent, $server))
-                    ->visible(fn (File $file) => $file->canEdit())
-                    ->url(fn (File $file) => EditFiles::getUrl(['path' => encode_path(join_paths($this->path, $file->name))])),
                 ActionGroup::make([
                     Action::make('fm_rename')
                         ->authorize(fn () => user()?->can(SubuserPermission::FileUpdate, $server))
@@ -357,22 +353,26 @@ class ListFiles extends ListRecords
 
                             $this->refreshPage();
                         }),
+                    DeleteAction::make()
+                        ->authorize(fn () => user()?->can(SubuserPermission::FileDelete, $server))
+                        // The global DeleteAction config hides its label, which is right in
+                        // a row of icons and wrong inside a dropdown, where it would render
+                        // as a blank menu item.
+                        ->hiddenLabel(false)
+                        ->requiresConfirmation()
+                        ->modalHeading(fn (File $file) => trans('filament-actions::delete.single.modal.heading', ['label' => $file->name . ' ' . ($file->is_directory ? 'folder' : 'file')]))
+                        ->action(function (File $file) {
+                            $this->deselectAllTableRecords();
+                            $this->getDaemonFileRepository()->deleteFiles($this->path, [$file->name]);
+
+                            Activity::event('server:file.delete')
+                                ->property('directory', $this->path)
+                                ->property('files', $file->name)
+                                ->log();
+
+                            $this->refreshPage();
+                        }),
                 ])->iconSize(IconSize::Large),
-                DeleteAction::make()
-                    ->authorize(fn () => user()?->can(SubuserPermission::FileDelete, $server))
-                    ->requiresConfirmation()
-                    ->modalHeading(fn (File $file) => trans('filament-actions::delete.single.modal.heading', ['label' => $file->name . ' ' . ($file->is_directory ? 'folder' : 'file')]))
-                    ->action(function (File $file) {
-                        $this->deselectAllTableRecords();
-                        $this->getDaemonFileRepository()->deleteFiles($this->path, [$file->name]);
-
-                        Activity::event('server:file.delete')
-                            ->property('directory', $this->path)
-                            ->property('files', $file->name)
-                            ->log();
-
-                        $this->refreshPage();
-                    }),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
