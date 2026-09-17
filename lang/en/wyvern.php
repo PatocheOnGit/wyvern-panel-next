@@ -14,6 +14,13 @@ return [
      * specific — an operator scanning four tiles should be able to stop reading as soon
      * as everything says it is fine.
      */
+    'updates' => [
+        'unknown_heading' => 'Version not verified',
+        'unknown_canary' => 'This install is a canary build (:version), so there is no release number to compare it against. Check it against the commits in :repository.',
+        'unknown_unreachable' => 'Could not ask :repository for its latest release. A private repository needs WYVERN_UPDATE_TOKEN set; a repository that publishes no releases has nothing to compare against.',
+        'open_repository' => 'Open repository',
+    ],
+
     'dashboard' => [
         'servers' => 'Servers',
         'servers_ok' => 'All in service',

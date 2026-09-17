@@ -39,6 +39,20 @@ return [
     ],
 
     /*
+     * Where the panel looks to find out whether it is out of date.
+     *
+     * Upstream asked GitHub about pelican/panel, which tells a Wyvern operator nothing.
+     * It asks about this repository instead — but note the API needs a token for a
+     * private one, exactly like the egg index does, and it needs the repository to
+     * publish releases. Without either the dashboard says it could not check, which is
+     * the truth, rather than claiming to be up to date.
+     */
+    'updates' => [
+        'repository' => env('WYVERN_UPDATE_REPOSITORY', 'PatocheOnGit/wyvern-panel'),
+        'token' => env('WYVERN_UPDATE_TOKEN'),
+    ],
+
+    /*
      * Where mods, plugins and modpacks are searched.
      *
      * Modrinth needs no key but asks clients to identify themselves, so the user agent
