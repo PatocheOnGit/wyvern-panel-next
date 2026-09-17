@@ -344,37 +344,67 @@
 
 /* ---- console page ---------------------------------------------------- */
 
-/* The stat blocks already ship the structure the design needs — a label span and
- * a value span — so this is all reachable without touching the view. */
+/* The six blocks above the terminal. They carry the same treatment as a card, at the
+ * density of a readout, with a meter where there is something to measure.
+ *
+ * The markup is ours now: the view used to nest anonymous spans and be styled by
+ * position (> span > span:first-child), which meant adding a meter to it moved the
+ * value's selector onto the meter. */
 
 .fi-small-stat-block {
-    padding: 0.8rem 1rem;
-    border-radius: var(--radius-lg);
+    overflow: hidden;
     background-color: var(--wy-card);
-    box-shadow: inset 0 1px 0 var(--wy-line), var(--wy-lift-sm) !important;
+    border-radius: var(--radius-xl);
+    box-shadow: inset 0 0 0 1px var(--wy-line), var(--wy-lift-sm);
 }
 
-.fi-small-stat-block > span {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-    min-width: 0;
+.fi-small-stat-block-body {
+    display: grid;
+    gap: 0.25rem;
+    width: 100%;
+    padding: 0.625rem 0.75rem;
+    text-align: start;
+    background: none;
+    border: 0;
 }
 
-.fi-small-stat-block > span > span:first-child {
-    font-size: 0.6rem;
-    font-weight: 500;
+/* Copyable blocks are buttons, so they get a pointer and the panel's focus ring for
+ * free — as a span they were clickable without being reachable by keyboard. */
+button.fi-small-stat-block-body {
+    cursor: pointer;
+}
+
+.fi-small-stat-block-label {
+    font-size: var(--wy-text-xs);
     color: var(--wy-muted);
+    line-height: 1;
 }
 
-.fi-small-stat-block > span > span:last-child {
+.fi-small-stat-block-value {
     font-family: var(--font-mono);
-    font-variant-numeric: tabular-nums;
-    font-size: 1.05rem;
+    font-size: var(--wy-text-md);
     font-weight: 500;
-    letter-spacing: -0.015em;
     color: var(--wy-text);
+    line-height: 1.25;
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.fi-small-stat-block-meter {
+    display: block;
+    height: 3px;
+    margin-top: 0.125rem;
+    overflow: hidden;
+    background-color: var(--wy-line);
+    border-radius: 9999px;
+}
+
+.fi-small-stat-block-meter > i {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    transition: width 320ms ease;
 }
 
 /* The terminal's own theme sets a 70% alpha background, so the surface under it
