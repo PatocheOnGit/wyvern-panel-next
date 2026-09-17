@@ -5,6 +5,7 @@ namespace App\Filament\Admin\Resources\Nodes\Widgets;
 use App\Models\Node;
 use Filament\Support\RawJs;
 use Filament\Widgets\ChartWidget;
+use Wyvern\ChartPalette;
 
 class NodeCpuChart extends ChartWidget
 {
@@ -42,9 +43,7 @@ class NodeCpuChart extends ChartWidget
             'datasets' => [
                 [
                     'data' => array_column($this->cpuHistory, 'cpu'),
-                    'backgroundColor' => [
-                        'rgba(96, 165, 250, 0.3)',
-                    ],
+                    ...ChartPalette::series(),
                     'tension' => '0.3',
                     'fill' => true,
                 ],

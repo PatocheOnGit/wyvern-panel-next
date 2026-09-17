@@ -68,8 +68,12 @@
             @foreach ([trans('server/dashboard.cpu'), trans('server/dashboard.memory'), trans('server/dashboard.disk')] as $label)
                 <div class="wy-server-card-stat">
                     <span class="wy-server-card-stat-label">{{ $label }}</span>
-                    <span class="wy-server-card-stat-value wy-server-card-stat-idle">&mdash;</span>
-                    <span class="wy-server-card-meter wy-server-card-meter-unmetered"></span>
+                    {{-- A bar where the figure will be, not an em dash. The dash was
+                         indistinguishable from the one a running server shows for an
+                         unmetered resource, so a card that was still loading looked like a
+                         card with nothing to measure. --}}
+                    <span class="wy-server-card-stat-value"><span class="wy-skeleton" style="width: 60%"></span></span>
+                    <span class="wy-server-card-meter wy-skeleton"></span>
                 </div>
             @endforeach
         </div>

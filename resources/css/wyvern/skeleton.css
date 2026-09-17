@@ -1,0 +1,119 @@
+/* Loading states.
+ *
+ * A skeleton is worth more than a spinner for the same reason a placeholder card is worth
+ * more than an empty one: it says what shape the answer will be, so the page does not
+ * rearrange itself under the reader when the answer arrives. A spinner says only "wait".
+ */
+
+/* The reusable bar. Sized by whatever it stands in for, so a skeleton for a one-line
+ * value is not the same height as one for a heading. */
+.wy-skeleton {
+    display: block;
+    min-height: 0.75rem;
+    overflow: hidden;
+    background-color: var(--wy-line);
+    background-image: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--wy-line-strong) 50%,
+        transparent 100%
+    );
+    background-size: 200% 100%;
+    border-radius: var(--radius-md);
+    animation: wy-shimmer 1.5s linear infinite;
+}
+
+@keyframes wy-shimmer {
+    to {
+        background-position: -200% 0;
+    }
+}
+
+/* A shimmer is decoration in the strictest sense — it carries no information a static bar
+ * does not — so it is the first thing to drop for anyone who asked for less motion. */
+@media (prefers-reduced-motion: reduce) {
+    .wy-skeleton {
+        animation: none;
+    }
+}
+
+/* ---- Filament's own lazy-widget placeholder -------------------------- */
+
+/* Filament renders a lazy widget as an empty 8rem div with animate-pulse on it. On our
+ * card surface that reads as a blank slab, which is what the admin dashboard looked like
+ * before its widgets resolved. Giving it two bars costs nothing and turns a void into a
+ * promise.
+ *
+ * Pseudo-elements rather than markup because the div has no children to style — and
+ * publishing Filament's view to add some would be a view to rebase for the sake of two
+ * rectangles. */
+.fi-loading-section {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--wy-card);
+    border-radius: var(--radius-xl);
+    box-shadow: inset 0 0 0 1px var(--wy-line);
+}
+
+.fi-loading-section::before,
+.fi-loading-section::after {
+    content: '';
+    position: absolute;
+    inset-inline-start: 1rem;
+    height: 0.75rem;
+    background-color: var(--wy-line);
+    border-radius: var(--radius-md);
+}
+
+.fi-loading-section::before {
+    top: 1.125rem;
+    width: min(9rem, 40%);
+}
+
+.fi-loading-section::after {
+    top: 2.5rem;
+    width: min(20rem, 72%);
+}
+
+/* ---- deferred tables ------------------------------------------------- */
+
+/* A deferred table renders .fi-ta-table-loading-ctn — a centred spinner in an otherwise
+ * empty container — so the page height jumps when the rows arrive. This is the exact
+ * class Filament emits when $records is null; the root also gets .fi-loading, which is
+ * what makes it safe to restyle without catching a table that merely has no rows.
+ *
+ * Rows proper would mean publishing Filament's table view, which is a view to rebase
+ * forever for the sake of some rectangles. Bands at the current row height cost nothing
+ * and do the same two jobs: hold the space, and show the shape. */
+.fi-loading .fi-ta-table-loading-ctn {
+    display: block;
+    min-height: calc(var(--wy-row-h) * 5);
+    padding: 0;
+    background-image: repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent calc(var(--wy-row-h) - 1px),
+        var(--wy-line) calc(var(--wy-row-h) - 1px),
+        var(--wy-line) var(--wy-row-h)
+    );
+    animation: wy-pending 1.6s ease-in-out infinite;
+}
+
+/* The spinner goes: bands and a spinner are two answers to one question. The container
+ * keeps role="status", aria-busy and its screen-reader text, so nothing is lost for
+ * anyone who is not looking at it. */
+.fi-loading .fi-ta-table-loading-ctn svg {
+    display: none;
+}
+
+@keyframes wy-pending {
+    50% {
+        opacity: 0.55;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fi-loading .fi-ta-table-loading-ctn {
+        animation: none;
+    }
+}

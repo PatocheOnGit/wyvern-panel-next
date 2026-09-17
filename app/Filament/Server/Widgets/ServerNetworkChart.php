@@ -8,6 +8,7 @@ use Filament\Facades\Filament;
 use Filament\Support\RawJs;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Carbon;
+use Wyvern\ChartPalette;
 
 class ServerNetworkChart extends ChartWidget
 {
@@ -54,18 +55,14 @@ class ServerNetworkChart extends ChartWidget
                 [
                     'label' => 'Inbound',
                     'data' => array_column($net, 'rx'),
-                    'backgroundColor' => [
-                        'rgba(100, 255, 105, 0.5)',
-                    ],
+                    ...ChartPalette::series(),
                     'tension' => '0.3',
                     'fill' => true,
                 ],
                 [
                     'label' => 'Outbound',
                     'data' => array_column($net, 'tx'),
-                    'backgroundColor' => [
-                        'rgba(96, 165, 250, 0.3)',
-                    ],
+                    ...ChartPalette::secondSeries(),
                     'tension' => '0.3',
                     'fill' => true,
                 ],

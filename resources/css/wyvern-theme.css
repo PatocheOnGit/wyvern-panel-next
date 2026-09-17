@@ -11,6 +11,7 @@
  *   tokens      every colour, radius and size, branched for light and dark
  *   chrome      the shell Filament draws — voice, density, focus, navigation
  *   shell       furniture Filament does not ship, such as the mobile tab bar
+ *   skeleton    loading states, ours and Filament's
  *   components  server cards, the shortcut row, the console page
  *   pages       the content browser and the version picker
  *
@@ -21,5 +22,6 @@
 @import './wyvern/tokens.css';
 @import './wyvern/chrome.css';
 @import './wyvern/shell.css';
+@import './wyvern/skeleton.css';
 @import './wyvern/components.css';
 @import './wyvern/pages.css';

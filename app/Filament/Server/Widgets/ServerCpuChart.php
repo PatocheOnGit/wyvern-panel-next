@@ -8,6 +8,7 @@ use Filament\Facades\Filament;
 use Filament\Support\RawJs;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Carbon;
+use Wyvern\ChartPalette;
 
 class ServerCpuChart extends ChartWidget
 {
@@ -40,9 +41,7 @@ class ServerCpuChart extends ChartWidget
             'datasets' => [
                 [
                     'data' => array_column($cpu, 'cpu'),
-                    'backgroundColor' => [
-                        'rgba(96, 165, 250, 0.3)',
-                    ],
+                    ...ChartPalette::series(),
                     'tension' => '0.3',
                     'fill' => true,
                 ],

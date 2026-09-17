@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources\Nodes\Widgets;
 
 use App\Models\Node;
 use Filament\Widgets\ChartWidget;
+use Wyvern\ChartPalette;
 
 class NodeStorageChart extends ChartWidget
 {
@@ -52,11 +53,10 @@ class NodeStorageChart extends ChartWidget
             'datasets' => [
                 [
                     'data' => [$used, $unused],
-                    'backgroundColor' => [
-                        'rgb(59, 130, 246)',
-                        'rgb(74, 222, 128)',
-                        'rgb(255, 205, 86)',
-                    ],
+                    // Two slices, two colours. This declared three, so the third was
+                    // never drawn — and the second was green, which read as "free space is
+                    // healthy" when it is simply the remainder.
+                    'backgroundColor' => ChartPalette::gauge(),
                 ],
             ],
             'labels' => [trans('admin/node.used'), trans('admin/node.unused')],
