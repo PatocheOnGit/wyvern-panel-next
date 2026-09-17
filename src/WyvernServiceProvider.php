@@ -2,8 +2,18 @@
 
 namespace Wyvern;
 
+use App\Enums\HeaderActionPosition;
 use App\Enums\HeaderWidgetPosition;
 use App\Filament\App\Resources\Servers\Pages\ListServers;
+use App\Filament\Server\Pages\ServerFormPage;
+use App\Filament\Server\Resources\Activities\Pages\ListActivities;
+use App\Filament\Server\Resources\Allocations\Pages\ListAllocations;
+use App\Filament\Server\Resources\Backups\Pages\ListBackups;
+use App\Filament\Server\Resources\Databases\Pages\ListDatabases;
+use App\Filament\Server\Resources\Files\Pages\ListFiles;
+use App\Filament\Server\Resources\Schedules\Pages\ListSchedules;
+use App\Filament\Server\Resources\Subusers\Pages\ListSubusers;
+use App\Filament\Server\Resources\Webhooks\Pages\ListWebhooks;
 use Filament\Facades\Filament;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
@@ -12,6 +22,7 @@ use Illuminate\Support\ServiceProvider;
 use Wyvern\Console\Commands\CheckContentLibrary;
 use Wyvern\Console\Commands\CheckMinecraftCatalogue;
 use Wyvern\Console\Commands\InstallModpack;
+use Wyvern\Filament\Actions\PowerActions;
 use Wyvern\Filament\Widgets\ShortcutsWidget;
 use Wyvern\Navigation\MobileTabs;
 
@@ -73,6 +84,31 @@ class WyvernServiceProvider extends ServiceProvider
             HeaderWidgetPosition::Before,
             ShortcutsWidget::class,
         );
+
+        // Power controls on every page of a server, not just the console.
+        //
+        // CanCustomizeHeaderActions is the seam Pelican already provides, and the trait
+        // declares its registry as a static — which is per-using-class, so each page has
+        // to be named. Registering on ServerFormPage covers Settings, Startup and Mounts
+        // together, because a static declared in a parent is shared with its subclasses.
+        //
+        // Console is deliberately absent: it already shows Start / Restart / Stop as
+        // explicit buttons, and a Power menu beside them would be the same controls twice.
+        $powerPages = [
+            ListFiles::class,
+            ListBackups::class,
+            ListDatabases::class,
+            ListSchedules::class,
+            ListSubusers::class,
+            ListAllocations::class,
+            ListActivities::class,
+            ListWebhooks::class,
+            ServerFormPage::class,
+        ];
+
+        foreach ($powerPages as $page) {
+            $page::registerCustomHeaderActions(HeaderActionPosition::Before, PowerActions::group());
+        }
 
         if ($this->app->runningInConsole()) {
             $this->commands([
