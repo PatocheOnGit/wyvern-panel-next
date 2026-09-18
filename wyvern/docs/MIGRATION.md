@@ -82,9 +82,9 @@ instead of somewhere Windows can reach.
 While the first server was being built, power events appeared that nothing in the
 setup scripts had sent. The activity log settles it:
 
-    id 15  12:48:42  server:power.stop   actor=saintpatoche  ip=::1
-    id 14  12:43:51  server:file.read    actor=saintpatoche  file=eula.txt
-    id 13  12:39:42  server:power.start  actor=saintpatoche
+    id 15  12:48:42  server:power.stop   actor=<admin>  ip=::1
+    id 14  12:43:51  server:file.read    actor=<admin>  file=eula.txt
+    id 13  12:39:42  server:power.start  actor=<admin>
 
 Ethan was in the panel in his own browser at the same time. The nginx access log shows
 two Livewire sessions polling in parallel, his Chrome and the automation's.
