@@ -57,6 +57,10 @@ return [
         'servers' => 'Server',
     ],
 
+    'release' => [
+        'line' => 'Wyvern :version  ·  :upstream :upstreamVersion',
+    ],
+
     'updates' => [
         'unknown_heading' => 'Version not verified',
         'unknown_canary' => 'This install is a canary build (:version), so there is no release number to compare it against. Check it against the commits in :repository.',

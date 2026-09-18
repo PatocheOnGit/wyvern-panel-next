@@ -72,6 +72,21 @@ class SoftwareVersionService
             : self::UPDATE_AVAILABLE;
     }
 
+    /**
+     * Wyvern's own version and the Pelican release under it, in one string.
+     *
+     * Both numbers, always, because either one alone is a half-answer: ours says what
+     * changed, theirs says what it changed on top of.
+     */
+    public function versionLine(): string
+    {
+        return trans('wyvern.release.line', [
+            'version' => $this->currentPanelVersion(),
+            'upstream' => config('wyvern.upstream.project'),
+            'upstreamVersion' => config('wyvern.upstream.version'),
+        ]);
+    }
+
     public function updateRepository(): string
     {
         return (string) config('wyvern.updates.repository');

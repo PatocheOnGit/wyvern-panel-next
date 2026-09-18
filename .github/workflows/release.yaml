@@ -70,7 +70,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           draft: true
-          prerelease: ${{ contains(github.ref, 'rc') || contains(github.ref, 'beta') || contains(github.ref, 'alpha') }}
+          # A 0.x tag carries no rc/beta/alpha, so upstream's condition alone would
+          # publish it as a stable release. A 0.x private panel is not that.
+          prerelease: ${{ contains(github.ref, 'rc') || contains(github.ref, 'beta') || contains(github.ref, 'alpha') || startsWith(github.ref, 'refs/tags/v0.') }}
           files: |
             panel.tar.gz
             checksum.txt

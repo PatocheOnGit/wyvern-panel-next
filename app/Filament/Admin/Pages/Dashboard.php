@@ -30,6 +30,6 @@ class Dashboard extends BaseDashboard
 
     public function getSubheading(): string
     {
-        return trans('admin/dashboard.version', ['version' => $this->softwareVersionService->currentPanelVersion()]);
+        return $this->softwareVersionService->versionLine();
     }
 }

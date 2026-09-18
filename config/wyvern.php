@@ -39,6 +39,23 @@ return [
     ],
 
     /*
+     * The Pelican release this tree is rebased on.
+     *
+     * Recorded here rather than encoded into the version number. See
+     * wyvern/docs/VERSIONING.md for why: version_compare() would rank an upstream bump
+     * above our own work, so a rebase would read as several Wyvern releases being undone.
+     *
+     * Update it when you rebase. It is shown next to Wyvern's own version everywhere the
+     * version appears, which is the whole point — both numbers visible, each moving for
+     * its own reason.
+     */
+    'upstream' => [
+        'project' => 'Pelican',
+        'repository' => 'pelican-dev/panel',
+        'version' => 'v1.0.0-beta38',
+    ],
+
+    /*
      * Where the panel looks to find out whether it is out of date.
      *
      * Upstream asked GitHub about pelican/panel, which tells a Wyvern operator nothing.
