@@ -60,6 +60,24 @@ Two things to know about that workflow:
   stable releases. Ours marks any `v0.` tag as a prerelease too, which is what a 0.x
   private panel actually is.
 
+## The trap that comes with marking 0.x as a prerelease
+
+**`GET /releases/latest` excludes prereleases.** With only `v0.1.0` published it answers
+404, so anything asking that question concludes there is no release at all — the
+dashboard reported "could not check", and an installer would have found nothing to
+download.
+
+Both consumers therefore read `GET /releases?per_page=1` instead, which is ordered newest
+first and includes prereleases. That is also the more honest question: *what is the most
+recent release of this repository*, rather than *what is the most recent release GitHub
+considers stable*.
+
+Worth remembering the other GitHub limit while you are here: anonymous API requests are
+capped at 60 per hour per IP. A VPS install makes a handful, so it is fine, but a loop
+that polls will be refused — and a refusal is a 403 whose body looks nothing like a
+release, which is exactly how an earlier version of this document came to claim that
+upstream published no releases at all.
+
 ## What the installer consumes
 
 `wyvern-installer` fetches the latest release's `panel.tar.gz` and verifies it against

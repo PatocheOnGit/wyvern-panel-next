@@ -112,10 +112,20 @@ class SoftwareVersionService
                 $request = $request->withToken($token);
             }
 
-            return $request
-                ->get('https://api.github.com/repos/' . $this->updateRepository() . '/releases/latest')
+            // The releases list, not /releases/latest.
+            //
+            // GitHub's "latest" endpoint excludes prereleases, and every 0.x Wyvern tag is
+            // marked as one — correctly, since a 0.x private panel is not a stable
+            // release. Asking for "latest" therefore returned nothing at all and the
+            // dashboard reported that it could not check. The list is ordered newest
+            // first and includes prereleases, which is the question actually being asked:
+            // what is the most recent release of this repository.
+            $releases = $request
+                ->get('https://api.github.com/repos/' . $this->updateRepository() . '/releases', ['per_page' => 1])
                 ->throw()
                 ->json();
+
+            return is_array($releases) ? ($releases[0] ?? null) : null;
         } catch (Exception) {
             return null;
         }
