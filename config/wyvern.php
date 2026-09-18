@@ -56,14 +56,15 @@ return [
      * Where mods, plugins and modpacks are searched.
      *
      * Modrinth needs no key but asks clients to identify themselves, so the user agent
-     * carries a contact address. CurseForge needs a key their docs say a third-party
+     * carries a contact. A repository URL rather than an email address: this file is
+     * public, and a mailbox in a public repository is a mailbox in every scraper's list. CurseForge needs a key their docs say a third-party
      * service must apply for; without one the source hides itself rather than offering
      * a tab that answers 403.
      */
     'content' => [
         'user_agent' => env(
             'WYVERN_CONTENT_USER_AGENT',
-            'PatocheOnGit/wyvern-panel (254776717+PatocheOnGit@users.noreply.github.com)',
+            'PatocheOnGit/wyvern-panel (+https://github.com/PatocheOnGit/wyvern-panel)',
         ),
         'curseforge_key' => env('WYVERN_CURSEFORGE_KEY'),
 

@@ -20,7 +20,6 @@ pretending otherwise here would make the history unreadable.
 | Database | `wyvern_panel` in the `wyvern-db` container |
 | Node | id 1, `local`, fqdn `localhost`, http :8080, sftp :2022 |
 | System user | `wyvern` (uid 995), docker network `wyvern_nw` |
-| Admin | `saintpatoche` / `254776717+PatocheOnGit@users.noreply.github.com` |
 
 Wings needs `--config /etc/wyvern/config.yml` in its unit: the binary's built-in
 default is `/etc/pelican/config.yml`.
