@@ -131,6 +131,11 @@ class SoftwareVersionService
         }
     }
 
+    public function wingsRepository(): string
+    {
+        return (string) config('wyvern.updates.wings_repository');
+    }
+
     public function latestWingsVersion(): string
     {
         $key = 'wings:latest_version';
@@ -140,9 +145,19 @@ class SoftwareVersionService
 
         return cache()->remember($key, now()->addMinutes(config('panel.cdn.cache_time', 60)), function () {
             try {
-                $response = Http::timeout(5)->connectTimeout(1)->get('https://api.github.com/repos/pelican/wings/releases/latest')->throw()->json();
+                // The list rather than /releases/latest, for the same reason as the panel's
+                // own check: "latest" hides prereleases, and every tag carrying "beta" is
+                // marked as one by the release workflow. The list is newest-first and
+                // answers the question actually being asked.
+                $releases = Http::timeout(5)
+                    ->connectTimeout(1)
+                    ->get('https://api.github.com/repos/' . $this->wingsRepository() . '/releases', ['per_page' => 1])
+                    ->throw()
+                    ->json();
 
-                return trim($response['tag_name'], 'v');
+                $tag = is_array($releases) ? ($releases[0]['tag_name'] ?? null) : null;
+
+                return filled($tag) ? ltrim((string) $tag, 'v') : 'error';
             } catch (Exception) {
                 return 'error';
             }
@@ -164,7 +179,19 @@ class SoftwareVersionService
             return true;
         }
 
-        return version_compare($version, $this->latestWingsVersion()) >= 0;
+        $latest = $this->latestWingsVersion();
+
+        // Say nothing rather than something wrong. When the check itself failed — GitHub
+        // unreachable, or the anonymous 60/hour rate limit spent — the sentinel would be
+        // fed to version_compare() and quietly rank below any real version, so every node
+        // would report as current. A failed check is not evidence that a node is current,
+        // but it is not evidence of the opposite either, and a health check that cries wolf
+        // whenever the network hiccups gets ignored.
+        if ($latest === 'error') {
+            return true;
+        }
+
+        return version_compare($version, $latest) >= 0;
     }
 
     public function currentPanelVersion(): string

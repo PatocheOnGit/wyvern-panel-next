@@ -2,7 +2,22 @@
 
 use App\Enums\TablerIcon;
 
+/*
+ * The public home of this panel.
+ *
+ * Six places link to it — the footer, the console's troubleshooting banner, the developer
+ * card, the docs shortcut, the update check and the outgoing user agent — and they were six
+ * copies of a slug that has already changed once: the published repository is
+ * `wyvern-panel-next`, while `wyvern-panel` is the private Pterodactyl-era fork and has no
+ * releases at all. So the update tile was asking a repository that could never answer.
+ * One value, read everywhere.
+ */
+$repository = env('WYVERN_REPOSITORY', 'PatocheOnGit/wyvern-panel-next');
+
 return [
+    'repository' => $repository,
+    'repository_url' => 'https://github.com/' . $repository,
+
     /*
      * The shortcut row on the client home.
      *
@@ -22,7 +37,7 @@ return [
             'id' => 'docs',
             'icon' => TablerIcon::Book->value,
             'tone' => 'accent',
-            'url' => env('WYVERN_DOCS_URL', 'https://github.com/PatocheOnGit/wyvern-panel'),
+            'url' => env('WYVERN_DOCS_URL', 'https://github.com/' . $repository),
         ],
         [
             'id' => 'status',
@@ -65,8 +80,17 @@ return [
      * the truth, rather than claiming to be up to date.
      */
     'updates' => [
-        'repository' => env('WYVERN_UPDATE_REPOSITORY', 'PatocheOnGit/wyvern-panel'),
+        'repository' => env('WYVERN_UPDATE_REPOSITORY', $repository),
         'token' => env('WYVERN_UPDATE_TOKEN'),
+
+        /*
+         * The daemon is checked separately, because it is versioned separately.
+         *
+         * Upstream asked GitHub about `pelican/wings`, so a Wyvern node running a Wyvern
+         * daemon was measured against someone else's release feed. Wyvern publishes its own
+         * builds of the daemon, and a node is out of date relative to those.
+         */
+        'wings_repository' => env('WYVERN_WINGS_REPOSITORY', 'PatocheOnGit/wyvern-wings'),
     ],
 
     /*
@@ -81,7 +105,7 @@ return [
     'content' => [
         'user_agent' => env(
             'WYVERN_CONTENT_USER_AGENT',
-            'PatocheOnGit/wyvern-panel (+https://github.com/PatocheOnGit/wyvern-panel)',
+            $repository . ' (+https://github.com/' . $repository . ')',
         ),
         'curseforge_key' => env('WYVERN_CURSEFORGE_KEY'),
 

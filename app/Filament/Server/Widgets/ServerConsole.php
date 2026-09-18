@@ -140,7 +140,7 @@ class ServerConsole extends Widget
                 Action::make('exclude_troubleshooting')
                     ->label('Open troubleshooting guide')
                     ->color('gray')
-                    ->url('https://github.com/PatocheOnGit/wyvern-panel', true),
+                    ->url(config('wyvern.repository_url'), true),
             ] : [])
             ->danger()
             ->send();

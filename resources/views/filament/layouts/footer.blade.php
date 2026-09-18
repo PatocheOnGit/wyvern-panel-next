@@ -1,7 +1,7 @@
 <footer class="flex flex-col items-center justify-center text-center space-y-2 p-4 text-gray-600 dark:text-gray-400">
     {{ \Filament\Support\Facades\FilamentView::renderHook(\App\Enums\CustomRenderHooks::FooterStart->value) }}
 
-    <a class="font-semibold" href="https://github.com/PatocheOnGit/wyvern-panel" target="_blank">
+    <a class="font-semibold" href="{{ config('wyvern.repository_url') }}" target="_blank">
         &copy; {{ date('Y') }} {{ $appName }}
     </a>
 
