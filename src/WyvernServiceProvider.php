@@ -22,12 +22,14 @@ use Filament\Facades\Filament;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Wyvern\Console\Commands\CheckContentLibrary;
 use Wyvern\Console\Commands\CheckMinecraftCatalogue;
 use Wyvern\Console\Commands\InstallModpack;
 use Wyvern\Filament\Actions\PowerActions;
 use Wyvern\Filament\Widgets\ShortcutsWidget;
+use Wyvern\Http\AuthorizePhpMyAdmin;
 use Wyvern\Navigation\MobileTabs;
 
 /**
@@ -55,8 +57,28 @@ class WyvernServiceProvider extends ServiceProvider
         return '<style>:root{--wy-row-h:3rem;--wy-pad:1rem;--wy-gap:1rem}</style>';
     }
 
+    /**
+     * Wyvern's own web routes.
+     *
+     * An invokable controller rather than a closure: `route:cache` refuses to serialise a
+     * closure, and a cached route table is the normal state of an installed panel, so a
+     * closure here would break the very command the installer runs.
+     *
+     * `web` and nothing else. The route has to answer a guest with 403 instead of being
+     * redirected to the login page — see the controller for why that distinction decides
+     * whether phpMyAdmin shows a login prompt or a 500.
+     */
+    private function registerRoutes(): void
+    {
+        Route::middleware('web')
+            ->get('/wyvern/internal/pma-authorize', AuthorizePhpMyAdmin::class)
+            ->name('wyvern.internal.pma-authorize');
+    }
+
     public function boot(): void
     {
+        $this->registerRoutes();
+
         // Filament serves its own panel stylesheet, and Pelican injects app.css through
         // STYLES_BEFORE. Ours has to land after both to reshape their surfaces, so it
         // goes on the other hook rather than relying on Vite's emission order.
