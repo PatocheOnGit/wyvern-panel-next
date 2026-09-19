@@ -78,11 +78,12 @@ class WyvernServiceProvider extends ServiceProvider
             ->get('/wyvern/internal/pma-authorize', AuthorizePhpMyAdmin::class)
             ->name('wyvern.internal.pma-authorize');
 
-        // No 'web' on this one. phpMyAdmin's signon script calls it server-to-server with
-        // no cookies and no session, so session middleware would only cost a redis round
-        // trip per call — and CSRF protection on a GET that carries its own single-use
-        // secret protects nothing.
-        Route::get('/wyvern/internal/pma-claim', ClaimPhpMyAdminSignon::class)
+        // 'web' on this one, because the session is the whole point: phpMyAdmin's signon
+        // script forwards the visitor's cookies, and this route answers with whatever that
+        // visitor chose in the picker. Without session middleware there would be no way to
+        // tell one visitor's selection from another's.
+        Route::middleware('web')
+            ->get('/wyvern/internal/pma-claim', ClaimPhpMyAdminSignon::class)
             ->name('wyvern.internal.pma-claim');
     }
 

@@ -15,9 +15,9 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
 use PDO;
 use PDOException;
+use Wyvern\Http\ClaimPhpMyAdminSignon;
 
 /**
  * The way in to phpMyAdmin.
@@ -39,9 +39,11 @@ use PDOException;
  *    schema and nothing else, so phpMyAdmin shows exactly that much without being
  *    configured to hide anything. A UI-level filter would be a second, weaker copy of a
  *    rule the database already enforces.
- *  - The handover is a single-use token with a one-minute life, not the credentials
- *    themselves. Nothing sensitive travels in the URL that is worth replaying a minute
- *    later, and nothing is written to disk.
+ *  - The handover is bound to the panel session, not to a URL. phpMyAdmin asks its
+ *    signon source for credentials on every single request, so anything consumed by
+ *    reading it — a one-time token, say — works for exactly one page and then throws the
+ *    visitor back here. The selection is stored against the session instead, which is the
+ *    session phpMyAdmin is being signed on from.
  *
  * @property Schema $form
  */
@@ -50,12 +52,13 @@ class DatabaseAccess extends Page
     use InteractsWithForms;
 
     /**
-     * How long the handover token lives, in seconds.
+     * How long a selection stays current, in minutes.
      *
-     * Long enough for a redirect, short enough that a token caught in a proxy log or a
-     * browser history is worthless by the time anyone reads it.
+     * Matched to the panel's own session lifetime: the selection is meaningless without
+     * the session that made it, so outliving it would only leave credentials in a cache
+     * with nobody able to reach them.
      */
-    private const TOKEN_TTL = 60;
+    private const SELECTION_TTL = 120;
 
     protected static string|BackedEnum|null $navigationIcon = TablerIcon::Database;
 
@@ -227,15 +230,17 @@ class DatabaseAccess extends Page
             return;
         }
 
-        $token = Str::random(64);
+        Cache::put(
+            ClaimPhpMyAdminSignon::cacheKey(user()->id),
+            [
+                'username' => $database->username,
+                'password' => $state['password'],
+                'database' => $database->database,
+            ],
+            now()->addMinutes(self::SELECTION_TTL),
+        );
 
-        Cache::put('wyvern:pma:' . $token, [
-            'username' => $database->username,
-            'password' => $state['password'],
-            'database' => $database->database,
-        ], self::TOKEN_TTL);
-
-        $this->redirect('/pma/app/index.php?wyvern=' . $token);
+        $this->redirect('/pma/app/index.php');
     }
 
     /**

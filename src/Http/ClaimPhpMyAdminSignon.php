@@ -7,51 +7,63 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
 /**
- * Hands phpMyAdmin the credentials behind a handover token, once.
+ * Tells phpMyAdmin which database the visitor chose, and as whom to open it.
  *
- * phpMyAdmin's `signon` auth calls a PHP script to ask who it should log in as. That
- * script runs inside phpMyAdmin, not inside the panel, so it cannot read the panel's
- * session, its cache or its encryption key. It calls this instead, over the loopback
- * interface, with the token it was given in the URL.
+ * phpMyAdmin's `signon` auth calls a PHP script to ask who it should log in as, and it
+ * asks on **every** request — page loads, AJAX calls, the lot. That is the fact this whole
+ * design turns on. The first version handed over a single-use token, which worked exactly
+ * once: the first page rendered, and the next click bounced back to the picker because the
+ * token had been spent. A signon source has to be readable for as long as the session
+ * lasts, not consumed by reading it.
  *
- * What keeps that safe is not the network — loopback is not a permission — but the token:
- * 64 random characters, minted only after someone proved they hold the database password,
- * valid for one minute, and destroyed by the act of reading it. Replaying it a second time
- * gets nothing, and so does guessing.
+ * So the selection lives against the panel session instead. The picker writes it, this
+ * route reads it, and phpMyAdmin's script forwards the visitor's cookies so that the panel
+ * resolves the same user it would for any other request. The panel session *is* the
+ * single-sign-on session, which is what signon was built to expect.
  *
- * The loopback check is still worth having. It costs nothing and it removes the whole
- * class of mistake where a reverse proxy, a container network or a future port-forward
- * quietly exposes this route to the internet, where a token could at least be brute-forced
- * in the open.
+ * The trust boundary is therefore the panel session itself, and nothing weaker: to get
+ * these credentials you must already hold a session that chose this database and proved
+ * its password. That is not a new key to the database — whoever holds that session can
+ * read the same password off the server's Databases page anyway.
+ *
+ * The loopback check stays. It costs nothing and removes the class of mistake where a
+ * proxy or a future port-forward quietly publishes this route.
  */
 class ClaimPhpMyAdminSignon
 {
+    /**
+     * Where a visitor's current selection lives.
+     */
+    public static function cacheKey(int $userId): string
+    {
+        return 'wyvern:pma:user:' . $userId;
+    }
+
     public function __invoke(Request $request): JsonResponse
     {
         if (!in_array($request->ip(), ['127.0.0.1', '::1'], true)) {
             return response()->json(['error' => 'not local'], 403);
         }
 
-        $token = (string) $request->query('token', '');
+        $user = user();
 
-        // Length-checked before it reaches the cache so a short or empty token cannot turn
-        // into a lookup for a key an attacker controls the shape of.
-        if (strlen($token) !== 64 || !ctype_alnum($token)) {
-            return response()->json(['error' => 'bad token'], 400);
+        if ($user === null) {
+            return response()->json(['error' => 'not signed in'], 403);
         }
 
-        // pull() is get-and-forget: one read and the token stops existing, so a token
-        // caught in a log cannot be used behind the person it was minted for.
-        $payload = Cache::pull('wyvern:pma:' . $token);
+        $selection = Cache::get(self::cacheKey($user->id));
 
-        if (!is_array($payload)) {
-            return response()->json(['error' => 'unknown or spent token'], 404);
+        // No selection is the normal state for someone who typed /pma/app directly, and it
+        // is not an error: phpMyAdmin reads the 404 as "no credentials" and sends them to
+        // SignonURL, which is the picker.
+        if (!is_array($selection)) {
+            return response()->json(['error' => 'nothing chosen'], 404);
         }
 
         return response()->json([
-            'username' => $payload['username'],
-            'password' => $payload['password'],
-            'database' => $payload['database'],
+            'username' => $selection['username'],
+            'password' => $selection['password'],
+            'database' => $selection['database'],
         ]);
     }
 }
