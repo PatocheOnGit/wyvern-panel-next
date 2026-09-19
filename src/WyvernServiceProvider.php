@@ -5,6 +5,7 @@ namespace Wyvern;
 use App\Enums\CustomizationKey;
 use App\Enums\HeaderActionPosition;
 use App\Enums\HeaderWidgetPosition;
+use App\Enums\TablerIcon;
 use App\Facades\Activity;
 use App\Filament\App\Resources\Servers\Pages\ListServers;
 use App\Filament\Server\Pages\ServerFormPage;
@@ -18,6 +19,7 @@ use App\Filament\Server\Resources\Subusers\Pages\ListSubusers;
 use App\Filament\Server\Resources\Webhooks\Pages\ListWebhooks;
 use App\Models\Egg;
 use App\Models\Server;
+use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
@@ -28,8 +30,10 @@ use Wyvern\Console\Commands\CheckContentLibrary;
 use Wyvern\Console\Commands\CheckMinecraftCatalogue;
 use Wyvern\Console\Commands\InstallModpack;
 use Wyvern\Filament\Actions\PowerActions;
+use Wyvern\Filament\App\Pages\DatabaseAccess;
 use Wyvern\Filament\Widgets\ShortcutsWidget;
 use Wyvern\Http\AuthorizePhpMyAdmin;
+use Wyvern\Http\ClaimPhpMyAdminSignon;
 use Wyvern\Navigation\MobileTabs;
 
 /**
@@ -73,11 +77,43 @@ class WyvernServiceProvider extends ServiceProvider
         Route::middleware('web')
             ->get('/wyvern/internal/pma-authorize', AuthorizePhpMyAdmin::class)
             ->name('wyvern.internal.pma-authorize');
+
+        // No 'web' on this one. phpMyAdmin's signon script calls it server-to-server with
+        // no cookies and no session, so session middleware would only cost a redis round
+        // trip per call — and CSRF protection on a GET that carries its own single-use
+        // secret protects nothing.
+        Route::get('/wyvern/internal/pma-claim', ClaimPhpMyAdminSignon::class)
+            ->name('wyvern.internal.pma-claim');
+    }
+
+    /**
+     * The way from a database to phpMyAdmin.
+     *
+     * On the page where someone is already looking at a database, rather than as a
+     * top-level menu entry: arriving at the picker from here means the database is chosen
+     * before the page loads, and the only question left is its password.
+     */
+    private function registerDatabaseShortcut(): void
+    {
+        if (!config('wyvern.phpmyadmin.enabled')) {
+            return;
+        }
+
+        ListDatabases::registerCustomHeaderActions(
+            HeaderActionPosition::After,
+            Action::make('open_phpmyadmin')
+                ->label(trans('wyvern.database_access.actions.open'))
+                ->icon(TablerIcon::Database)
+                ->color('gray')
+                ->url(fn () => DatabaseAccess::getUrl(panel: 'app'))
+                ->visible(fn () => user() !== null),
+        );
     }
 
     public function boot(): void
     {
         $this->registerRoutes();
+        $this->registerDatabaseShortcut();
 
         // Filament serves its own panel stylesheet, and Pelican injects app.css through
         // STYLES_BEFORE. Ours has to land after both to reshape their surfaces, so it

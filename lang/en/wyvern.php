@@ -180,4 +180,33 @@ return [
             'failed' => 'Could not start the install',
         ],
     ],
+
+    'database_access' => [
+        'title' => 'Open a database',
+        'heading' => 'Sign in to phpMyAdmin',
+        'description' => 'Pick one of your databases and give its password. phpMyAdmin opens signed in as that database\'s own MySQL user, so it shows that database and nothing else.',
+
+        'fields' => [
+            'database' => 'Database',
+            'database_help' => 'Signs in as :username on :host.',
+            'password' => 'Database password',
+            'password_help' => 'The password of the database itself, not your panel password. It is on the server\'s Databases page.',
+        ],
+
+        'actions' => [
+            'open' => 'Open in phpMyAdmin',
+        ],
+
+        'empty' => [
+            'heading' => 'No databases yet',
+            'body' => 'Databases are created per server, on a server\'s Databases page. Once one exists it can be opened from here.',
+        ],
+
+        'notifications' => [
+            'gone' => 'That database is no longer available to you',
+            'no_host' => 'That database has no host configured',
+            'refused' => 'MySQL refused those credentials',
+            'refused_body' => 'The database password is the one shown on the server\'s Databases page, not your panel password.',
+        ],
+    ],
 ];

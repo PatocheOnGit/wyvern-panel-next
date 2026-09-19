@@ -94,6 +94,17 @@ return [
     ],
 
     /*
+     * phpMyAdmin, when the installer put one there.
+     *
+     * The panel cannot see whether /pma exists — it is nginx that routes it — so the
+     * installer says so here. Without this the database picker and the button that leads
+     * to it would be offered on every install, and most of them would 404.
+     */
+    'phpmyadmin' => [
+        'enabled' => (bool) env('WYVERN_PMA_ENABLED', false),
+    ],
+
+    /*
      * Where mods, plugins and modpacks are searched.
      *
      * Modrinth needs no key but asks clients to identify themselves, so the user agent

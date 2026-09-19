@@ -10,6 +10,7 @@ use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Navigation\NavigationItem;
 use Filament\Panel;
+use Wyvern\Filament\WyvernPlugin;
 
 class AppPanelProvider extends PanelProvider
 {
@@ -45,6 +46,7 @@ class AppPanelProvider extends PanelProvider
             ->plugins([
                 FilamentLogViewerPlugin::make()
                     ->authorize(false),
+                WyvernPlugin::make(),
             ]);
 
         /** @var PluginService $pluginService */

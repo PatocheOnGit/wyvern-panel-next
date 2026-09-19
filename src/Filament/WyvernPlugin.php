@@ -4,6 +4,7 @@ namespace Wyvern\Filament;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use Wyvern\Filament\App\Pages\DatabaseAccess;
 use Wyvern\Filament\Server\Pages\Content;
 use Wyvern\Filament\Server\Pages\Version;
 use Wyvern\Filament\Widgets\FleetOverview;
@@ -33,6 +34,16 @@ class WyvernPlugin implements Plugin
                 FleetOverview::class,
                 NodeHealth::class,
                 RecentActivity::class,
+            ]);
+
+            return;
+        }
+
+        if ($panel->getId() === 'app') {
+            // The way in to phpMyAdmin. It lives on the client panel because the people who
+            // need it are server owners, not administrators.
+            $panel->pages([
+                DatabaseAccess::class,
             ]);
 
             return;
