@@ -240,7 +240,10 @@ class DatabaseAccess extends Page
             now()->addMinutes(self::SELECTION_TTL),
         );
 
-        $this->redirect('/pma/app/index.php');
+        // Straight into the database, rather than phpMyAdmin's front page — which is a
+        // version number and a server collation nobody here can change, and which the
+        // theme hides for that reason.
+        $this->redirect('/pma/app/index.php?route=/database/structure&db=' . urlencode($database->database));
     }
 
     /**
