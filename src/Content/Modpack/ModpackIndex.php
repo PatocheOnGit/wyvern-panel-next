@@ -79,4 +79,16 @@ final readonly class ModpackIndex
 
         return null;
     }
+
+    /** The exact loader version the pack pins, e.g. 0.16.9 or 21.1.77. */
+    public function loaderVersion(): ?string
+    {
+        foreach (['neoforge', 'forge', 'fabric-loader', 'quilt-loader'] as $key) {
+            if (isset($this->dependencies[$key])) {
+                return (string) $this->dependencies[$key];
+            }
+        }
+
+        return null;
+    }
 }

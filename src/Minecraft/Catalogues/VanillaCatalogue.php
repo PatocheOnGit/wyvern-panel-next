@@ -47,6 +47,32 @@ class VanillaCatalogue extends CachedCatalogue implements LoaderCatalogue
         return [];
     }
 
+    /** The Java major Mojang ships this version with. */
+    public function javaVersion(string $gameVersion): ?int
+    {
+        return $this->remember("java.{$gameVersion}", function () use ($gameVersion): ?int {
+            $url = $this->metadataUrls()[$gameVersion] ?? null;
+
+            if (!$url) {
+                return null;
+            }
+
+            $meta = Http::timeout(10)->get($url);
+
+            return $meta->successful() ? ($meta->json('javaVersion.majorVersion') ?: null) : null;
+        });
+    }
+
+    /** @return array<string, string> */
+    private function metadataUrls(): array
+    {
+        return $this->remember('urls', function (): array {
+            $manifest = Http::timeout(10)->get(self::MANIFEST);
+
+            return $manifest->failed() ? [] : collect($manifest->json('versions', []))->pluck('url', 'id')->all();
+        });
+    }
+
     public function binary(string $gameVersion, ?string $build = null): ?ServerBinary
     {
         return $this->remember("binary.{$gameVersion}", function () use ($gameVersion): ?ServerBinary {

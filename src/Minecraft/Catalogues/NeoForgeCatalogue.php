@@ -79,9 +79,13 @@ class NeoForgeCatalogue extends CachedCatalogue implements LoaderCatalogue
 
             preg_match_all('#<version>([^<]+)</version>#', $response->body(), $matches);
 
+            // Highest first, not newest published: 1.21.1 backports keep shipping after 26.x.
+            $versions = $matches[1];
+            usort($versions, fn (string $a, string $b) => version_compare($b, $a));
+
             $grouped = [];
 
-            foreach (array_reverse($matches[1] ?? []) as $version) {
+            foreach ($versions as $version) {
                 // Pre-releases carry a suffix the installer url would not resolve.
                 if (str_contains($version, '-')) {
                     continue;

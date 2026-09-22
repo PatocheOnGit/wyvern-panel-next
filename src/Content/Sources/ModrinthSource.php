@@ -3,6 +3,7 @@
 namespace Wyvern\Content\Sources;
 
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Wyvern\Content\ContentFile;
 use Wyvern\Content\ContentProject;
@@ -124,32 +125,96 @@ class ModrinthSource implements ContentSource
             return [];
         }
 
-        $files = [];
+        return array_values(array_filter(array_map(
+            fn (array $version) => $this->toFile($version),
+            array_slice($response->json() ?? [], 0, $limit),
+        )));
+    }
 
-        foreach (array_slice($response->json() ?? [], 0, $limit) as $version) {
-            // A release can ship several files; the primary one is the artefact, the
-            // rest are sources and javadocs nobody wants on a server.
-            $file = collect($version['files'] ?? [])->firstWhere('primary', true)
-                ?? ($version['files'][0] ?? null);
+    /**
+     * One Modrinth version object as the file a server would install.
+     *
+     * @param  array<string, mixed>  $version
+     */
+    private function toFile(array $version): ?ContentFile
+    {
+        // A release can ship several files; the primary one is the artefact, the
+        // rest are sources and javadocs nobody wants on a server.
+        $file = collect($version['files'] ?? [])->firstWhere('primary', true)
+            ?? ($version['files'][0] ?? null);
 
-            if (!$file) {
-                continue;
-            }
-
-            $files[] = new ContentFile(
-                source: $this->key(),
-                id: $version['id'],
-                filename: $file['filename'],
-                url: $file['url'] ?? null,
-                versionName: $version['version_number'] ?? $version['name'] ?? '',
-                gameVersions: $version['game_versions'] ?? [],
-                loaders: $version['loaders'] ?? [],
-                size: $file['size'] ?? null,
-                releaseType: $version['version_type'] ?? null,
-            );
+        if (!$file) {
+            return null;
         }
 
-        return $files;
+        return new ContentFile(
+            source: $this->key(),
+            id: $version['id'],
+            filename: $file['filename'],
+            url: $file['url'] ?? null,
+            versionName: $version['version_number'] ?? $version['name'] ?? '',
+            gameVersions: $version['game_versions'] ?? [],
+            loaders: $version['loaders'] ?? [],
+            size: $file['size'] ?? null,
+            releaseType: $version['version_type'] ?? null,
+            projectId: $version['project_id'] ?? null,
+            sha1: $file['hashes']['sha1'] ?? null,
+        );
+    }
+
+    /**
+     * The newest compatible version for each installed file, keyed by its sha1.
+     *
+     * @param  string[]  $sha1s
+     * @return array<string, ContentFile>
+     */
+    public function updates(array $sha1s, Loader $loader, ?string $gameVersion): array
+    {
+        $body = ['hashes' => array_values($sha1s), 'algorithm' => 'sha1', 'loaders' => $loader->contentLoaders()];
+
+        if (filled($gameVersion)) {
+            $body['game_versions'] = [$gameVersion];
+        }
+
+        $response = $this->client()->post(self::BASE . '/version_files/update', $body);
+
+        if ($response->failed()) {
+            return [];
+        }
+
+        return array_filter(array_map(fn (array $version) => $this->toFile($version), $response->json() ?? []));
+    }
+
+    /**
+     * Title and icon for each project id, for listing what is installed.
+     *
+     * @param  string[]  $ids
+     * @return array<string, array{title: string, icon: ?string, slug: ?string}>
+     */
+    public function projects(array $ids): array
+    {
+        $ids = array_values(array_unique(array_filter($ids)));
+        sort($ids);
+
+        if ($ids === []) {
+            return [];
+        }
+
+        return Cache::remember('wyvern.modrinth.projects.' . md5(implode(',', $ids)), now()->addHour(), function () use ($ids) {
+            $projects = [];
+
+            foreach (array_chunk($ids, 100) as $chunk) {
+                foreach ($this->client()->get(self::BASE . '/projects', ['ids' => json_encode($chunk)])->json() ?? [] as $project) {
+                    $projects[$project['id']] = [
+                        'title' => $project['title'] ?? $project['slug'] ?? $project['id'],
+                        'icon' => $project['icon_url'] ?? null,
+                        'slug' => $project['slug'] ?? null,
+                    ];
+                }
+            }
+
+            return $projects;
+        });
     }
 
     /**

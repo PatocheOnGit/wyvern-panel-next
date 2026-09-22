@@ -39,11 +39,23 @@ return [
         ],
     ],
     'egg' => [
-        'delete' => 'Deleted the <b>:name</b> egg, and the <b>:servers</b> server(s) that used it',
+        'delete' => 'Deleted the <b>:name</b> egg',
     ],
 
     'server' => [
         'delete' => 'Deleted the server <b>:name</b> (<b>:uuid</b>)',
+        'wyvern' => [
+            'version' => 'Installed <b>:loader</b> <b>:version</b>, build <b>:build</b>',
+            'content' => 'Installed <b>:file</b>',
+            'modpack' => 'Queued the modpack <b>:project</b>',
+            'properties' => 'Changed <b>:keys</b> in server.properties',
+            'players' => [
+                'add' => 'Added <b>:name</b> to <b>:list</b>',
+                'remove' => 'Removed <b>:name</b> from <b>:list</b>',
+                'kick' => 'Kicked <b>:name</b>',
+                'whitelist' => 'Turned the whitelist <b>:enabled</b>',
+            ],
+        ],
         'console' => [
             'command' => 'Executed "<b>:command</b>" on the server',
         ],

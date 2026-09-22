@@ -83,7 +83,7 @@ final class PowerActions
             ->action(fn () => self::send($power));
     }
 
-    private static function send(string $power): void
+    public static function send(string $power): void
     {
         $server = self::server();
 

@@ -7,6 +7,7 @@ use Illuminate\Console\Command;
 use Wyvern\Content\ContentLibrary;
 use Wyvern\Content\Modpack\ModpackInstaller;
 use Wyvern\Content\ServerProfile;
+use Wyvern\Minecraft\InstallRecords;
 
 class InstallModpack extends Command
 {
@@ -18,7 +19,7 @@ class InstallModpack extends Command
 
     protected $description = 'Install a Modrinth modpack onto a server';
 
-    public function handle(ContentLibrary $library, ModpackInstaller $installer): int
+    public function handle(ContentLibrary $library, ModpackInstaller $installer, InstallRecords $records): int
     {
         $server = Server::query()
             ->where('id', $this->argument('server'))
@@ -32,7 +33,7 @@ class InstallModpack extends Command
         }
 
         $profile = ServerProfile::of($server);
-        $files = $library->files('modrinth', $this->argument('project'), $profile->loader, $profile->gameVersion);
+        $files = $library->files('modrinth', $this->argument('project'), $profile->loader, $profile->gameVersion($records));
 
         if ($files === []) {
             $this->error('Modrinth has no build of that pack for this server.');
@@ -73,10 +74,6 @@ class InstallModpack extends Command
         $this->newLine();
         $this->info("  {$index->name} {$index->versionId} installed.");
         $this->line('  it expects Minecraft ' . ($index->minecraftVersion() ?? '?') . ' on ' . ($index->loader() ?? '?'));
-
-        if ($profile->loader && $index->loader() && $index->loader() !== $profile->loader->value) {
-            $this->warn('  this server runs ' . $profile->loader->value . ', so the pack will not load until the server is reinstalled on ' . $index->loader());
-        }
 
         return self::SUCCESS;
     }

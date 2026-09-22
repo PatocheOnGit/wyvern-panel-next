@@ -36,8 +36,8 @@ enum ContentType: string
     {
         return match ($loader) {
             Loader::Vanilla => [],
-            Loader::Paper, Loader::Purpur => [self::Plugin],
-            Loader::Fabric, Loader::Forge, Loader::NeoForge => [self::Mod, self::Modpack],
+            Loader::Paper, Loader::Purpur, Loader::Folia => [self::Plugin],
+            Loader::Fabric, Loader::Quilt, Loader::Forge, Loader::NeoForge => [self::Mod, self::Modpack],
         };
     }
 }

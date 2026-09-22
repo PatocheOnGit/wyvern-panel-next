@@ -16,7 +16,10 @@ use RuntimeException;
  */
 class ContentInstaller
 {
-    public function __construct(private readonly DaemonFileRepository $files) {}
+    public function __construct(
+        private readonly DaemonFileRepository $files,
+        private readonly InstalledContent $installed,
+    ) {}
 
     /**
      * @throws RuntimeException when the file cannot be installed on this server
@@ -48,6 +51,21 @@ class ContentInstaller
             'foreground' => false,
         ]);
 
-        return trim($directory . '/' . $file->filename, '/');
+        $path = trim($directory . '/' . $file->filename, '/');
+        $this->installed->record($server, [$path => self::record($file)]);
+
+        return $path;
+    }
+
+    /** @return array<string, mixed> */
+    public static function record(ContentFile $file): array
+    {
+        return [
+            'source' => $file->source,
+            'project' => $file->projectId,
+            'version' => $file->id,
+            'version_name' => $file->versionName,
+            'sha1' => $file->sha1,
+        ];
     }
 }

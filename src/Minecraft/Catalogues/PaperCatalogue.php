@@ -16,17 +16,22 @@ use Wyvern\Minecraft\ServerBinary;
  */
 class PaperCatalogue extends CachedCatalogue implements LoaderCatalogue
 {
-    private const BASE = 'https://fill.papermc.io/v3/projects/paper';
+    private const API = 'https://fill.papermc.io/v3/projects/';
 
     public function loader(): Loader
     {
         return Loader::Paper;
     }
 
+    protected function base(): string
+    {
+        return self::API . $this->loader()->value;
+    }
+
     public function gameVersions(): array
     {
         return $this->remember('versions', function (): array {
-            $response = Http::timeout(10)->get(self::BASE);
+            $response = Http::timeout(10)->get($this->base());
 
             if ($response->failed()) {
                 return [];
@@ -47,7 +52,7 @@ class PaperCatalogue extends CachedCatalogue implements LoaderCatalogue
     public function builds(string $gameVersion): array
     {
         return $this->remember("builds.{$gameVersion}", function () use ($gameVersion): array {
-            $response = Http::timeout(10)->get(self::BASE . "/versions/{$gameVersion}/builds");
+            $response = Http::timeout(10)->get($this->base() . "/versions/{$gameVersion}/builds");
 
             if ($response->failed()) {
                 return [];
@@ -64,7 +69,7 @@ class PaperCatalogue extends CachedCatalogue implements LoaderCatalogue
     public function binary(string $gameVersion, ?string $build = null): ?ServerBinary
     {
         return $this->remember("binary.{$gameVersion}." . ($build ?? 'latest'), function () use ($gameVersion, $build): ?ServerBinary {
-            $response = Http::timeout(10)->get(self::BASE . "/versions/{$gameVersion}/builds");
+            $response = Http::timeout(10)->get($this->base() . "/versions/{$gameVersion}/builds");
 
             if ($response->failed()) {
                 return null;
@@ -82,7 +87,7 @@ class PaperCatalogue extends CachedCatalogue implements LoaderCatalogue
             }
 
             return new ServerBinary(
-                loader: Loader::Paper,
+                loader: $this->loader(),
                 gameVersion: $gameVersion,
                 build: (string) $entry['id'],
                 url: $download['url'],

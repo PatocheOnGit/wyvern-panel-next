@@ -9,6 +9,7 @@ final readonly class ModpackFile
         public string $url,
         public ?int $size,
         public string $serverEnv,
+        public ?string $sha1 = null,
     ) {}
 
     /** @param array<string, mixed> $entry */
@@ -33,7 +34,14 @@ final readonly class ModpackFile
             url: $url,
             size: $entry['fileSize'] ?? null,
             serverEnv: $entry['env']['server'] ?? 'required',
+            sha1: $entry['hashes']['sha1'] ?? null,
         );
+    }
+
+    /** The Modrinth version id, from the same CDN url as the project. */
+    public function versionId(): ?string
+    {
+        return preg_match('#/versions/([A-Za-z0-9]+)/#', $this->url, $m) === 1 ? $m[1] : null;
     }
 
     /**

@@ -23,6 +23,8 @@ final readonly class ContentFile
         public array $loaders = [],
         public ?int $size = null,
         public ?string $releaseType = null,
+        public ?string $projectId = null,
+        public ?string $sha1 = null,
     ) {}
 
     public function isDownloadable(): bool

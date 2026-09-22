@@ -36,11 +36,11 @@
                 <dl class="wy-version-facts">
                     <div class="wy-version-fact">
                         <dt>{{ trans('wyvern.version.fields.version') }}</dt>
-                        <dd>{{ $this->installed['MC_VERSION'] ?? '—' }}</dd>
+                        <dd>{{ $this->installedValue('MC_VERSION') }}</dd>
                     </div>
                     <div class="wy-version-fact">
                         <dt>{{ trans('wyvern.version.fields.build') }}</dt>
-                        <dd>{{ $this->installed['MC_BUILD'] ?? '—' }}</dd>
+                        <dd>{{ $this->installedValue('MC_BUILD') }}</dd>
                     </div>
                 </dl>
             </div>

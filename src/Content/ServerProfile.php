@@ -5,6 +5,7 @@ namespace Wyvern\Content;
 use App\Models\EggVariable;
 use App\Models\Server;
 use Illuminate\Database\Query\JoinClause;
+use Wyvern\Minecraft\InstallRecords;
 use Wyvern\Minecraft\Loader;
 
 /**
@@ -19,7 +20,8 @@ final readonly class ServerProfile
 {
     public function __construct(
         public ?Loader $loader,
-        public ?string $gameVersion,
+        private ?string $pinnedVersion,
+        private ?Server $server = null,
     ) {}
 
     public static function of(Server $server): self
@@ -29,12 +31,25 @@ final readonly class ServerProfile
         return new self(
             self::loaderOf($server, $env),
             self::first($env, ['MC_VERSION', 'MINECRAFT_VERSION', 'VERSION']),
+            $server,
         );
     }
 
     public function isKnown(): bool
     {
         return $this->loader !== null;
+    }
+
+    /** What is on disk first, the variable second. Lazy: it costs a call to the node. */
+    public function gameVersion(InstallRecords $records): ?string
+    {
+        $record = $this->server && $this->loader ? $records->of($this->server) : null;
+
+        if ($record?->minecraft !== null && $record->loader === $this->loader) {
+            return $record->minecraft;
+        }
+
+        return $this->pinnedVersion;
     }
 
     /** @return ContentType[] */
@@ -78,7 +93,7 @@ final readonly class ServerProfile
         $name = mb_strtolower($server->egg?->name ?? '');
 
         // Ordered so neoforge wins before forge, which is a substring of it.
-        foreach ([Loader::NeoForge, Loader::Purpur, Loader::Paper, Loader::Fabric, Loader::Forge, Loader::Vanilla] as $loader) {
+        foreach ([Loader::NeoForge, Loader::Purpur, Loader::Folia, Loader::Paper, Loader::Quilt, Loader::Fabric, Loader::Forge, Loader::Vanilla] as $loader) {
             if (str_contains($name, $loader->value)) {
                 return $loader;
             }

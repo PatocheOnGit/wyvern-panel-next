@@ -3,10 +3,12 @@
 namespace Wyvern\Minecraft;
 
 use Wyvern\Minecraft\Catalogues\FabricCatalogue;
+use Wyvern\Minecraft\Catalogues\FoliaCatalogue;
 use Wyvern\Minecraft\Catalogues\ForgeCatalogue;
 use Wyvern\Minecraft\Catalogues\NeoForgeCatalogue;
 use Wyvern\Minecraft\Catalogues\PaperCatalogue;
 use Wyvern\Minecraft\Catalogues\PurpurCatalogue;
+use Wyvern\Minecraft\Catalogues\QuiltCatalogue;
 use Wyvern\Minecraft\Catalogues\VanillaCatalogue;
 use Wyvern\Minecraft\Contracts\LoaderCatalogue;
 
@@ -27,7 +29,9 @@ class VersionCatalogue
             Loader::Vanilla => new VanillaCatalogue(),
             Loader::Paper => new PaperCatalogue(),
             Loader::Purpur => new PurpurCatalogue(),
+            Loader::Folia => new FoliaCatalogue(),
             Loader::Fabric => new FabricCatalogue(),
+            Loader::Quilt => new QuiltCatalogue(),
             Loader::Forge => new ForgeCatalogue(),
             Loader::NeoForge => new NeoForgeCatalogue(),
         };
@@ -48,5 +52,17 @@ class VersionCatalogue
     public function binary(Loader $loader, string $gameVersion, ?string $build = null): ?ServerBinary
     {
         return $this->for($loader)->binary($gameVersion, $build);
+    }
+
+    /** "latest" as the flavour's newest version; anything else unchanged. */
+    public function resolve(Loader $loader, string $gameVersion): ?string
+    {
+        return $gameVersion === 'latest' ? ($this->gameVersions($loader)[0] ?? null) : $gameVersion;
+    }
+
+    /** Every flavour runs on the Java its Minecraft version ships with. */
+    public function javaVersion(string $gameVersion): ?int
+    {
+        return (new VanillaCatalogue())->javaVersion($gameVersion);
     }
 }

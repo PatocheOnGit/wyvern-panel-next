@@ -8,6 +8,7 @@ use Wyvern\Content\ContentInstaller;
 use Wyvern\Content\ContentLibrary;
 use Wyvern\Content\ContentType;
 use Wyvern\Content\ServerProfile;
+use Wyvern\Minecraft\InstallRecords;
 
 /**
  * Searches the content libraries as a given server would, and optionally installs the
@@ -24,7 +25,7 @@ class CheckContentLibrary extends Command
 
     protected $description = 'Search mods, plugins and modpacks for a server, and optionally install one';
 
-    public function handle(ContentLibrary $library, ContentInstaller $installer): int
+    public function handle(ContentLibrary $library, ContentInstaller $installer, InstallRecords $records): int
     {
         $server = Server::query()
             ->with('egg', 'variables')
@@ -43,7 +44,7 @@ class CheckContentLibrary extends Command
 
         $this->line("  server:  {$server->name}");
         $this->line('  loader:  ' . ($profile->loader?->label() ?? 'unknown'));
-        $this->line('  version: ' . ($profile->gameVersion ?? 'any'));
+        $this->line('  version: ' . ($profile->gameVersion($records) ?? 'any'));
         $this->line('  accepts: ' . (collect($profile->installableTypes())->map(fn ($t) => $t->value)->implode(', ') ?: 'nothing'));
         $this->newLine();
 
@@ -56,7 +57,7 @@ class CheckContentLibrary extends Command
                 (string) $this->option('query'),
                 $type,
                 $profile->loader,
-                $profile->gameVersion,
+                $profile->gameVersion($records),
                 6,
             );
 
@@ -76,7 +77,7 @@ class CheckContentLibrary extends Command
             }
 
             $first = $results[0];
-            $files = $source->files($first->id, $profile->loader, $profile->gameVersion);
+            $files = $source->files($first->id, $profile->loader, $profile->gameVersion($records));
             $this->line('     files for ' . $first->title . ': ' . count($files));
 
             foreach (array_slice($files, 0, 3) as $file) {
@@ -91,7 +92,7 @@ class CheckContentLibrary extends Command
                 ));
             }
 
-            if ($profile->gameVersion === null) {
+            if ($profile->gameVersion($records) === null) {
                 $this->warn('     this server does not pin a Minecraft version, so files were not narrowed to one');
             }
 

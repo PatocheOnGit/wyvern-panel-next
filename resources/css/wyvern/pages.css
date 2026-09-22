@@ -379,6 +379,13 @@
     box-shadow: none;
 }
 
+/* Folia's mark is a white leaf: the dark plate, in both themes. */
+.wy-loader-mark[data-loader='folia'],
+.wy-version-hero-mark[data-loader='folia'] {
+    background-color: var(--gray-900);
+    box-shadow: none;
+}
+
 .wy-loader-name {
     font-size: 0.9rem;
     font-weight: 600;
@@ -537,4 +544,354 @@
     flex: 0 0 auto;
     width: 1rem;
     height: 1rem;
+}
+
+
+/* ---- shared page furniture ------------------------------------------- */
+
+.wy-page-note {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-lg);
+    background-color: var(--wy-card);
+    box-shadow: inset 0 1px 0 var(--wy-line);
+    font-size: 0.82rem;
+    color: var(--wy-text-2);
+}
+
+.wy-page-note p {
+    margin: 0;
+}
+
+.wy-page-footnote {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--wy-muted);
+}
+
+.wy-page-footnote code {
+    margin-inline-start: 0.35rem;
+    font-family: var(--font-mono);
+}
+
+.wy-page-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.wy-row-button {
+    height: 1.75rem;
+    padding: 0 0.65rem;
+    border-radius: 0.45rem;
+    background-color: var(--wy-control);
+    box-shadow: inset 0 0 0 1px var(--wy-line);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--wy-text);
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.wy-row-button:hover {
+    box-shadow: inset 0 0 0 1px var(--wy-line-strong);
+}
+
+.wy-row-button-danger {
+    color: var(--wy-offline);
+}
+
+.wy-row-button:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+
+/* ---- properties ------------------------------------------------------ */
+
+/* The multiplayer screen draws the MOTD on dark stone; the console ground is the
+ * nearest dark surface we have in both themes. */
+.wy-motd {
+    display: block;
+    flex-basis: 100%;
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    border-radius: var(--radius-md);
+    background-color: var(--wy-console-bg);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.45;
+    white-space: pre-wrap;
+}
+
+
+/* ---- players --------------------------------------------------------- */
+
+.wy-players {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.wy-players-strip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-lg);
+    background-color: var(--wy-card);
+    box-shadow: inset 0 1px 0 var(--wy-line), var(--wy-lift-sm);
+}
+
+.wy-players-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+}
+
+.wy-players-stat-value {
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--wy-text);
+}
+
+.wy-players-stat-label {
+    font-size: 0.8rem;
+    color: var(--wy-text-2);
+}
+
+.wy-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background-color: var(--wy-muted);
+}
+
+.wy-dot-on {
+    background-color: var(--wy-online);
+}
+
+.wy-players-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.82rem;
+    color: var(--wy-text);
+    cursor: pointer;
+}
+
+.wy-players-switch input {
+    accent-color: var(--wy-accent);
+    width: 1rem;
+    height: 1rem;
+}
+
+.wy-players-hint {
+    flex-basis: 100%;
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--wy-muted);
+}
+
+.wy-players-tabs {
+    flex-wrap: wrap;
+    align-self: flex-start;
+}
+
+.wy-players-count {
+    margin-inline-start: 0.3rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--wy-muted);
+}
+
+.wy-players-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.wy-players-heading {
+    margin: 0;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--wy-muted);
+}
+
+.wy-players-empty {
+    margin: 0;
+    padding: 1.25rem 1rem;
+    border-radius: var(--radius-lg);
+    background-color: var(--wy-card);
+    box-shadow: inset 0 1px 0 var(--wy-line);
+    font-size: 0.82rem;
+    color: var(--wy-muted);
+}
+
+.wy-players-add {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.wy-players-add input {
+    flex: 1 1 12rem;
+    height: 2.1rem;
+    padding: 0 0.75rem;
+    border-radius: 0.45rem;
+    border: 0;
+    background-color: var(--wy-card);
+    box-shadow: inset 0 0 0 1px var(--wy-line);
+    font-size: 0.82rem;
+    color: var(--wy-text);
+}
+
+.wy-players-add input:focus {
+    outline: 2px solid var(--wy-focus);
+    outline-offset: -1px;
+}
+
+.wy-players-add .wy-content-install {
+    height: 2.1rem;
+    margin-inline-start: 0;
+}
+
+.wy-player-list {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-radius: var(--radius-lg);
+    background-color: var(--wy-card);
+    box-shadow: inset 0 1px 0 var(--wy-line), var(--wy-lift-sm);
+}
+
+.wy-player-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: var(--wy-row-h, 2.75rem);
+    padding: 0.5rem 0.85rem;
+}
+
+.wy-player-row + .wy-player-row {
+    border-top: 1px solid var(--wy-line);
+}
+
+.wy-player-head {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-md);
+    background-color: var(--wy-raised);
+    image-rendering: pixelated;
+    color: var(--wy-muted);
+}
+
+.wy-player-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.wy-player-name {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--wy-text);
+}
+
+.wy-player-meta {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--wy-muted);
+}
+
+.wy-player-badge {
+    padding: 0.05rem 0.4rem;
+    border-radius: 9999px;
+    background-color: var(--wy-accent-quiet);
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--wy-accent);
+}
+
+.wy-player-badge-danger {
+    background-color: color-mix(in oklab, var(--wy-offline) 12%, transparent);
+    color: var(--wy-offline);
+}
+
+.wy-player-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.35rem;
+    margin-inline-start: auto;
+}
+
+@media (max-width: 640px) {
+    .wy-player-row {
+        flex-wrap: wrap;
+    }
+
+    .wy-player-actions {
+        flex-basis: 100%;
+        justify-content: flex-start;
+        margin-inline-start: 2.75rem;
+    }
+}
+
+
+/* ---- installed content ----------------------------------------------- */
+
+.wy-content-modes {
+    align-self: flex-start;
+}
+
+.wy-content-summary-line {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--wy-text-2);
+}
+
+.wy-content-summary-line + .wy-content-install {
+    margin-inline-start: auto;
+}
+
+.wy-content-file-icon img {
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    object-fit: cover;
+    image-rendering: auto;
+}
+
+.wy-player-badge-muted {
+    background-color: var(--wy-raised);
+    color: var(--wy-text-2);
+}
+
+.wy-row-button-accent {
+    background-color: var(--wy-accent-quiet);
+    color: var(--wy-accent);
+}
+
+.wy-link {
+    color: var(--wy-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
 }

@@ -6,7 +6,10 @@ use App\Models\Server;
 use App\Repositories\Daemon\DaemonFileRepository;
 use Closure;
 use RuntimeException;
+use Wyvern\Content\InstalledContent;
+use Wyvern\Content\ServerProfile;
 use Wyvern\Content\Sources\ModrinthSource;
+use Wyvern\Minecraft\InstallRecords;
 
 /**
  * Installs a Modrinth modpack onto a server.
@@ -41,14 +44,42 @@ class ModpackInstaller
     public function __construct(
         private readonly DaemonFileRepository $files,
         private readonly ModrinthSource $modrinth,
+        private readonly InstallRecords $records,
+        private readonly InstalledContent $installed,
     ) {}
 
     /**
      * @param  Closure(string): void|null  $progress
+     * @param  array{project?: ?string, version?: ?string}  $pack
      *
      * @throws RuntimeException
      */
-    public function install(Server $server, string $archiveUrl, ?Closure $progress = null): ModpackIndex
+    public function install(Server $server, string $archiveUrl, ?Closure $progress = null, array $pack = []): ModpackIndex
+    {
+        $index = $this->prepare($server, $archiveUrl, $progress);
+
+        try {
+            $this->assertFits($server, $index);
+        } catch (RuntimeException $e) {
+            $this->discard($server);
+
+            throw $e;
+        }
+
+        $this->apply($server, $index, $progress, $pack);
+
+        return $index;
+    }
+
+    /**
+     * Download and unpack the pack into staging, and read its index. A server switch can
+     * happen between this and apply(): the install script leaves staging alone.
+     *
+     * @param  Closure(string): void|null  $progress
+     *
+     * @throws RuntimeException
+     */
+    public function prepare(Server $server, string $archiveUrl, ?Closure $progress = null): ModpackIndex
     {
         $repo = $this->files->setServer($server);
         $say = $progress ?? fn (string $m) => null;
@@ -68,9 +99,38 @@ class ModpackInstaller
             $repo->decompressFile('/' . self::STAGING, 'pack.zip');
             $this->waitForFile($repo, '/' . self::STAGING, 'modrinth.index.json', 300);
 
-            $index = ModpackIndex::parse(
+            return ModpackIndex::parse(
                 $repo->getContent('/' . self::STAGING . '/modrinth.index.json', 8 * 1024 * 1024)
             );
+        } catch (\Throwable $e) {
+            $this->reset($repo);
+
+            throw $e instanceof RuntimeException ? $e : new RuntimeException($e->getMessage(), 0, $e);
+        }
+    }
+
+    public function discard(Server $server): void
+    {
+        $this->reset($this->files->setServer($server));
+    }
+
+    /**
+     * Fetch the pack's files and lay its overrides, from what prepare() staged.
+     *
+     * @param  Closure(string): void|null  $progress
+     * @param  array{project?: ?string, version?: ?string}  $pack
+     */
+    public function apply(Server $server, ModpackIndex $index, ?Closure $progress = null, array $pack = [], bool $replaceMods = false): void
+    {
+        $repo = $this->files->setServer($server);
+        $say = $progress ?? fn (string $m) => null;
+
+        try {
+            if ($replaceMods) {
+                $say('removing the previous mods');
+                $this->deleteQuietly($repo, 'mods');
+                $this->installed->forgetDirectory($server, 'mods');
+            }
 
             $wanted = $this->serverSafeFiles($index);
             $skipped = count($index->files) - count($wanted);
@@ -98,6 +158,22 @@ class ModpackInstaller
             $say('applying overrides');
             $this->applyOverrides($repo, 'overrides');
             $this->applyOverrides($repo, 'server-overrides');
+
+            $this->installed->record($server, collect($wanted)->mapWithKeys(fn (ModpackFile $file) => [$file->path => [
+                'source' => 'modrinth',
+                'project' => $file->projectId(),
+                'version' => $file->versionId(),
+                'sha1' => $file->sha1,
+                'modpack' => true,
+            ]])->all());
+
+            $this->installed->setModpack($server, [
+                'source' => 'modrinth',
+                'project' => $pack['project'] ?? null,
+                'version' => $pack['version'] ?? null,
+                'name' => $index->name,
+                'version_name' => $index->versionId,
+            ]);
         } finally {
             // Whatever happened, a staging tree is not something to leave behind in
             // someone's server directory.
@@ -106,8 +182,15 @@ class ModpackInstaller
         }
 
         $say('done');
+    }
 
-        return $index;
+    private function deleteQuietly(DaemonFileRepository $repo, string $path): void
+    {
+        try {
+            $repo->deleteFiles('/', [$path]);
+        } catch (\Throwable) {
+            // Nothing there.
+        }
     }
 
     /**
@@ -140,6 +223,33 @@ class ModpackInstaller
 
             return $support[$project] !== 'unsupported';
         }));
+    }
+
+    /** @throws RuntimeException when the pack targets another loader or Minecraft version */
+    public function assertFits(Server $server, ModpackIndex $index): void
+    {
+        $profile = ServerProfile::of($server);
+        $packLoader = $index->loader();
+
+        if ($packLoader !== null && $profile->loader !== null && $packLoader !== $profile->loader->value) {
+            throw new RuntimeException(trans('wyvern.content.errors.modpack_loader', [
+                'pack' => $index->name,
+                'expected' => $packLoader,
+                'actual' => $profile->loader->label(),
+            ]));
+        }
+
+        $packVersion = $index->minecraftVersion();
+        $serverVersion = $profile->gameVersion($this->records);
+
+        // An unknown server version cannot be compared; the search already narrowed it.
+        if ($packVersion !== null && $serverVersion !== null && $packVersion !== $serverVersion) {
+            throw new RuntimeException(trans('wyvern.content.errors.modpack_version', [
+                'pack' => $index->name,
+                'expected' => $packVersion,
+                'actual' => $serverVersion,
+            ]));
+        }
     }
 
     private function timeout(): int

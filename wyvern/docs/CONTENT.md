@@ -52,25 +52,26 @@ loading. `ServerProfile` therefore queries the tables itself rather than trustin
 the caller loaded the server — otherwise a `with('variables')` upstream silently makes
 every server look like it has no loader.
 
-## The known gap: unpinned versions
+## Unpinned versions: what "latest" became
 
-A server installed with `MC_VERSION=latest` never records what "latest" turned out to
-be, so nothing can narrow its mod list to one Minecraft version. Left alone, that
-installs the wrong build: the first JEI release Modrinth returned for the test server
-was a 1.21.1 backport, which would not load on 26.2.
+A server installed with `MC_VERSION=latest` used to leave no trace of what "latest"
+turned out to be, so its mod list could not be narrowed: the first JEI release Modrinth
+returned for the test server was a 1.21.1 backport, which would not load on 26.2.
 
-For now the command prints each file's game versions and warns when a server pins
-nothing, so the mismatch is visible. The proper fix is for the install script to record
-what it resolved — loader, version, build — into a file the panel can read back. That is
-worth doing before the picker ships.
+The Wyvern egg now writes `.wyvern/install.json` (loader, minecraft, build) at the end of
+every install. `InstallRecord` reads it through Wings, caches it for an hour, and drops
+the cache on the `Installed` event. `ServerProfile::gameVersion()` prefers it over the
+variable. Servers on other eggs, or installed before this, fall back to the variable.
 
-## Not done yet
+## Modpacks
 
-**Modpacks.** A Modrinth `.mrpack` is not a server: it is a zip holding
-`modrinth.index.json`, a list of files to fetch, and an `overrides/` tree to lay on top.
-"Click install and it runs" therefore means download, unpack, fetch every listed file,
-apply the overrides — a queued job, not one pull. CurseForge modpacks are the same shape
-with a different manifest. That is the next piece.
+A Modrinth `.mrpack` is a zip holding `modrinth.index.json`, a list of files to fetch, and
+an `overrides/` tree to lay on top. `InstallModpackJob` does it in the queue and sends the
+user a notification either way. The pack is refused before any file is fetched if its
+loader or Minecraft version does not match the server.
+
+CurseForge modpacks use a different manifest and have no installer yet, so the Modpacks
+tab only appears for Modrinth.
 
 ## What was actually run
 
@@ -78,3 +79,20 @@ Chunky installed onto the Paper server from Modrinth, landing in `plugins/`. JEI
 installed onto the NeoForge server, landing in `mods/`; NeoForge listed it at boot
 (`Just Enough Items 30.32.0.221`) and the server reached `Done (0.429s)!` with the port
 listening.
+
+## Installed content
+
+Everything the panel installs is recorded in `.wyvern/content.json` (source, project,
+version, sha1), keyed by path without `.disabled`. The Installed view lists what is
+really in `plugins/` or `mods/`, adds titles and icons from Modrinth, and checks updates
+in one call to `version_files/update` with the recorded hashes. Files added by hand
+have no record, so they can be disabled or deleted but not updated.
+
+## A modpack as a version
+
+On the Wyvern egg the Modpacks tab shows every pack, whatever the server runs. When the
+pack does not fit, `ChangeServerJob` downloads it, reinstalls the server with the loader,
+Minecraft version and exact loader build the pack pins (Forge accepts an exact build for
+this), switches the Java image, waits for the install, then applies the pack. It can
+empty `mods/` first and take a backup before anything else. Each step waits on the node;
+the user gets one notification at the end.

@@ -6,6 +6,8 @@ use App\Enums\CustomizationKey;
 use App\Enums\HeaderActionPosition;
 use App\Enums\HeaderWidgetPosition;
 use App\Enums\TablerIcon;
+use App\Events\Server\Installed;
+use App\Extensions\Features\FeatureService;
 use App\Facades\Activity;
 use App\Filament\App\Resources\Servers\Pages\ListServers;
 use App\Filament\Server\Pages\ServerFormPage;
@@ -19,11 +21,13 @@ use App\Filament\Server\Resources\Subusers\Pages\ListSubusers;
 use App\Filament\Server\Resources\Webhooks\Pages\ListWebhooks;
 use App\Models\Egg;
 use App\Models\Server;
+use App\Models\Subuser;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Wyvern\Console\Commands\CheckContentLibrary;
@@ -34,6 +38,10 @@ use Wyvern\Filament\App\Pages\DatabaseAccess;
 use Wyvern\Filament\Widgets\ShortcutsWidget;
 use Wyvern\Http\AuthorizePhpMyAdmin;
 use Wyvern\Http\ClaimPhpMyAdminSignon;
+use Wyvern\Http\PlayerHead;
+use Wyvern\Minecraft\Features\ConsoleFixes;
+use Wyvern\Minecraft\Files\MinecraftFiles;
+use Wyvern\Minecraft\InstallRecords;
 use Wyvern\Navigation\MobileTabs;
 
 /**
@@ -85,6 +93,11 @@ class WyvernServiceProvider extends ServiceProvider
         Route::middleware('web')
             ->get('/wyvern/internal/pma-claim', ClaimPhpMyAdminSignon::class)
             ->name('wyvern.internal.pma-claim');
+
+        Route::middleware(['web', 'throttle:240,1'])
+            ->get('/wyvern/heads/{name}', PlayerHead::class)
+            ->where('name', '\.?[A-Za-z0-9_]{1,16}')
+            ->name('wyvern.heads');
     }
 
     /**
@@ -115,6 +128,15 @@ class WyvernServiceProvider extends ServiceProvider
     {
         $this->registerRoutes();
         $this->registerDatabaseShortcut();
+
+        // Checked as minecraft.players and minecraft.properties.
+        Subuser::registerCustomPermissions('minecraft', ['players', 'properties'], 'wyvern.permissions', TablerIcon::Cube);
+
+        $this->callAfterResolving(FeatureService::class, function (FeatureService $features, $app) {
+            foreach (ConsoleFixes::all($app->make(MinecraftFiles::class)) as $schema) {
+                $features->register($schema);
+            }
+        });
 
         // Filament serves its own panel stylesheet, and Pelican injects app.css through
         // STYLES_BEFORE. Ours has to land after both to reshape their surfaces, so it
@@ -198,14 +220,8 @@ class WyvernServiceProvider extends ServiceProvider
             $page::registerCustomHeaderActions(HeaderActionPosition::Before, PowerActions::group());
         }
 
-        // Deleting a server or an egg leaves no trace in the activity log, which is the
-        // one gap that turns a two-minute question into a twenty-minute one: servers.egg_id
-        // is a foreign key onto eggs, so removing an egg takes its servers with it, and
-        // nothing anywhere records that it happened. Power actions are logged, so the log
-        // shows a server being started and then simply stops mentioning it.
-        //
-        // Model events rather than a resource hook, so it holds however the deletion was
-        // triggered — admin page, API, tinker or cascade.
+        // Upstream logs neither deletion. Model events, so every path is covered.
+        // servers.egg_id is RESTRICT: an egg with servers cannot be deleted at all.
         Server::deleted(function (Server $server) {
             Activity::event('server:delete')
                 ->property('name', $server->name)
@@ -216,11 +232,11 @@ class WyvernServiceProvider extends ServiceProvider
         Egg::deleted(function (Egg $egg) {
             Activity::event('egg:delete')
                 ->property('name', $egg->name)
-                // The count is the point: an egg deletion is only alarming in proportion to
-                // what went with it, and after the fact there is no way to find out.
-                ->property('servers', $egg->servers()->count())
                 ->log();
         });
+
+        // A reinstall rewrites .wyvern/install.json.
+        Event::listen(Installed::class, fn (Installed $event) => InstallRecords::forget($event->server));
 
         if ($this->app->runningInConsole()) {
             $this->commands([

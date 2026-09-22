@@ -38,6 +38,7 @@ class ServerPanelProvider extends PanelProvider
             // Ordered the way the sidebar reads. Console and Files stay ungrouped, so
             // Filament renders them above every group: they are where the time goes.
             ->navigationGroups([
+                NavigationGroup::make(fn () => trans('wyvern.navigation.game')),
                 NavigationGroup::make(fn () => trans('wyvern.navigation.software')),
                 NavigationGroup::make(fn () => trans('wyvern.navigation.data')),
                 NavigationGroup::make(fn () => trans('wyvern.navigation.automation')),

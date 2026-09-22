@@ -159,6 +159,7 @@ class CurseForgeSource implements ContentSource
         return match ($loader) {
             Loader::Forge => 1,
             Loader::Fabric => 4,
+            Loader::Quilt => 5,
             Loader::NeoForge => 6,
             default => null,
         };

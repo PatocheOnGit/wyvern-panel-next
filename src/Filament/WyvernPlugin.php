@@ -6,6 +6,8 @@ use Filament\Contracts\Plugin;
 use Filament\Panel;
 use Wyvern\Filament\App\Pages\DatabaseAccess;
 use Wyvern\Filament\Server\Pages\Content;
+use Wyvern\Filament\Server\Pages\Players;
+use Wyvern\Filament\Server\Pages\Properties;
 use Wyvern\Filament\Server\Pages\Version;
 use Wyvern\Filament\Widgets\FleetOverview;
 use Wyvern\Filament\Widgets\NodeHealth;
@@ -54,6 +56,8 @@ class WyvernPlugin implements Plugin
         }
 
         $panel->pages([
+            Players::class,
+            Properties::class,
             Version::class,
             Content::class,
         ]);
