@@ -6,7 +6,7 @@ return [
     'logo' => env('APP_LOGO'),
     'favicon' => env('APP_FAVICON', '/wyvern/mark.svg'),
 
-    'version' => 'canary',
+    'version' => '0.3.4',
 
     'timezone' => 'UTC',
 
