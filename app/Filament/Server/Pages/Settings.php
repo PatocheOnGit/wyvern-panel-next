@@ -25,6 +25,8 @@ use Filament\Schemas\Components\Image;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Alignment;
+use Wyvern\Filament\Forms\BackupToggle;
+use Wyvern\Jobs\ChangeServerJob;
 
 class Settings extends ServerFormPage
 {
@@ -208,8 +210,22 @@ class Settings extends ServerFormPage
                             ->modalHeading(trans('server/setting.reinstall.modal'))
                             ->modalDescription(trans('server/setting.reinstall.modal_description'))
                             ->modalSubmitActionLabel(trans('server/setting.reinstall.yes'))
-                            ->action(function (Server $server, ReinstallServerService $reinstallService) {
+                            // Wyvern: an optional backup first, which the reinstall then waits for.
+                            ->schema(fn (Server $server) => [BackupToggle::make($server)])
+                            ->action(function (array $data, Server $server, ReinstallServerService $reinstallService) {
                                 abort_unless(user()?->can(SubuserPermission::SettingsReinstall, $server), 403);
+
+                                if (($data['backup'] ?? false) && BackupToggle::available($server)) {
+                                    ChangeServerJob::dispatch($server, user(), [], null, true, null, true);
+
+                                    Notification::make()
+                                        ->title(trans('wyvern.version.notifications.queued'))
+                                        ->body(trans('wyvern.version.notifications.queued_body'))
+                                        ->success()
+                                        ->send();
+
+                                    return;
+                                }
 
                                 try {
                                     $reinstallService->handle($server);

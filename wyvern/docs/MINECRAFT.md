@@ -105,3 +105,31 @@ Both pages are gated by the custom subuser permissions `minecraft.players` and
 `mc_port`, `mc_memory`, `mc_dependency`, `mc_client_mod` and `mc_world_version`, in
 `src/Minecraft/Features`. Wings matches the line but does not pass it on, so the ones
 that need details read the end of `logs/latest.log`.
+
+Properties also has a filter, a dot on keys that differ from Mojang's default, a reset
+per key, and a guard that asks before leaving with unsaved changes. The defaults live in
+`PropertyCatalog::DEFAULTS`; keys without one show no marker.
+
+## Worlds
+
+A world is any root folder holding `level.dat`; Bukkit's `_nether` and `_the_end` fold
+into their world. The page downloads a world as a `tar.gz` built by Wings (removed two
+hours later by `DeleteFileLater`), switches `level-name`, deletes unused worlds, and
+resets the active one with an optional seed and backup. A reset needs the server stopped,
+and keeps `datapacks/`: it is parked in `.wyvern/`, the world deleted, then moved back, so
+worldgen packs like Terralith shape the new world. Datapacks come from Modrinth's
+`datapack` loader, matched to the server's Minecraft version.
+
+Uploading goes through Files: an upload page would only duplicate it.
+
+## Scheduled restarts
+
+Two schedule tasks, registered on Pelican's `TaskService`:
+
+- `wyvern_restart_countdown` takes a countdown in minutes as its payload and warns players
+  at each of 30, 15, 10, 5 and 1 minutes and 30 and 10 seconds that fits in it, then
+  restarts. Each step is a delayed `CountdownStep` job, so the schedule returns at once.
+- `wyvern_restart_empty` restarts only when nobody is online (Server List Ping, or
+  `dynamic.json` on FiveM).
+
+Both skip a server that is not running.

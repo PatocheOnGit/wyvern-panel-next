@@ -148,6 +148,22 @@
                            placeholder="{{ trans('wyvern.content.search_placeholder', ['source' => $source?->label() ?? 'Modrinth']) }}">
                 </div>
 
+                <select class="wy-select wy-select-compact" wire:model.live="sort" aria-label="{{ trans('wyvern.content.sort.label') }}">
+                    @foreach (\Wyvern\Content\Contracts\ContentSource::SORTS as $sortKey)
+                        <option value="{{ $sortKey }}">{{ trans("wyvern.content.sort.$sortKey") }}</option>
+                    @endforeach
+                </select>
+
+                @php $categories = $this->categories(); @endphp
+                @if ($categories !== [])
+                    <select class="wy-select wy-select-compact" wire:model.live="category" aria-label="{{ trans('wyvern.content.category') }}">
+                        <option value="">{{ trans('wyvern.content.all_categories') }}</option>
+                        @foreach ($categories as $slug => $label)
+                            <option value="{{ $slug }}">{{ $label }}</option>
+                        @endforeach
+                    </select>
+                @endif
+
                 <div class="wy-content-scope">
                     <span>{{ $profile->loader?->label() }}</span>
                     <span class="wy-content-dot">·</span>
@@ -198,6 +214,11 @@
                                             {{ trans('wyvern.content.install') }}
                                         </button>
                                     @else
+                                        <button type="button"
+                                                class="wy-content-versions"
+                                                wire:click="mountAction('chooseVersion', { project: @js($project->id), title: @js($project->title) })">
+                                            {{ trans('wyvern.content.versions.action') }}
+                                        </button>
                                         <button type="button"
                                                 class="wy-content-install"
                                                 wire:click="install('{{ $project->id }}')"

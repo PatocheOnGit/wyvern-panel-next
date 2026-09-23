@@ -6,9 +6,11 @@ use Filament\Contracts\Plugin;
 use Filament\Panel;
 use Wyvern\Filament\App\Pages\DatabaseAccess;
 use Wyvern\Filament\Server\Pages\Content;
+use Wyvern\Filament\Server\Pages\FiveM;
 use Wyvern\Filament\Server\Pages\Players;
 use Wyvern\Filament\Server\Pages\Properties;
 use Wyvern\Filament\Server\Pages\Version;
+use Wyvern\Filament\Server\Pages\Worlds;
 use Wyvern\Filament\Widgets\FleetOverview;
 use Wyvern\Filament\Widgets\NodeHealth;
 use Wyvern\Filament\Widgets\RecentActivity;
@@ -57,7 +59,12 @@ class WyvernPlugin implements Plugin
 
         $panel->pages([
             Players::class,
+            FiveM\PlayerList::class,
+            FiveM\Config::class,
+            FiveM\Artifact::class,
+            FiveM\ResourceList::class,
             Properties::class,
+            Worlds::class,
             Version::class,
             Content::class,
         ]);

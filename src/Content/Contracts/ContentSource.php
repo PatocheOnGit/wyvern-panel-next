@@ -21,6 +21,8 @@ interface ContentSource
      */
     public function isAvailable(): bool;
 
+    public const SORTS = ['relevance', 'downloads', 'updated', 'newest'];
+
     /** @return ContentProject[] */
     public function search(
         string $query,
@@ -28,6 +30,8 @@ interface ContentSource
         ?Loader $loader = null,
         ?string $gameVersion = null,
         int $limit = 24,
+        string $sort = 'relevance',
+        ?string $category = null,
     ): array;
 
     /**

@@ -12,9 +12,12 @@ use App\Traits\Filament\BlockAccessInConflict;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Text;
+use Filament\Schemas\Components\Utilities\Get;
 use Livewire\Attributes\Url;
 use Wyvern\Content\ContentFile;
 use Wyvern\Content\ContentInstaller;
@@ -57,6 +60,12 @@ class Content extends Page
 
     #[Url]
     public string $search = '';
+
+    #[Url]
+    public string $sort = 'relevance';
+
+    #[Url]
+    public string $category = '';
 
     /** @var array<string, array{id: string, versionName: string, url: ?string, filename: string, sha1: ?string, project: ?string}> path => newer file */
     public array $updates = [];
@@ -121,6 +130,8 @@ class Content extends Page
     public function selectType(string $type): void
     {
         $this->type = $type;
+        // Categories belong to a project type.
+        $this->category = '';
     }
 
     public function selectSource(string $source): void
@@ -200,6 +211,17 @@ class Content extends Page
             && EggVariable::query()->where('egg_id', $server->egg_id)->where('env_variable', 'MC_LOADER')->exists();
     }
 
+    /** @return array<string, string> slug => label, Modrinth only */
+    public function categories(): array
+    {
+        return $this->source === 'modrinth' ? $this->modrinth->categories($this->currentType()) : [];
+    }
+
+    public function updatedCategory(): void
+    {
+        // Livewire re-renders, results() runs again.
+    }
+
     /** @return ContentProject[] */
     public function results(): array
     {
@@ -224,13 +246,51 @@ class Content extends Page
             $open ? null : $profile->loader,
             $open ? null : $this->gameVersion(),
             24,
+            in_array($this->sort, ContentSource::SORTS, true) ? $this->sort : 'relevance',
+            $this->category !== '' ? $this->category : null,
         );
     }
 
-    public function install(string $projectId): void
+    /**
+     * Releases of a project this server can run, newest first. Falls back to any Minecraft
+     * version when none matches, so an unpinned or brand-new server still sees something.
+     *
+     * @return list<ContentFile>
+     */
+    private function projectFiles(string $projectId): array
+    {
+        return $this->memo["files.$projectId"] ??= (function () use ($projectId) {
+            $loader = $this->profile()->loader;
+            $files = $this->library->files($this->source, $projectId, $loader, $this->gameVersion());
+
+            return $files !== [] ? $files : $this->library->files($this->source, $projectId, $loader);
+        })();
+    }
+
+    /**
+     * @param  list<ContentFile>  $files
+     * @return array<string, string> file id => "1.2.3 · 1.21.1, 1.21 · beta"
+     */
+    private function versionOptions(array $files): array
+    {
+        $options = [];
+
+        foreach ($files as $file) {
+            if ($file->isDownloadable()) {
+                $options[$file->id] = implode(' · ', array_filter([
+                    $file->versionName,
+                    implode(', ', array_slice($file->gameVersions, 0, 3)),
+                    $file->releaseType !== 'release' ? $file->releaseType : null,
+                ]));
+            }
+        }
+
+        return $options;
+    }
+
+    public function install(string $projectId, ?string $fileId = null): void
     {
         $server = $this->server();
-        $profile = $this->profile();
         $type = $this->currentType();
 
         if (!user()?->can(SubuserPermission::FileCreate, $server)) {
@@ -245,8 +305,8 @@ class Content extends Page
             return;
         }
 
-        $files = $this->library->files($this->source, $projectId, $profile->loader, $this->gameVersion());
-        $file = collect($files)->first(fn ($f) => $f->isDownloadable());
+        $file = collect($this->projectFiles($projectId))
+            ->first(fn (ContentFile $f) => $f->isDownloadable() && ($fileId === null || $f->id === $fileId));
 
         if (!$file) {
             $this->fail(trans('wyvern.content.errors.nothing_to_install'));
@@ -255,7 +315,7 @@ class Content extends Page
         }
 
         try {
-            $path = $this->installer->install($server, $file, $type);
+            $paths = $this->installer->installWithDependencies($server, $file, $type);
         } catch (\Throwable $e) {
             $this->fail($e->getMessage());
 
@@ -263,14 +323,39 @@ class Content extends Page
         }
 
         Activity::event('server:wyvern.content')
-            ->property(['project' => $projectId, 'file' => $path])
+            ->property(['project' => $projectId, 'file' => implode(', ', $paths)])
             ->log();
 
+        $dependencies = array_map('basename', array_slice($paths, 1));
+
         Notification::make()
-            ->title(trans('wyvern.content.notifications.installed', ['file' => basename($path)]))
-            ->body(trans('wyvern.content.notifications.installed_body'))
+            ->title(trans('wyvern.content.notifications.installed', ['file' => basename($paths[0])]))
+            ->body($dependencies === []
+                ? trans('wyvern.content.notifications.installed_body')
+                : trans('wyvern.content.notifications.installed_with', ['files' => implode(', ', $dependencies)]))
             ->success()
             ->send();
+    }
+
+    public function chooseVersionAction(): Action
+    {
+        return Action::make('chooseVersion')
+            ->label(trans('wyvern.content.versions.action'))
+            ->modalHeading(fn (array $arguments) => trans('wyvern.content.versions.heading', ['name' => $arguments['title'] ?? '']))
+            ->schema(fn (array $arguments) => [
+                Select::make('file')
+                    ->label(trans('wyvern.content.versions.label'))
+                    ->options($this->versionOptions($this->projectFiles((string) ($arguments['project'] ?? ''))))
+                    ->helperText(trans('wyvern.content.versions.help'))
+                    ->searchable()
+                    ->native(false)
+                    ->required(),
+            ])
+            ->fillForm(fn (array $arguments) => [
+                'file' => array_key_first($this->versionOptions($this->projectFiles((string) ($arguments['project'] ?? '')))),
+            ])
+            ->modalSubmitActionLabel(trans('wyvern.content.install'))
+            ->action(fn (array $data, array $arguments) => $this->install((string) ($arguments['project'] ?? ''), (string) $data['file']));
     }
 
     public function installModpackAction(): Action
@@ -279,12 +364,20 @@ class Content extends Page
             ->label(trans('wyvern.content.install'))
             ->modalIcon('tabler-packages')
             ->modalHeading(fn (array $arguments) => trans('wyvern.content.modpack.heading', ['name' => $arguments['title'] ?? '']))
-            ->modalDescription(fn (array $arguments) => $this->modpackPlan((string) ($arguments['project'] ?? '')))
-            ->fillForm(fn (array $arguments) => [
-                'replace_mods' => !$this->modpackFits($this->modpackFile((string) ($arguments['project'] ?? ''))),
-                'backup' => false,
-            ])
-            ->schema([
+            ->fillForm(function (array $arguments) {
+                $first = $this->modpackFile((string) ($arguments['project'] ?? ''));
+
+                return ['file' => $first?->id, 'replace_mods' => !$this->modpackFits($first), 'backup' => false];
+            })
+            ->schema(fn (array $arguments) => [
+                Select::make('file')
+                    ->label(trans('wyvern.content.versions.label'))
+                    ->options($this->versionOptions($this->modpackFiles((string) ($arguments['project'] ?? ''))))
+                    ->selectablePlaceholder(false)
+                    ->native(false)
+                    ->live()
+                    ->required(),
+                Text::make(fn (Get $get) => $this->modpackPlan((string) ($arguments['project'] ?? ''), $get('file'))),
                 Toggle::make('replace_mods')
                     ->label(trans('wyvern.content.modpack.replace_mods'))
                     ->helperText(trans('wyvern.content.modpack.replace_mods_help')),
@@ -294,7 +387,7 @@ class Content extends Page
             ->action(function (array $data, array $arguments) {
                 $server = $this->server();
                 $project = (string) ($arguments['project'] ?? '');
-                $file = $this->modpackFile($project);
+                $file = $this->modpackFile($project, $data['file'] ?? null);
 
                 abort_unless(user()?->can(SubuserPermission::FileCreate, $server), 403);
 
@@ -331,20 +424,29 @@ class Content extends Page
             });
     }
 
-    /** The newest version of a pack this server can take, switching if it may. */
-    private function modpackFile(string $project): ?ContentFile
+    /**
+     * Versions of a pack this server can take, switching if it may.
+     *
+     * @return list<ContentFile>
+     */
+    private function modpackFiles(string $project): array
     {
         if ($project === '') {
-            return null;
+            return [];
         }
 
         return $this->memo["pack.$project"] ??= (function () use ($project) {
             $open = self::canSwitch($this->server());
             $files = $this->library->files('modrinth', $project, $open ? null : $this->profile()->loader, $open ? null : $this->gameVersion());
 
-            return collect($files)->first(fn (ContentFile $f) => $f->isDownloadable()
-                && array_intersect($f->loaders, ['fabric', 'quilt', 'forge', 'neoforge']) !== []);
+            return array_values(array_filter($files, fn (ContentFile $f) => $f->isDownloadable()
+                && array_intersect($f->loaders, ['fabric', 'quilt', 'forge', 'neoforge']) !== []));
         })();
+    }
+
+    private function modpackFile(string $project, ?string $fileId = null): ?ContentFile
+    {
+        return collect($this->modpackFiles($project))->first(fn (ContentFile $f) => $fileId === null || $f->id === $fileId);
     }
 
     private function modpackFits(?ContentFile $file): bool
@@ -359,9 +461,9 @@ class Content extends Page
             && in_array($version, $file->gameVersions, true);
     }
 
-    private function modpackPlan(string $project): string
+    private function modpackPlan(string $project, ?string $fileId = null): string
     {
-        $file = $this->modpackFile($project);
+        $file = $this->modpackFile($project, $fileId);
 
         if ($file === null) {
             return trans('wyvern.content.errors.nothing_to_install');
@@ -605,6 +707,7 @@ class Content extends Page
         $server = Filament::getTenant();
 
         return $server !== null
+            && !$server->isInConflictState()
             && (ServerProfile::of($server)->installableTypes() !== [] || self::canSwitch($server));
     }
 

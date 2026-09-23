@@ -54,8 +54,10 @@ class ContentLibrary
         ?Loader $loader = null,
         ?string $gameVersion = null,
         int $limit = 24,
+        string $sort = 'relevance',
+        ?string $category = null,
     ): array {
-        return $this->source($sourceKey)?->search($query, $type, $loader, $gameVersion, $limit) ?? [];
+        return $this->source($sourceKey)?->search($query, $type, $loader, $gameVersion, $limit, $sort, $category) ?? [];
     }
 
     /** @return ContentFile[] */

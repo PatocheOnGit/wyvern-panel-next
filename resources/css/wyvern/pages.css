@@ -895,3 +895,81 @@
     text-decoration: underline;
     text-underline-offset: 2px;
 }
+
+
+/* ---- FiveM ------------------------------------------------------------ */
+
+.wy-select {
+    width: 100%;
+    max-width: 28rem;
+    height: 2.25rem;
+    padding: 0 0.75rem;
+    border: 0;
+    border-radius: 0.45rem;
+    background-color: var(--wy-card);
+    box-shadow: inset 0 0 0 1px var(--wy-line);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--wy-text);
+}
+
+.wy-select:focus {
+    outline: 2px solid var(--wy-focus);
+    outline-offset: -1px;
+}
+
+.wy-pin {
+    font-family: var(--font-mono);
+    font-size: 1.25rem;
+    letter-spacing: 0.2em;
+    color: var(--wy-text);
+}
+
+.wy-player-id {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--wy-text-2);
+}
+
+.wy-select-compact {
+    width: auto;
+    max-width: 12rem;
+    height: 2.1rem;
+    font-family: inherit;
+    font-size: 0.78rem;
+}
+
+.wy-content-versions {
+    margin-inline-start: auto;
+    height: 1.85rem;
+    padding: 0 0.6rem;
+    border-radius: 0.45rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--wy-text-2);
+    cursor: pointer;
+}
+
+.wy-content-versions:hover {
+    color: var(--wy-text);
+    background-color: var(--wy-control);
+}
+
+.wy-content-versions + .wy-content-install {
+    margin-inline-start: 0.35rem;
+}
+
+.wy-unsaved {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin: 0;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--wy-transition);
+}
+
+.wy-push {
+    margin-inline-start: auto;
+}

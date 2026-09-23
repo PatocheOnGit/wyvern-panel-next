@@ -25,6 +25,8 @@ final readonly class ContentFile
         public ?string $releaseType = null,
         public ?string $projectId = null,
         public ?string $sha1 = null,
+        /** @var list<array{project: ?string, version: ?string}> required dependencies */
+        public array $dependencies = [],
     ) {}
 
     public function isDownloadable(): bool

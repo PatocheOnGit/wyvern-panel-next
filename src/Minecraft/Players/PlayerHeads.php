@@ -66,7 +66,7 @@ class PlayerHeads
     {
         for ($x = 40; $x < 48; $x++) {
             for ($y = 8; $y < 16; $y++) {
-                if ((imagecolorsforindex($skin, imagecolorat($skin, $x, $y))['alpha'] ?? 0) > 0) {
+                if (imagecolorsforindex($skin, imagecolorat($skin, $x, $y))['alpha'] > 0) {
                     return true;
                 }
             }

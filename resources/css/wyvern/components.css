@@ -203,6 +203,15 @@
     color: var(--wy-muted);
 }
 
+.wy-server-card-players {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-family: var(--font-mono);
+    font-size: var(--wy-text-xs);
+    color: var(--wy-text-2);
+}
+
 .wy-server-card-description {
     margin: 0;
     overflow: hidden;

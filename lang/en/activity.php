@@ -49,6 +49,16 @@ return [
             'content' => 'Installed <b>:file</b>',
             'modpack' => 'Queued the modpack <b>:project</b>',
             'properties' => 'Changed <b>:keys</b> in server.properties',
+            'worlds' => [
+                'use' => 'Switched to the world <b>:name</b>',
+                'delete' => 'Deleted the world <b>:name</b>',
+                'reset' => 'Reset the world <b>:name</b>',
+            ],
+            'fivem' => [
+                'artifact' => 'Installed FXServer artifact <b>:artifact</b>',
+                'config' => 'Changed server.cfg',
+                'resource' => 'Resource <b>:name</b>: <b>:state</b>',
+            ],
             'players' => [
                 'add' => 'Added <b>:name</b> to <b>:list</b>',
                 'remove' => 'Removed <b>:name</b> from <b>:list</b>',

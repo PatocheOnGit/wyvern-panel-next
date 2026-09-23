@@ -63,6 +63,8 @@ class CurseForgeSource implements ContentSource
         ?Loader $loader = null,
         ?string $gameVersion = null,
         int $limit = 24,
+        string $sort = 'relevance',
+        ?string $category = null,
     ): array {
         if (!$this->isAvailable()) {
             return [];
@@ -74,7 +76,13 @@ class CurseForgeSource implements ContentSource
             'searchFilter' => $query ?: null,
             'gameVersion' => $gameVersion ?: null,
             'modLoaderType' => $this->loaderId($loader),
-            'sortField' => 6, // total downloads
+            // Their sort fields: 2 popularity, 3 last updated, 6 total downloads, 11 release date.
+            'sortField' => match ($sort) {
+                'updated' => 3,
+                'newest' => 11,
+                'downloads' => 6,
+                default => $query !== '' ? 2 : 6,
+            },
             'sortOrder' => 'desc',
             'pageSize' => $limit,
         ], fn ($v) => $v !== null);

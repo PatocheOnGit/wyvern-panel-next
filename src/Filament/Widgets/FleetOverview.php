@@ -30,9 +30,10 @@ class FleetOverview extends StatsOverviewWidget
 
     protected static ?int $sort = -10;
 
-    protected function getColumns(): int
+    /** @return array<string, int> one per row on a phone, 2×2 on a tablet, a row of four when there is room */
+    protected function getColumns(): array
     {
-        return 4;
+        return ['default' => 1, 'sm' => 2, 'xl' => 4];
     }
 
     /** @return Stat[] */

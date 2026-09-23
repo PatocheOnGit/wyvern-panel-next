@@ -23,6 +23,14 @@
             </div>
         @endunless
 
+        <div class="wy-content-bar">
+            <div class="wy-content-search">
+                <x-filament::icon icon="tabler-search" class="h-4 w-4" />
+                <input type="text" wire:model.live.debounce.300ms="filter" placeholder="{{ trans('wyvern.properties.filter') }}">
+            </div>
+            @include('wyvern.partials.unsaved-guard')
+        </div>
+
         {{ $this->form }}
 
         @if ($managed !== [])

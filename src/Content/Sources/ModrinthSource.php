@@ -47,8 +47,14 @@ class ModrinthSource implements ContentSource
         ?Loader $loader = null,
         ?string $gameVersion = null,
         int $limit = 24,
+        string $sort = 'relevance',
+        ?string $category = null,
     ): array {
         $facets = [[$this->projectTypeFacet($type)]];
+
+        if (filled($category)) {
+            $facets[] = ["categories:{$category}"];
+        }
 
         if ($loader && $type !== ContentType::Modpack) {
             $loaders = $loader->contentLoaders();
@@ -65,7 +71,8 @@ class ModrinthSource implements ContentSource
         $response = $this->client()->get(self::BASE . '/search', [
             'query' => $query,
             'facets' => json_encode($facets),
-            'index' => filled($query) ? 'relevance' : 'downloads',
+            // Relevance means nothing without a query; downloads is the useful default then.
+            'index' => $sort === 'relevance' && !filled($query) ? 'downloads' : $sort,
             'limit' => $limit,
         ]);
 
@@ -159,7 +166,41 @@ class ModrinthSource implements ContentSource
             releaseType: $version['version_type'] ?? null,
             projectId: $version['project_id'] ?? null,
             sha1: $file['hashes']['sha1'] ?? null,
+            dependencies: array_values(array_map(
+                fn (array $d) => ['project' => $d['project_id'] ?? null, 'version' => $d['version_id'] ?? null],
+                array_filter($version['dependencies'] ?? [], fn ($d) => is_array($d) && ($d['dependency_type'] ?? null) === 'required'),
+            )),
         );
+    }
+
+    /** One exact version, for a dependency pinned by version id. */
+    public function version(string $versionId): ?ContentFile
+    {
+        $response = $this->client()->get(self::BASE . "/version/{$versionId}");
+
+        return $response->successful() && is_array($response->json()) ? $this->toFile($response->json()) : null;
+    }
+
+    /**
+     * The categories Modrinth files this kind of project under, for the filter.
+     *
+     * @return array<string, string> slug => label
+     */
+    public function categories(ContentType $type): array
+    {
+        $all = Cache::remember('wyvern.modrinth.categories', now()->addDay(), function (): array {
+            $response = $this->client()->get(self::BASE . '/tag/category');
+
+            return $response->successful() ? ($response->json() ?? []) : [];
+        });
+
+        $projectType = $type === ContentType::Plugin ? 'mod' : $type->value;
+
+        return collect($all)
+            ->filter(fn ($c) => ($c['project_type'] ?? null) === $projectType && ($c['header'] ?? null) === 'categories')
+            ->mapWithKeys(fn ($c) => [$c['name'] => ucwords(str_replace('-', ' ', $c['name']))])
+            ->sort()
+            ->all();
     }
 
     /**

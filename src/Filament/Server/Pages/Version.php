@@ -450,6 +450,7 @@ class Version extends ServerFormPage
         $server = Filament::getTenant();
 
         return $server !== null
+            && !$server->isInConflictState()
             && EggVariable::query()
                 ->where('egg_id', $server->egg_id)
                 ->where('env_variable', 'MC_LOADER')

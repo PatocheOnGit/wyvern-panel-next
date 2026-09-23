@@ -6,6 +6,7 @@ use App\Filament\Server\Components\SmallStatBlock;
 use App\Models\Server;
 use Carbon\CarbonInterface;
 use Filament\Widgets\StatsOverviewWidget;
+use Wyvern\Servers\GameSummary;
 
 class ServerOverview extends StatsOverviewWidget
 {
@@ -19,19 +20,27 @@ class ServerOverview extends StatsOverviewWidget
         $memory = $this->memory();
         $disk = $this->disk();
 
-        return [
+        // Wyvern: what the server runs and who is on it, for the games it knows.
+        $summary = app(GameSummary::class);
+        $software = $summary->software($this->server);
+        $players = $software !== null ? $summary->players($this->server) : null;
+
+        return array_values(array_filter([
             SmallStatBlock::make(trans('server/console.labels.name'), $this->server->name)
                 ->copyable(),
             SmallStatBlock::make(trans('server/console.labels.status'), $this->status()),
             SmallStatBlock::make(trans('server/console.labels.address'), $this->server?->allocation->address ?? 'None')
                 ->copyable(),
+            $software !== null ? SmallStatBlock::make(trans('wyvern.cards.software'), $software) : null,
+            $software !== null ? SmallStatBlock::make(trans('wyvern.cards.players_label'), $players ? $players['online'] . ' / ' . $players['max'] : '—')
+                ->ratio($players && $players['max'] > 0 ? $players['online'] / $players['max'] : null) : null,
             SmallStatBlock::make(trans('server/console.labels.cpu'), $cpu['value'])
                 ->ratio($cpu['ratio']),
             SmallStatBlock::make(trans('server/console.labels.memory'), $memory['value'])
                 ->ratio($memory['ratio']),
             SmallStatBlock::make(trans('server/console.labels.disk'), $disk['value'])
                 ->ratio($disk['ratio']),
-        ];
+        ]));
     }
 
     private function status(): string

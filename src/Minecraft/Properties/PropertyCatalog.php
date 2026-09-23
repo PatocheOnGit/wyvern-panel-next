@@ -85,6 +85,32 @@ final class PropertyCatalog
         'enable-jmx-monitoring' => ['group' => 'remote', 'type' => 'bool'],
     ];
 
+    /** What a fresh vanilla server writes, for the "changed" mark and the reset. */
+    private const DEFAULTS = [
+        'motd' => 'A Minecraft Server', 'max-players' => '20', 'gamemode' => 'survival', 'force-gamemode' => 'false',
+        'difficulty' => 'easy', 'hardcore' => 'false', 'pvp' => 'true', 'online-mode' => 'true', 'allow-flight' => 'false',
+        'white-list' => 'false', 'enforce-whitelist' => 'false', 'level-name' => 'world', 'level-seed' => '',
+        'level-type' => 'minecraft:normal', 'generator-settings' => '{}', 'generate-structures' => 'true',
+        'allow-nether' => 'true', 'spawn-monsters' => 'true', 'spawn-animals' => 'true', 'spawn-npcs' => 'true',
+        'spawn-protection' => '16', 'max-world-size' => '29999984', 'view-distance' => '10', 'simulation-distance' => '10',
+        'initial-enabled-packs' => 'vanilla', 'initial-disabled-packs' => '', 'player-idle-timeout' => '0',
+        'op-permission-level' => '4', 'function-permission-level' => '2', 'enable-command-block' => 'false',
+        'hide-online-players' => 'false', 'enforce-secure-profile' => 'true', 'prevent-proxy-connections' => 'false',
+        'accepts-transfers' => 'false', 'log-ips' => 'true', 'broadcast-console-to-ops' => 'true', 'bug-report-link' => '',
+        'resource-pack' => '', 'resource-pack-sha1' => '', 'resource-pack-id' => '', 'require-resource-pack' => 'false',
+        'resource-pack-prompt' => '', 'pause-when-empty-seconds' => '60', 'network-compression-threshold' => '256',
+        'rate-limit' => '0', 'max-tick-time' => '60000', 'entity-broadcast-range-percentage' => '100',
+        'max-chained-neighbor-updates' => '1000000', 'sync-chunk-writes' => 'true', 'use-native-transport' => 'true',
+        'region-file-compression' => 'deflate', 'enable-status' => 'true', 'enable-query' => 'false',
+        'enable-rcon' => 'false', 'rcon.port' => '25575', 'rcon.password' => '', 'broadcast-rcon-to-ops' => 'true',
+        'enable-jmx-monitoring' => 'false',
+    ];
+
+    public static function default(string $key): ?string
+    {
+        return self::DEFAULTS[$key] ?? null;
+    }
+
     /** @return array{group: string, type: string, options?: list<string>, min?: int, max?: int} */
     public static function definition(string $key): array
     {

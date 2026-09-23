@@ -53,7 +53,29 @@ class ChangeServerJob implements ShouldQueue
         public ?string $image = null,
         public bool $backup = false,
         public ?array $modpack = null,
+        public bool $reinstall = false,
     ) {}
+
+    private function logReinstall(): void
+    {
+        $activity = Activity::event(match (true) {
+            isset($this->variables['MC_LOADER']) => 'server:wyvern.version',
+            isset($this->variables['FIVEM_VERSION']) => 'server:wyvern.fivem.artifact',
+            default => 'server:settings.reinstall',
+        })->subject($this->server)->actor($this->user ?? $this->server->user);
+
+        if (isset($this->variables['MC_LOADER'])) {
+            $activity->property([
+                'loader' => $this->variables['MC_LOADER'],
+                'version' => $this->variables['MC_VERSION'] ?? null,
+                'build' => $this->variables['MC_BUILD'] ?? null,
+            ]);
+        } elseif (isset($this->variables['FIVEM_VERSION'])) {
+            $activity->property('artifact', $this->variables['FIVEM_VERSION']);
+        }
+
+        $activity->log();
+    }
 
     public function handle(Reinstaller $reinstaller, ModpackInstaller $modpacks, InitiateBackupService $backups, VersionCatalogue $catalogue): void
     {
@@ -72,19 +94,10 @@ class ChangeServerJob implements ShouldQueue
             }
         }
 
-        if ($this->variables !== []) {
-            $this->say('reinstalling as ' . implode(' ', $this->variables));
+        if ($this->variables !== [] || $this->reinstall) {
+            $this->say('reinstalling ' . implode(' ', $this->variables));
             $reinstaller->apply($this->server, $this->variables, $this->image);
-
-            Activity::event('server:wyvern.version')
-                ->subject($this->server)
-                ->actor($this->user ?? $this->server->user)
-                ->property([
-                    'loader' => $this->variables['MC_LOADER'] ?? null,
-                    'version' => $this->variables['MC_VERSION'] ?? null,
-                    'build' => $this->variables['MC_BUILD'] ?? null,
-                ])
-                ->log();
+            $this->logReinstall();
 
             if ($index !== null) {
                 $this->waitForInstall();
@@ -111,7 +124,7 @@ class ChangeServerJob implements ShouldQueue
             ->title($index !== null
                 ? trans('wyvern.jobs.modpack_done', ['name' => trim("{$index->name} {$index->versionId}")])
                 : trans('wyvern.jobs.switch_done'))
-            ->body(trans('wyvern.jobs.done_body', ['server' => $this->server->name])));
+            ->body(trans($index !== null ? 'wyvern.jobs.done_body' : 'wyvern.jobs.started_body', ['server' => $this->server->name])));
     }
 
     /** Also runs on timeout, which never reaches handle()'s end. */

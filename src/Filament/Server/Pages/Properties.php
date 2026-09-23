@@ -22,6 +22,7 @@ use Filament\Pages\Page;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Text;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\HtmlString;
@@ -57,6 +58,8 @@ class Properties extends Page
     public array $original = [];
 
     public bool $exists = false;
+
+    public string $filter = '';
 
     protected MinecraftFiles $files;
 
@@ -101,8 +104,11 @@ class Properties extends Page
             }
 
             if ($fields !== []) {
+                $groupKeys = array_filter($this->keys, fn ($k) => !PropertyCatalog::isManaged($k) && PropertyCatalog::definition($k)['group'] === $group);
+
                 $sections[] = Section::make(trans("wyvern.properties.groups.$group"))
                     ->columns(['default' => 1, 'lg' => 2])
+                    ->hidden(fn () => !collect($groupKeys)->contains(fn ($k) => $this->matchesFilter($k)))
                     ->schema($fields);
             }
         }
@@ -119,15 +125,17 @@ class Properties extends Page
         $slug = PropertyCatalog::slug($key);
 
         $field = match ($definition['type']) {
-            'bool' => Toggle::make($slug),
+            'bool' => Toggle::make($slug)->live(),
             'int' => TextInput::make($slug)
                 ->integer()
                 ->minValue($definition['min'] ?? null)
-                ->maxValue($definition['max'] ?? null),
+                ->maxValue($definition['max'] ?? null)
+                ->live(onBlur: true),
             'enum' => Select::make($slug)
                 ->options($this->options($key, $definition['options'] ?? []))
                 ->selectablePlaceholder(false)
-                ->native(false),
+                ->native(false)
+                ->live(),
             'motd' => Textarea::make($slug)
                 ->rows(2)
                 ->live(debounce: 400)
@@ -136,8 +144,8 @@ class Properties extends Page
                     Text::make(new HtmlString('<span class="wy-motd">' . Motd::html((string) $get($slug)) . '</span>')),
                     trans('wyvern.properties.motd_help'),
                 ]),
-            'password' => TextInput::make($slug)->password()->revealable(),
-            default => TextInput::make($slug),
+            'password' => TextInput::make($slug)->password()->revealable()->live(onBlur: true),
+            default => TextInput::make($slug)->live(onBlur: true),
         };
 
         $label = "wyvern.properties.keys.$slug.label";
@@ -145,14 +153,48 @@ class Properties extends Page
 
         $field = $field
             ->label(Lang::has($label) ? trans($label) : $key)
-            ->hint($key);
+            ->hint($key)
+            ->hidden(fn () => !$this->matchesFilter($key));
 
         // The MOTD's help already sits under its preview.
         if (Lang::has($help) && $definition['type'] !== 'motd') {
             $field->helperText(trans($help));
         }
 
+        $default = PropertyCatalog::default($key);
+
+        if ($default !== null) {
+            $shown = $default === '' ? trans('wyvern.properties.empty') : $default;
+            $changed = fn (Get $get) => $this->fromState($key, $get($slug)) !== $default;
+
+            $field
+                ->hintIcon(fn (Get $get) => $changed($get) ? 'tabler-point-filled' : null)
+                ->hintIconTooltip(trans('wyvern.properties.changed', ['default' => $shown]))
+                ->hintColor(fn (Get $get) => $changed($get) ? 'primary' : 'gray')
+                ->hintAction(
+                    Action::make("reset_$slug")
+                        ->icon('tabler-arrow-back-up')
+                        ->iconButton()
+                        ->tooltip(trans('wyvern.properties.reset', ['default' => $shown]))
+                        ->visible(fn (Get $get) => $this->canEdit() && $changed($get))
+                        ->action(fn (Set $set) => $set($slug, $this->toState($key, $default))),
+                );
+        }
+
         return $field;
+    }
+
+    public function matchesFilter(string $key): bool
+    {
+        $filter = mb_strtolower(trim($this->filter));
+
+        if ($filter === '') {
+            return true;
+        }
+
+        $label = 'wyvern.properties.keys.' . PropertyCatalog::slug($key) . '.label';
+
+        return str_contains(mb_strtolower($key . ' ' . (Lang::has($label) ? trans($label) : '')), $filter);
     }
 
     /**
@@ -205,7 +247,8 @@ class Properties extends Page
         $changed = [];
 
         foreach ($this->keys as $key) {
-            if (PropertyCatalog::isManaged($key)) {
+            // Fields hidden by the filter are not in the state; they did not change.
+            if (PropertyCatalog::isManaged($key) || !array_key_exists(PropertyCatalog::slug($key), $state)) {
                 continue;
             }
 
@@ -225,6 +268,7 @@ class Properties extends Page
         }
 
         $this->files->saveProperties($server, $properties);
+        $this->dispatch('wyvern-form-saved');
         $this->original = $properties->all();
 
         // Keys only: values can be secrets.
@@ -300,6 +344,7 @@ class Properties extends Page
         $server = Filament::getTenant();
 
         return $server instanceof Server
+            && !$server->isInConflictState()
             && ServerProfile::of($server)->isKnown()
             && (user()?->can(self::PERMISSION, $server) ?? false);
     }

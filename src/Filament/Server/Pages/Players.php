@@ -235,6 +235,7 @@ class Players extends Page
         $server = Filament::getTenant();
 
         return $server instanceof Server
+            && !$server->isInConflictState()
             && ServerProfile::of($server)->isKnown()
             && (user()?->can(self::PERMISSION, $server) ?? false);
     }

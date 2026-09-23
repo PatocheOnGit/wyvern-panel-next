@@ -8,8 +8,10 @@ use App\Enums\HeaderWidgetPosition;
 use App\Enums\TablerIcon;
 use App\Events\Server\Installed;
 use App\Extensions\Features\FeatureService;
+use App\Extensions\Tasks\TaskService;
 use App\Facades\Activity;
 use App\Filament\App\Resources\Servers\Pages\ListServers;
+use App\Filament\Server\Pages\Console;
 use App\Filament\Server\Pages\ServerFormPage;
 use App\Filament\Server\Resources\Activities\Pages\ListActivities;
 use App\Filament\Server\Resources\Allocations\Pages\ListAllocations;
@@ -34,6 +36,7 @@ use Wyvern\Console\Commands\CheckContentLibrary;
 use Wyvern\Console\Commands\CheckMinecraftCatalogue;
 use Wyvern\Console\Commands\InstallModpack;
 use Wyvern\Filament\Actions\PowerActions;
+use Wyvern\Filament\Actions\TxAdminAction;
 use Wyvern\Filament\App\Pages\DatabaseAccess;
 use Wyvern\Filament\Widgets\ShortcutsWidget;
 use Wyvern\Http\AuthorizePhpMyAdmin;
@@ -43,6 +46,8 @@ use Wyvern\Minecraft\Features\ConsoleFixes;
 use Wyvern\Minecraft\Files\MinecraftFiles;
 use Wyvern\Minecraft\InstallRecords;
 use Wyvern\Navigation\MobileTabs;
+use Wyvern\Schedules\RestartWhenEmpty;
+use Wyvern\Schedules\RestartWithCountdown;
 
 /**
  * Everything Wyvern adds to the panel that is not a panel configuration call.
@@ -131,6 +136,14 @@ class WyvernServiceProvider extends ServiceProvider
 
         // Checked as minecraft.players and minecraft.properties.
         Subuser::registerCustomPermissions('minecraft', ['players', 'properties'], 'wyvern.permissions', TablerIcon::Cube);
+        Subuser::registerCustomPermissions('fivem', ['players', 'config'], 'wyvern.permissions', TablerIcon::Car);
+
+        Console::registerCustomHeaderActions(HeaderActionPosition::Before, TxAdminAction::make());
+
+        $this->callAfterResolving(TaskService::class, function (TaskService $tasks, $app) {
+            $tasks->register(new RestartWithCountdown());
+            $tasks->register($app->make(RestartWhenEmpty::class));
+        });
 
         $this->callAfterResolving(FeatureService::class, function (FeatureService $features, $app) {
             foreach (ConsoleFixes::all($app->make(MinecraftFiles::class)) as $schema) {

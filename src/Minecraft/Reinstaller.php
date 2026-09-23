@@ -24,13 +24,14 @@ class Reinstaller
      * The values a server owner may set, checked against the egg's own rules.
      *
      * @param  array<string, mixed>  $values
+     * @param  string[]  $keys  the variables this caller may change
      * @return array<string, string>
      *
      * @throws ValidationException
      */
-    public function validate(Server $server, array $values): array
+    public function validate(Server $server, array $values, array $keys = self::VARIABLES): array
     {
-        $values = array_map('strval', array_intersect_key($values, array_flip(self::VARIABLES)));
+        $values = array_map('strval', array_intersect_key($values, array_flip($keys)));
 
         return $this->validator->handle($server->egg_id, $values)
             ->filter(fn (object $variable) => array_key_exists($variable->key, $values))
@@ -43,10 +44,10 @@ class Reinstaller
      *
      * @param  array<string, string>  $values  already validated
      */
-    public function apply(Server $server, array $values, ?string $image = null): void
+    public function apply(Server $server, array $values, ?string $image = null, bool $reinstall = true): void
     {
         try {
-            DB::transaction(function () use ($server, $values, $image) {
+            DB::transaction(function () use ($server, $values, $image, $reinstall) {
                 $variables = EggVariable::query()
                     ->where('egg_id', $server->egg_id)
                     ->whereIn('env_variable', array_keys($values))
@@ -65,7 +66,9 @@ class Reinstaller
                     $server->forceFill(['image' => $image])->saveOrFail();
                 }
 
-                $this->reinstall->handle($server);
+                if ($reinstall) {
+                    $this->reinstall->handle($server);
+                }
             });
         } catch (\Throwable $e) {
             $server->refresh();

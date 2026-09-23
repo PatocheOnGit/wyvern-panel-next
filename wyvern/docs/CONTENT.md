@@ -96,3 +96,15 @@ Minecraft version and exact loader build the pack pins (Forge accepts an exact b
 this), switches the Java image, waits for the install, then applies the pack. It can
 empty `mods/` first and take a backup before anything else. Each step waits on the node;
 the user gets one notification at the end.
+
+## Dependencies, sorting and versions
+
+Installing from Modrinth also pulls the project's `required` dependencies, three levels
+deep, skipping any already recorded in `.wyvern/content.json`. They are fetched in the
+foreground so a missing one fails the click instead of the next boot (Chunky on Fabric
+pulled `fabric-api`). Optional dependencies are left to the user.
+
+Search takes a sort (relevance, downloads, follows, newest, updated) and, on Modrinth, a
+category from `/tag/category` filtered to the server's project type. The Versions button
+lists every file that fits the server and installs the chosen one instead of the latest;
+the modpack modal does the same and shows what a version would change before it runs.

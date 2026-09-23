@@ -76,8 +76,14 @@
             @endif
         </span>
 
+        @php
+            $summary = app(\Wyvern\Servers\GameSummary::class);
+            $software = $summary->software($server);
+            $players = $summary->players($server);
+        @endphp
+
         <span class="wy-server-card-heading">
-            <span class="wy-server-card-egg">{{ $server->egg->name }}</span>
+            <span class="wy-server-card-egg">{{ $software ?? $server->egg->name }}</span>
             <h2 class="wy-server-card-name">{{ $server->name }}</h2>
         </span>
 
@@ -114,6 +120,12 @@
             <span class="wy-server-card-host">{{ $server->allocation?->address ?? trans('server/dashboard.none') }}</span>
             @if ($uptime > 0)
                 <span class="wy-server-card-uptime">{{ $server->formatResource(ServerResourceType::Uptime) }}</span>
+            @endif
+            @if ($players !== null)
+                <span class="wy-server-card-players">
+                    <x-filament::icon icon="tabler-users" class="h-3.5 w-3.5" />
+                    {{ trans('wyvern.cards.players', ['online' => $players['online'], 'max' => $players['max']]) }}
+                </span>
             @endif
         </div>
 
