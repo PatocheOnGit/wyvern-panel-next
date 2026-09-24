@@ -20,6 +20,28 @@ class GameSummary
         private readonly MinecraftFiles $files,
     ) {}
 
+    /**
+     * The game's mark for a card: the loader's logo, served locally, or an icon.
+     *
+     * @return array{logo?: string, icon?: string}|null
+     */
+    public function emblem(Server $server): ?array
+    {
+        $loader = ServerProfile::of($server)->loader;
+
+        if ($loader !== null) {
+            return ['logo' => $loader->logo()];
+        }
+
+        $fivem = FiveMServer::of($server);
+
+        if ($fivem !== null) {
+            return ['icon' => $fivem->game() === 'redm' ? 'tabler-horse' : 'tabler-car'];
+        }
+
+        return null;
+    }
+
     /** "Paper 26.2", "FiveM · build 35245", or null for anything else. */
     public function software(Server $server): ?string
     {
@@ -42,7 +64,7 @@ class GameSummary
                 $build = null;
             }
 
-            $game = $fivem->game() === 'redm' ? 'RedM' : 'FiveM';
+            $game = $fivem->label();
 
             return $build ? $game . ' · build ' . strtok((string) $build, '-') : $game;
         }) ?: null;

@@ -50,11 +50,26 @@
         ];
     };
 
+    // A stopped server uses no CPU or memory: a dash, not a zero that reads as idle.
+    $idle = $server->retrieveStatus()->isOffline();
+    $none = ['percent' => null, 'colour' => null];
+
     $stats = [
-        ['label' => trans('server/dashboard.cpu'), 'value' => $server->formatResource(ServerResourceType::CPU, 0), 'meter' => $meter($cpuCurrent, $cpuMax)],
-        ['label' => trans('server/dashboard.memory'), 'value' => $server->formatResource(ServerResourceType::Memory), 'meter' => $meter($memCurrent, $memMax)],
+        ['label' => trans('server/dashboard.cpu'), 'value' => $idle ? '—' : $server->formatResource(ServerResourceType::CPU, 0), 'meter' => $idle ? $none : $meter($cpuCurrent, $cpuMax)],
+        ['label' => trans('server/dashboard.memory'), 'value' => $idle ? '—' : $server->formatResource(ServerResourceType::Memory), 'meter' => $idle ? $none : $meter($memCurrent, $memMax)],
         ['label' => trans('server/dashboard.disk'), 'value' => $server->formatResource(ServerResourceType::Disk), 'meter' => $meter($diskCurrent, $diskMax)],
     ];
+@endphp
+
+@php
+    $summary = app(\Wyvern\Servers\GameSummary::class);
+    $software = $summary->software($server);
+    $players = $summary->players($server);
+    $emblem = $icon ? ['logo' => $icon] : $summary->emblem($server);
+
+    // $component is read into locals first: Blade rebinds $component inside component tags.
+    $isPinned = $component->isPinned();
+    $pinLabel = trans($isPinned ? 'wyvern.pins.unpin' : 'wyvern.pins.pin');
 @endphp
 
 <div wire:poll.15s
@@ -63,40 +78,23 @@
      x-on:click="{{ $component->redirectUrl() }}"
      x-on:auxclick.prevent="if ($event.button === 1) {{ $component->redirectUrl(true) }}">
 
-    {{-- The head answers the two questions a card is scanned for: which server, and is
-         it up. The game identity is the edge and the emblem, not a picture behind the
-         title — it used to take 40% of the card and crop its own icon. --}}
+    {{-- Which server, what it runs, and the two controls, on one line. --}}
     <div class="wy-server-card-head">
         <span class="wy-server-card-emblem">
-            @if ($icon)
-                <img src="{{ $icon }}" alt="">
+            @if (isset($emblem['logo']))
+                <img src="{{ $emblem['logo'] }}" alt="">
+            @elseif (isset($emblem['icon']))
+                <x-filament::icon :icon="$emblem['icon']" class="wy-server-card-emblem-icon" style="color: {{ ServerCover::tint($server) }};" />
             @else
                 <span class="wy-server-card-initials"
                       style="color: {{ ServerCover::tint($server) }};">{{ Str::upper(Str::substr($server->name, 0, 2)) }}</span>
             @endif
         </span>
 
-        @php
-            $summary = app(\Wyvern\Servers\GameSummary::class);
-            $software = $summary->software($server);
-            $players = $summary->players($server);
-        @endphp
-
         <span class="wy-server-card-heading">
-            <span class="wy-server-card-egg">{{ $software ?? $server->egg->name }}</span>
             <h2 class="wy-server-card-name">{{ $server->name }}</h2>
+            <span class="wy-server-card-egg">{{ $software ?? $server->egg->name }}</span>
         </span>
-
-        {{-- Before the state chip so the two never swap places: the pin is a control and
-             the chip is a readout, and a control that moves is a control you misclick.
-
-             $component is read into a local first because Blade rebinds $component inside
-             a component tag — calling $component->isPinned() in the icon's attribute
-             resolves against the icon component, not this one, and throws. --}}
-        @php
-            $isPinned = $component->isPinned();
-            $pinLabel = trans($isPinned ? 'wyvern.pins.unpin' : 'wyvern.pins.pin');
-        @endphp
 
         <button
             type="button"
@@ -110,47 +108,47 @@
             <x-filament::icon :icon="$isPinned ? 'tabler-pinned-filled' : 'tabler-pin'" />
         </button>
 
-        <span class="wy-server-card-state fi-color fi-color-{{ $server->condition->getColor() }}">
-            <i class="wy-server-card-dot"></i>{{ $server->condition->getLabel() }}
-        </span>
+        @if ($actiongroup->isVisible())
+            <span class="wy-server-card-actions" x-on:click.stop>
+                {{ $actiongroup }}
+            </span>
+        @endif
     </div>
 
-    <div class="wy-server-card-body">
-        <div class="wy-server-card-meta">
-            <span class="wy-server-card-host">{{ $server->allocation?->address ?? trans('server/dashboard.none') }}</span>
+    {{-- Is it up, where, and who is on it. --}}
+    <div class="wy-server-card-status">
+        <span class="wy-server-card-state fi-color fi-color-{{ $server->condition->getColor() }}">
+            <i class="wy-server-card-dot"></i>{{ $server->condition->getLabel() }}
             @if ($uptime > 0)
                 <span class="wy-server-card-uptime">{{ $server->formatResource(ServerResourceType::Uptime) }}</span>
             @endif
-            @if ($players !== null)
-                <span class="wy-server-card-players">
-                    <x-filament::icon icon="tabler-users" class="h-3.5 w-3.5" />
-                    {{ trans('wyvern.cards.players', ['online' => $players['online'], 'max' => $players['max']]) }}
-                </span>
-            @endif
-        </div>
-
-        @if ($server->description)
-            <p class="wy-server-card-description">{{ Str::limit($server->description, 64, preserveWords: true) }}</p>
+        </span>
+        <span class="wy-server-card-host">{{ $server->allocation?->address ?? trans('server/dashboard.none') }}</span>
+        @if ($players !== null)
+            <span class="wy-server-card-players">
+                <x-filament::icon icon="tabler-users" class="h-3.5 w-3.5" />
+                {{ $players['online'] }}/{{ $players['max'] }}
+            </span>
         @endif
+    </div>
 
-        <div class="wy-server-card-stats">
-            @foreach ($stats as $stat)
-                <div class="wy-server-card-stat">
+    @if ($server->description)
+        <p class="wy-server-card-description">{{ Str::limit($server->description, 80, preserveWords: true) }}</p>
+    @endif
+
+    <div class="wy-server-card-stats">
+        @foreach ($stats as $stat)
+            <div class="wy-server-card-stat">
+                <span class="wy-server-card-stat-head">
                     <span class="wy-server-card-stat-label">{{ $stat['label'] }}</span>
                     <span class="wy-server-card-stat-value">{{ $stat['value'] }}</span>
-                    @if ($stat['meter']['percent'] !== null)
-                        <span class="wy-server-card-meter"><i style="width: {{ $stat['meter']['percent'] }}%; background: {{ $stat['meter']['colour'] }};"></i></span>
-                    @else
-                        <span class="wy-server-card-meter wy-server-card-meter-unmetered"></span>
-                    @endif
-                </div>
-            @endforeach
-        </div>
-
-        @if ($actiongroup->isVisible())
-            <div class="wy-server-card-actions" x-on:click.stop>
-                {{ $actiongroup }}
+                </span>
+                @if ($stat['meter']['percent'] !== null)
+                    <span class="wy-server-card-meter"><i style="width: {{ $stat['meter']['percent'] }}%; background: {{ $stat['meter']['colour'] }};"></i></span>
+                @else
+                    <span class="wy-server-card-meter wy-server-card-meter-unmetered"></span>
+                @endif
             </div>
-        @endif
+        @endforeach
     </div>
 </div>

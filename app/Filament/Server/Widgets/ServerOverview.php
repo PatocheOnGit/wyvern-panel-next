@@ -2,67 +2,50 @@
 
 namespace App\Filament\Server\Widgets;
 
-use App\Filament\Server\Components\SmallStatBlock;
 use App\Models\Server;
 use Carbon\CarbonInterface;
-use Filament\Widgets\StatsOverviewWidget;
+use Filament\Widgets\Widget;
 use Wyvern\Servers\GameSummary;
 
-class ServerOverview extends StatsOverviewWidget
+/** Wyvern: one card above the console, a status line and three meters, instead of eight blocks. */
+class ServerOverview extends Widget
 {
-    protected ?string $pollingInterval = '1s';
+    protected string $view = 'filament.server.widgets.server-overview';
+
+    protected int|string|array $columnSpan = 'full';
 
     public ?Server $server = null;
 
-    protected function getStats(): array
+    /** @return array<string, mixed> */
+    protected function getViewData(): array
     {
-        $cpu = $this->cpu();
-        $memory = $this->memory();
-        $disk = $this->disk();
-
-        // Wyvern: what the server runs and who is on it, for the games it knows.
         $summary = app(GameSummary::class);
         $software = $summary->software($this->server);
-        $players = $software !== null ? $summary->players($this->server) : null;
 
-        return array_values(array_filter([
-            SmallStatBlock::make(trans('server/console.labels.name'), $this->server->name)
-                ->copyable(),
-            SmallStatBlock::make(trans('server/console.labels.status'), $this->status()),
-            SmallStatBlock::make(trans('server/console.labels.address'), $this->server?->allocation->address ?? 'None')
-                ->copyable(),
-            $software !== null ? SmallStatBlock::make(trans('wyvern.cards.software'), $software) : null,
-            $software !== null ? SmallStatBlock::make(trans('wyvern.cards.players_label'), $players ? $players['online'] . ' / ' . $players['max'] : '—')
-                ->ratio($players && $players['max'] > 0 ? $players['online'] / $players['max'] : null) : null,
-            SmallStatBlock::make(trans('server/console.labels.cpu'), $cpu['value'])
-                ->ratio($cpu['ratio']),
-            SmallStatBlock::make(trans('server/console.labels.memory'), $memory['value'])
-                ->ratio($memory['ratio']),
-            SmallStatBlock::make(trans('server/console.labels.disk'), $disk['value'])
-                ->ratio($disk['ratio']),
-        ]));
+        return [
+            'condition' => $this->server->condition,
+            'uptime' => $this->uptime(),
+            'address' => $this->server->allocation?->address,
+            'software' => $software,
+            'players' => $software !== null ? $summary->players($this->server) : null,
+            'meters' => [
+                trans('server/console.labels.cpu') => $this->cpu(),
+                trans('server/console.labels.memory') => $this->memory(),
+                trans('server/console.labels.disk') => $this->disk(),
+            ],
+        ];
     }
 
-    private function status(): string
+    private function uptime(): ?string
     {
-        $status = $this->server->condition->getLabel();
         $uptime = collect(cache()->get("servers.{$this->server->id}.uptime"))->last() ?? 0;
 
-        if ($uptime === 0) {
-            return $status;
-        }
-
-        $uptime = now()->subMillis($uptime)->diffForHumans(syntax: CarbonInterface::DIFF_ABSOLUTE, short: true, parts: 2);
-
-        return "$status ($uptime)";
+        return $uptime === 0 ? null : now()->subMillis($uptime)->diffForHumans(syntax: CarbonInterface::DIFF_ABSOLUTE, short: true, parts: 2);
     }
 
     /**
-     * An em dash rather than the word "Offline".
-     *
-     * These three blocks sit next to a Status block that already says the server is off,
-     * so repeating it three times spent the only line each block has on something
-     * already known — and it read as a measurement, which it is not.
+     * An em dash rather than the word "Offline": the status line already says so, and a
+     * dash does not read as a measurement.
      *
      * @return array{value: string, ratio: float|null}
      */
@@ -110,9 +93,7 @@ class ServerOverview extends StatsOverviewWidget
     {
         $used = collect(cache()->get("servers.{$this->server->id}.disk_bytes"))->last(default: 0);
 
-        // Disk is the one figure the daemon keeps reporting for a stopped server, so it
-        // is not gated on status — but a zero here means it has not reported yet, which
-        // is different from a server using no disk.
+        // The daemon keeps reporting disk for a stopped server; zero means no report yet.
         if ($used === 0) {
             return ['value' => trans('server/console.labels.unavailable'), 'ratio' => null];
         }
