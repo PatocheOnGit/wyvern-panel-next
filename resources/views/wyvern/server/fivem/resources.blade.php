@@ -1,14 +1,19 @@
 @php
     $rows = $this->rows();
-    $txadmin = $this->fivem()->usesTxAdmin();
+    $layout = $this->layout();
 @endphp
 
 <x-filament-panels::page>
     <div class="wy-content">
-        @if ($txadmin)
+        @if ($layout->pending)
             <div class="wy-page-note">
                 <x-filament::icon icon="tabler-info-circle" class="h-5 w-5" />
-                <p>{{ trans('wyvern.fivem.resources.txadmin_note') }}</p>
+                <p>{{ trans('wyvern.fivem.txadmin.pending') }}</p>
+            </div>
+        @elseif ($this->fivem()->usesTxAdmin())
+            <div class="wy-page-note">
+                <x-filament::icon icon="tabler-info-circle" class="h-5 w-5" />
+                <p>{{ trans('wyvern.fivem.txadmin.deployment', ['path' => $layout->root]) }}</p>
             </div>
         @endif
 

@@ -549,6 +549,15 @@
 
 /* ---- shared page furniture ------------------------------------------- */
 
+.wy-version-notes {
+    display: grid;
+    gap: 0.4rem;
+    padding-left: 1.1rem;
+    list-style: disc;
+    font-size: 0.875rem;
+    color: var(--wy-muted);
+}
+
 .wy-page-note {
     display: flex;
     align-items: center;

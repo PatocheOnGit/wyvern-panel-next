@@ -40,9 +40,25 @@ final readonly class FiveMServer
         return ($this->env['TXHOST_GAME_NAME'] ?? 'fivem') === 'redm' ? 'redm' : 'fivem';
     }
 
+    /** FiveM for GTA V Enhanced runs the new cfx-server, with its own artifacts and convars. */
+    public function enhanced(): bool
+    {
+        return ($this->env['FIVEM_PLATFORM'] ?? 'legacy') === 'enhanced';
+    }
+
+    /** txAdmin does not start on Enhanced for Linux yet, so the start script skips it there. */
     public function usesTxAdmin(): bool
     {
-        return in_array(strtolower($this->env['TXADMIN_ENABLE'] ?? '0'), ['1', 'true'], true);
+        return !$this->enhanced() && in_array(strtolower($this->env['TXADMIN_ENABLE'] ?? '0'), ['1', 'true'], true);
+    }
+
+    public function label(): string
+    {
+        return match (true) {
+            $this->game() === 'redm' => 'RedM',
+            $this->enhanced() => 'FiveM Enhanced',
+            default => 'FiveM',
+        };
     }
 
     public function txAdminPort(): ?int

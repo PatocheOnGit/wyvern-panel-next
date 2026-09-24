@@ -5,12 +5,14 @@ namespace Wyvern\FiveM;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
-/** Cfx.re's Linux server artifacts: the four channels and every published build. */
+/** Cfx.re's Linux server artifacts: the four legacy channels, every legacy build, and Enhanced. */
 class Artifacts
 {
     private const CHANGELOG = 'https://changelogs-live.fivem.net/api/changelog/versions/linux/server';
 
     private const LISTING = 'https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/';
+
+    private const DOWNLOADS = 'https://docs.fivem.net/docs/server-download/';
 
     public const CHANNELS = ['recommended', 'optional', 'latest', 'critical'];
 
@@ -29,6 +31,30 @@ class Artifacts
 
             return $channels;
         });
+    }
+
+    /**
+     * The one FiveM Enhanced build Cfx.re publishes, read from its download page as the egg does.
+     *
+     * @return array{build: string, url: string}|null
+     */
+    public function enhanced(): ?array
+    {
+        $data = Cache::remember('wyvern.fivem.enhanced', now()->addMinutes(30), function (): array {
+            $html = Http::timeout(10)->get(self::DOWNLOADS)->body();
+
+            if (!preg_match('#<script id="__NEXT_DATA__"[^>]*>(.*?)</script>#s', $html, $m)) {
+                return [];
+            }
+
+            $linux = json_decode($m[1], true)['props']['pageProps']['enhanced']['linux'][0] ?? null;
+
+            return is_array($linux) && isset($linux['downloadURL'])
+                ? ['build' => (string) preg_replace('/\D+/', '', (string) ($linux['subtitle'] ?? '')), 'url' => (string) $linux['downloadURL']]
+                : [];
+        });
+
+        return $data === [] ? null : $data;
     }
 
     /** @return list<string> "35945-0d8a2a…", newest first */

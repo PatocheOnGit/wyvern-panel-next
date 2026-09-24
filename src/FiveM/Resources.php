@@ -2,10 +2,9 @@
 
 namespace Wyvern\FiveM;
 
-use App\Models\Server;
 use App\Repositories\Daemon\DaemonFileRepository;
 
-/** The resources under resources/, found by their manifest files in one Wings search each. */
+/** The resources in the game server's resources/, found by their manifest files in one Wings search each. */
 class Resources
 {
     public function __construct(private readonly DaemonFileRepository $files) {}
@@ -14,21 +13,23 @@ class Resources
      * @param  list<string>  $ensured  names and [categories] from server.cfg
      * @return list<array{name: string, path: string, category: ?string, ensured: bool, via: ?string, origin: string}>
      */
-    public function list(Server $server, array $ensured): array
+    public function list(FiveMServer $fivem, Layout $layout, array $ensured): array
     {
+        $server = $fivem->server;
         $repo = $this->files->setServer($server);
+        $base = $layout->resources();
         $found = [];
 
         foreach (['fxmanifest.lua', '__resource.lua'] as $manifest) {
             try {
-                $entries = $repo->search($manifest, '/resources');
+                $entries = $repo->search($manifest, $base);
             } catch (\Throwable) {
                 $entries = [];
             }
 
             foreach (is_array($entries) ? $entries : [] as $entry) {
                 $path = dirname('/' . ltrim((string) ($entry['name'] ?? ''), '/'));
-                if (basename((string) ($entry['name'] ?? '')) === $manifest && str_starts_with($path, '/resources/')) {
+                if (basename((string) ($entry['name'] ?? '')) === $manifest && str_starts_with($path, $base . '/')) {
                     $found[$path] = true;
                 }
             }
@@ -39,7 +40,7 @@ class Resources
 
         foreach (array_keys($found) as $path) {
             $name = basename($path);
-            $categories = array_values(array_filter(explode('/', dirname($path)), fn ($p) => str_starts_with($p, '[')));
+            $categories = array_values(array_filter(explode('/', dirname(substr($path, strlen($base)))), fn ($p) => str_starts_with($p, '[')));
             // "ensure [gameplay]" starts every resource under that category.
             $via = collect($categories)->first(fn ($c) => in_array(strtolower($c), $lower, true));
 
@@ -57,9 +58,14 @@ class Resources
 
         // Ensured but not in resources/: shipped inside the artifact, or simply missing.
         $present = array_map('strtolower', array_column($rows, 'name'));
-        $builtin = $this->systemResources($server);
+        $builtin = $this->systemResources($fivem);
 
         foreach ($ensured as $name) {
+            // The console bridge the egg adds under txAdmin; stopping it would cut the console off.
+            if (strcasecmp($name, 'wyvern-console') === 0) {
+                continue;
+            }
+
             if (!str_starts_with($name, '[') && !in_array(strtolower($name), $present, true)) {
                 $rows[] = [
                     'name' => $name,
@@ -75,11 +81,13 @@ class Resources
         return $rows;
     }
 
-    /** @return list<string> resources FXServer ships in citizen/system_resources */
-    private function systemResources(Server $server): array
+    /** @return list<string> resources the artifact ships in its system_resources */
+    private function systemResources(FiveMServer $fivem): array
     {
+        $dir = $fivem->enhanced() ? '/alpine/opt/cfx-server/system_resources' : '/alpine/opt/cfx-server/citizen/system_resources';
+
         try {
-            $entries = $this->files->setServer($server)->getDirectory('/alpine/opt/cfx-server/citizen/system_resources');
+            $entries = $this->files->setServer($fivem->server)->getDirectory($dir);
         } catch (\Throwable) {
             return [];
         }

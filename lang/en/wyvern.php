@@ -101,6 +101,8 @@ return [
         'players' => ':online/:max players',
         'players_label' => 'Players',
         'software' => 'Software',
+        'copy_address' => 'Copy the address',
+        'copied' => 'Copied',
     ],
 
     'permissions' => [
@@ -544,15 +546,38 @@ return [
             'exact' => 'Exact build',
             'exact_help' => 'Every Linux artifact Cfx.re publishes, newest first. A channel follows whatever it points to at each reinstall; a build stays put.',
             'plan' => 'Will install build :build.',
+            'plan_enhanced' => 'Will install FiveM Enhanced build :build.',
+            'platform' => 'Platform',
+            'platform_help' => 'FiveM for GTA V Enhanced is a separate platform, in early access. Players need the Enhanced game to join it.',
+            'platforms' => [
+                'legacy' => 'FiveM',
+                'enhanced' => 'FiveM Enhanced',
+            ],
+            'platform_summaries' => [
+                'legacy' => 'GTA V Legacy · FXServer · txAdmin',
+                'enhanced' => 'GTA V Enhanced · Cfx Server · early access',
+            ],
+            'switch_platform' => 'This switches the platform: players then need the matching game to join.',
+            'enhanced_build' => 'Enhanced build',
+            'enhanced_help' => 'Cfx.re publishes one Enhanced build at a time; it is build :build today. Reinstall later to take a newer one.',
+            'enhanced_unknown' => 'Cfx.re\'s download page did not answer, so the current build is unknown. The install fetches whatever it lists.',
+            'enhanced_notes' => [
+                'txAdmin does not start on Enhanced for Linux yet: the server runs server.cfg directly.',
+                'OneSync and pure mode are always on; only the latest game build, or 1 for the base game, is supported.',
+                'Every resource needs lua54 \'yes\' in its fxmanifest.lua, C# resources must be rebuilt for .NET 10, and escrowed resources do not run yet.',
+            ],
         ],
 
         'config' => [
             'title' => 'server.cfg',
             'failed' => 'Could not save',
             'missing' => 'This server has no server.cfg yet. Reinstall it and the egg writes one.',
-            'txadmin_note' => 'txAdmin runs this server, and it starts from the server.cfg of its own deployment in txData. Changes here apply only when txAdmin is off.',
-            'managed' => 'The name, slots, OneSync and the keys are egg variables: Wyvern writes them into server.cfg on every start. Everything else here is the file itself.',
+            'managed' => 'The name, slots and OneSync are server settings: they are kept in server.cfg and passed to the server on every start. Everything else here is the file itself.',
+            'managed_txadmin' => 'Everything here is the server.cfg txAdmin starts the server with. OneSync is set in txAdmin\'s own settings.',
+            'enhanced_note' => 'FiveM Enhanced always runs OneSync and pure mode, and supports only the latest game build or the base game.',
             'default_build' => 'Default (no DLC enforced)',
+            'latest_build' => 'Latest (default)',
+            'base_build' => '1 · Base game, no DLC',
             'groups' => [
                 'listing' => 'Server listing',
                 'game' => 'Game',
@@ -573,7 +598,6 @@ return [
                 'pure_level' => 'Pure mode',
                 'script_hook' => 'Allow ScriptHook',
                 'rcon' => 'RCON password',
-                'endpoint_privacy' => 'Hide player IPs',
                 'mysql' => 'MySQL connection string',
             ],
             'help' => [
@@ -582,9 +606,9 @@ return [
                 'listed' => 'Off keeps the server out of the public list; players join by address.',
                 'slots' => '48 without OneSync. Up to 2048 with OneSync on, depending on your Cfx.re key.',
                 'game_build' => 'Forces a DLC level on every player. Newer builds unlock newer vehicles and maps.',
+                'game_build_enhanced' => 'Enhanced plays the latest game build; 1 keeps to the base game without DLC.',
                 'script_hook' => 'Lets players run ScriptHookV menus. Leave off on a public server.',
                 'rcon' => 'Empty turns RCON off.',
-                'endpoint_privacy' => 'Keeps player IP addresses out of logs and players.json.',
                 'mysql' => 'Used by oxmysql and mysql-async, as ESX and QBCore expect.',
             ],
             'onesync' => [
@@ -626,7 +650,6 @@ return [
             'next_start' => 'Takes effect at the next start.',
             'deleted' => ':name deleted',
             'delete_confirm' => 'Delete the :name resource and its files?',
-            'txadmin_note' => 'txAdmin runs this server from its own server.cfg in txData, so starting or stopping a resource here applies only when txAdmin is off.',
         ],
 
         'players' => [
@@ -646,6 +669,8 @@ return [
             'allocation_help' => 'One of this server\'s allocations. Ask for one more if the list is empty.',
             'use_port' => 'Use this port',
             'port_set' => 'txAdmin will listen on :port',
+            'pending' => 'txAdmin is not set up yet. Open txAdmin, finish its setup, and this page then works on the server it deployed.',
+            'deployment' => 'txAdmin runs this server, so this page works on its deployment: :path.'
         ],
     ],
 

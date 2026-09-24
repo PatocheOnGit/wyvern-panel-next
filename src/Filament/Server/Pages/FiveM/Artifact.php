@@ -21,7 +21,7 @@ use Wyvern\Jobs\ChangeServerJob;
 use Wyvern\Minecraft\Files\MinecraftFiles;
 use Wyvern\Minecraft\Reinstaller;
 
-/** Pick the FXServer artifact: a channel, or an exact build. */
+/** Pick the platform, then the artifact: a legacy channel or exact build, or the current Enhanced build. */
 class Artifact extends Page
 {
     use FiveMPage;
@@ -37,6 +37,8 @@ class Artifact extends Page
     protected string $view = 'wyvern.server.fivem.artifact';
 
     public string $choice = 'recommended';
+
+    public string $platform = 'legacy';
 
     protected Artifacts $artifacts;
 
@@ -54,6 +56,26 @@ class Artifact extends Page
     public function mount(): void
     {
         $this->choice = $this->fivem()->env['FIVEM_VERSION'] ?? 'recommended';
+        $this->platform = $this->fivem()->enhanced() ? 'enhanced' : 'legacy';
+    }
+
+    /** @return array{build: string, url: string}|null */
+    public function enhanced(): ?array
+    {
+        return $this->artifacts->enhanced();
+    }
+
+    /** Enhanced is GTA V only. */
+    public function offersEnhanced(): bool
+    {
+        return $this->fivem()->game() === 'fivem';
+    }
+
+    public function choosePlatform(string $platform): void
+    {
+        if ($platform === 'legacy' || ($platform === 'enhanced' && $this->offersEnhanced())) {
+            $this->platform = $platform;
+        }
     }
 
     /** @return array<string, array{build: string, txadmin: ?string}> */
@@ -96,13 +118,14 @@ class Artifact extends Page
             ->button()
             ->requiresConfirmation()
             ->modalHeading(trans('wyvern.version.actions.confirm_heading'))
-            ->modalDescription(trans('wyvern.fivem.artifact.confirm'))
+            ->modalDescription(fn () => trans('wyvern.fivem.artifact.confirm')
+                . ($this->platform !== ($this->fivem()->enhanced() ? 'enhanced' : 'legacy') ? ' ' . trans('wyvern.fivem.artifact.switch_platform') : ''))
             ->schema([BackupToggle::make($this->server())])
             ->action(function (array $data) {
                 $server = $this->server();
 
                 try {
-                    $values = $this->reinstaller->validate($server, ['FIVEM_VERSION' => $this->choice], ['FIVEM_VERSION']);
+                    $values = $this->reinstaller->validate($server, ['FIVEM_PLATFORM' => $this->platform, 'FIVEM_VERSION' => $this->choice], ['FIVEM_PLATFORM', 'FIVEM_VERSION']);
                 } catch (ValidationException $e) {
                     Notification::make()->title(trans('wyvern.version.notifications.failed'))->body($e->validator->errors()->first())->danger()->send();
 
@@ -124,10 +147,11 @@ class Artifact extends Page
                     return;
                 }
 
-                Activity::event('server:wyvern.fivem.artifact')->property('artifact', $this->choice)->log();
+                $artifact = $this->platform === 'enhanced' ? 'Enhanced ' . ($this->enhanced()['build'] ?? '') : $this->choice;
+                Activity::event('server:wyvern.fivem.artifact')->property('artifact', trim($artifact))->log();
 
                 Notification::make()
-                    ->title(trans('wyvern.fivem.artifact.started', ['artifact' => $this->choice]))
+                    ->title(trans('wyvern.fivem.artifact.started', ['artifact' => trim($artifact)]))
                     ->body(trans('wyvern.version.notifications.started_body'))
                     ->success()
                     ->send();

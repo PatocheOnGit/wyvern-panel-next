@@ -57,6 +57,31 @@ final class ServerCfg
         }
     }
 
+    /** A convar written either way: "sv_maxclients 48" or "set sv_maxclients 48". */
+    public function convar(string $name): ?string
+    {
+        return $this->get('set ' . $name) ?? $this->get($name);
+    }
+
+    /** Always as "set name value": Enhanced has no bare-convar commands. */
+    public function setConvar(string $name, string $value): void
+    {
+        if ($this->has($name) && !$this->has('set ' . $name)) {
+            $this->lines[(int) $this->index($name)] = 'set ' . $name . ' ' . self::quote($value);
+
+            return;
+        }
+
+        $this->remove($name);
+        $this->set('set ' . $name, $value);
+    }
+
+    public function removeConvar(string $name): void
+    {
+        $this->remove($name);
+        $this->remove('set ' . $name);
+    }
+
     public function remove(string $key): void
     {
         $this->lines = array_values(array_filter(
